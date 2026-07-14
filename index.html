@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b2740">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://worldcup26.ir http://127.0.0.1:4174; base-uri 'self'; form-action 'self'"
+    >
+    <meta name="description" content="Explore World Cup 2026 venues, fixtures, teams, and groups through five focused views.">
+    <title>World Cup 2026 Matchday Atlas</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/styles.css">
+    <script type="module" src="js/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header class="site-header">
+      <a class="brand" href="#tour" aria-label="World Cup 2026 Matchday Atlas home">
+        <span class="brand__year" aria-hidden="true">26</span>
+        <span class="brand__name">Matchday<br>Atlas</span>
+      </a>
+      <p class="site-header__edition">North America · 16 host cities</p>
+      <div id="test-mode-badge" class="test-badge" hidden>Test mode</div>
+    </header>
+
+    <nav class="route-nav" aria-label="World Cup views">
+      <p class="route-nav__label" aria-hidden="true">Choose a gate</p>
+      <ol class="route-nav__track">
+        <li><a data-route="tour" href="#tour"><span>01</span>Tour</a></li>
+        <li><a data-route="agenda" href="#agenda"><span>02</span>Agenda</a></li>
+        <li><a data-route="timeline" href="#timeline"><span>03</span>Timeline</a></li>
+        <li><a data-route="fan-dashboard" href="#fan-dashboard"><span>04</span>Fan dashboard</a></li>
+        <li><a data-route="group-matrix" href="#group-matrix"><span>05</span>Group matrix</a></li>
+      </ol>
+    </nav>
+
+    <main id="main-content" tabindex="-1">
+      <section class="hero" aria-labelledby="view-title">
+        <div class="hero__copy">
+          <p id="view-marker" class="hero__marker">Gate 01</p>
+          <h1 id="view-title">Virtual venue tour</h1>
+          <p id="view-description" class="hero__description">Cross the continent through every host stadium and the matches played there.</p>
+        </div>
+        <div class="hero__scoreboard" aria-hidden="true">
+          <span>CAN</span><strong>·</strong><span>MEX</span><strong>·</strong><span>USA</span>
+        </div>
+      </section>
+
+      <section class="module-stage" aria-labelledby="module-heading">
+        <header class="module-stage__header">
+          <div>
+            <p class="eyebrow">Current view</p>
+            <h2 id="module-heading">Venue map and match list</h2>
+          </div>
+          <span id="module-status" class="stage-status">Shell ready</span>
+        </header>
+        <div id="module-placeholder" class="module-placeholder">
+          <p class="module-placeholder__label">This gate is being prepared</p>
+          <p id="module-next-step">Venue cards and their linked fixtures will appear here.</p>
+        </div>
+        <div id="tour-view" class="tour-view" hidden>
+          <ul id="tour-venue-list" class="venue-grid" aria-label="World Cup 2026 host venues"></ul>
+          <div id="tour-venue-detail" class="venue-detail" role="status" aria-live="polite">
+            <p class="venue-detail__hint">Select a venue to see its matches.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section id="session-panel" class="session-panel" aria-labelledby="session-title" hidden>
+      <div class="session-panel__intro">
+        <p class="eyebrow">Secure access</p>
+        <h2 id="session-title">Sign in to load live match data</h2>
+        <p id="session-copy">Your atlas stays open while you sign in.</p>
+      </div>
+      <form id="login-form" class="login-form">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="username" required>
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <button id="login-button" type="submit">Sign in</button>
+      </form>
+      <p id="login-status" class="login-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <div id="app-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <footer class="site-footer">
+      <p>World Cup 2026 · Five views, one matchday.</p>
+      <p>Live data requires an authenticated API session.</p>
+    </footer>
+  </body>
+</html>

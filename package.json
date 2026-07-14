@@ -1,0 +1,11 @@
+{
+  "name": "wc26-resilience-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node tools/app-server.mjs",
+    "test:server": "node tools/test-server.mjs",
+    "test": "node --test"
+  }
+}
