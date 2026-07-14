@@ -4,6 +4,7 @@ import { describeLoginError } from './login-feedback.js';
 import { createInitialViewState, normalizeRoute, reduceViewState } from './router.js';
 import { createSessionStore } from './session.js';
 import { createTourView } from './tour-view.js';
+import { createAgendaView } from './agenda-view.js';
 import { createShellView } from './ui.js';
 
 const session = createSessionStore(window.sessionStorage);
@@ -30,9 +31,11 @@ const api = createApiClient({
 });
 
 const tourView = createTourView(document, api);
+const agendaView = createAgendaView(document, api);
 
-function loadTourIfActive() {
+function loadActiveModule() {
   if (state.route === 'tour') tourView.ensureLoaded();
+  if (state.route === 'agenda') agendaView.ensureLoaded();
 }
 
 async function handleLogin(credentials) {
@@ -40,9 +43,10 @@ async function handleLogin(credentials) {
   try {
     await api.authenticate(credentials);
     tourView.reset();
+    agendaView.reset();
     update({ type: 'LOGIN_SUCCEEDED' }, { announceMessage: 'Signed in. Live match data is available.' });
     view.focusCurrentView();
-    loadTourIfActive();
+    loadActiveModule();
   } catch (error) {
     update({ type: 'LOGIN_FAILED', message: describeLoginError(error) });
   }
@@ -50,9 +54,9 @@ async function handleLogin(credentials) {
 
 view = createShellView(document, { onLogin: handleLogin });
 view.render(state);
-loadTourIfActive();
+loadActiveModule();
 
 window.addEventListener('hashchange', () => {
   update({ type: 'NAVIGATED', route: normalizeRoute(window.location.hash) }, { announce: true });
-  loadTourIfActive();
+  loadActiveModule();
 });

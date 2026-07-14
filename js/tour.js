@@ -4,7 +4,6 @@ function crossReferenceVenues(stadiums, games, gamesFailed) {
     id: stadium.id,
     name: stadium.name,
     city: stadium.city,
-    capacity: stadium.capacity,
     games: Object.freeze(gameList.filter((game) => game.stadiumId === stadium.id)),
     gamesError: gamesFailed
   }));
@@ -15,6 +14,7 @@ export function createInitialTourState() {
     status: 'idle',
     venues: [],
     gamesFailed: false,
+    stadiumsFailed: false,
     selectedVenueId: null
   });
 }
@@ -22,13 +22,14 @@ export function createInitialTourState() {
 export function reduceTourState(state, action) {
   switch (action?.type) {
     case 'LOAD_STARTED':
-      return state.status === 'idle' ? Object.freeze({ ...state, status: 'loading' }) : state;
+      return Object.freeze({ ...state, status: 'loading' });
     case 'DATA_LOADED':
       return Object.freeze({
         ...state,
         status: 'loaded',
         venues: crossReferenceVenues(action.stadiums ?? [], action.games ?? [], Boolean(action.gamesFailed)),
-        gamesFailed: Boolean(action.gamesFailed)
+        gamesFailed: Boolean(action.gamesFailed),
+        stadiumsFailed: Boolean(action.stadiumsFailed)
       });
     case 'VENUE_SELECTED':
       return state.selectedVenueId === action.venueId

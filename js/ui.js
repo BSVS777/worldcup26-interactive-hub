@@ -1,3 +1,4 @@
+import { requireElement } from './dom.js';
 import { MODULE_ROUTES } from './router.js';
 
 const MODULE_COPY = Object.freeze({
@@ -28,30 +29,25 @@ const MODULE_COPY = Object.freeze({
   })
 });
 
-function requireElement(document, id) {
-  const element = document.getElementById(id);
-  if (!element) throw new Error(`Missing shell element: ${id}`);
-  return element;
-}
-
 export function createShellView(document, { onLogin }) {
   const elements = {
-    viewMarker: requireElement(document, 'view-marker'),
-    viewTitle: requireElement(document, 'view-title'),
-    viewDescription: requireElement(document, 'view-description'),
-    moduleHeading: requireElement(document, 'module-heading'),
-    moduleNextStep: requireElement(document, 'module-next-step'),
-    modulePlaceholder: requireElement(document, 'module-placeholder'),
-    tourView: requireElement(document, 'tour-view'),
-    moduleStatus: requireElement(document, 'module-status'),
-    testBadge: requireElement(document, 'test-mode-badge'),
-    sessionPanel: requireElement(document, 'session-panel'),
-    sessionTitle: requireElement(document, 'session-title'),
-    sessionCopy: requireElement(document, 'session-copy'),
-    loginForm: requireElement(document, 'login-form'),
-    loginButton: requireElement(document, 'login-button'),
-    loginStatus: requireElement(document, 'login-status'),
-    appStatus: requireElement(document, 'app-status')
+    viewMarker: requireElement(document, 'view-marker', 'shell element'),
+    viewTitle: requireElement(document, 'view-title', 'shell element'),
+    viewDescription: requireElement(document, 'view-description', 'shell element'),
+    moduleHeading: requireElement(document, 'module-heading', 'shell element'),
+    moduleNextStep: requireElement(document, 'module-next-step', 'shell element'),
+    modulePlaceholder: requireElement(document, 'module-placeholder', 'shell element'),
+    tourView: requireElement(document, 'tour-view', 'shell element'),
+    agendaView: requireElement(document, 'agenda-view', 'shell element'),
+    moduleStatus: requireElement(document, 'module-status', 'shell element'),
+    testBadge: requireElement(document, 'test-mode-badge', 'shell element'),
+    sessionPanel: requireElement(document, 'session-panel', 'shell element'),
+    sessionTitle: requireElement(document, 'session-title', 'shell element'),
+    sessionCopy: requireElement(document, 'session-copy', 'shell element'),
+    loginForm: requireElement(document, 'login-form', 'shell element'),
+    loginButton: requireElement(document, 'login-button', 'shell element'),
+    loginStatus: requireElement(document, 'login-status', 'shell element'),
+    appStatus: requireElement(document, 'app-status', 'shell element')
   };
   const routeLinks = [...document.querySelectorAll('[data-route]')];
 
@@ -76,8 +72,10 @@ export function createShellView(document, { onLogin }) {
     elements.testBadge.hidden = !state.testMode;
 
     const isTour = route.id === 'tour';
-    elements.modulePlaceholder.hidden = isTour;
+    const isAgenda = route.id === 'agenda';
+    elements.modulePlaceholder.hidden = isTour || isAgenda;
     elements.tourView.hidden = !isTour;
+    elements.agendaView.hidden = !isAgenda;
 
     for (const link of routeLinks) {
       if (link.dataset.route === route.id) link.setAttribute('aria-current', 'page');
@@ -102,7 +100,7 @@ export function createShellView(document, { onLogin }) {
   }
 
   function focusSession() {
-    const email = requireElement(document, 'email');
+    const email = requireElement(document, 'email', 'shell element');
     email.focus();
   }
 

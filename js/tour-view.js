@@ -1,18 +1,22 @@
+import { requireElement } from './dom.js';
 import { createInitialTourState, reduceTourState } from './tour.js';
-
-function requireElement(document, id) {
-  const element = document.getElementById(id);
-  if (!element) throw new Error(`Missing tour element: ${id}`);
-  return element;
-}
+import { createLoadableView, formatScore } from './loadable-view.js';
 
 export function createTourView(document, api) {
   const elements = {
-    list: requireElement(document, 'tour-venue-list'),
-    detail: requireElement(document, 'tour-venue-detail')
+    list: requireElement(document, 'tour-venue-list', 'tour element'),
+    detail: requireElement(document, 'tour-venue-detail', 'tour element')
   };
   let state = createInitialTourState();
-  let loadPromise = null;
+  const loadable = createLoadableView(api);
+
+  function paragraph(className, text, attrs = {}) {
+    const p = document.createElement('p');
+    p.className = className;
+    p.textContent = text;
+    for (const [name, value] of Object.entries(attrs)) p.setAttribute(name, value);
+    return p;
+  }
 
   function createVenueCard(venue) {
     const item = document.createElement('li');
@@ -46,28 +50,21 @@ export function createTourView(document, api) {
   }
 
   function renderFatalError(message) {
-    const error = document.createElement('p');
-    error.className = 'venue-detail__error';
-    error.setAttribute('role', 'alert');
-    error.textContent = message;
-    elements.list.replaceChildren(error);
+    elements.list.replaceChildren(paragraph('venue-detail__error', message, { role: 'alert' }));
   }
 
   function renderDetail(venue) {
     if (!venue) {
-      const hint = document.createElement('p');
-      hint.className = 'venue-detail__hint';
-      hint.textContent = 'Select a venue to see its matches.';
-      elements.detail.replaceChildren(hint);
+      elements.detail.replaceChildren(paragraph('venue-detail__hint', 'Select a venue to see its matches.'));
       return;
     }
 
     if (venue.gamesError) {
-      const error = document.createElement('p');
-      error.className = 'venue-detail__error';
-      error.setAttribute('role', 'alert');
-      error.textContent = `Match data for ${venue.name} is unavailable right now. Try another venue or refresh later.`;
-      elements.detail.replaceChildren(error);
+      elements.detail.replaceChildren(paragraph(
+        'venue-detail__error',
+        `Match data for ${venue.name} is unavailable right now. Try another venue or refresh later.`,
+        { role: 'alert' }
+      ));
       return;
     }
 
@@ -75,10 +72,7 @@ export function createTourView(document, api) {
     heading.textContent = venue.name;
 
     if (venue.games.length === 0) {
-      const hint = document.createElement('p');
-      hint.className = 'venue-detail__hint';
-      hint.textContent = `No matches are scheduled for ${venue.name} yet.`;
-      elements.detail.replaceChildren(heading, hint);
+      elements.detail.replaceChildren(heading, paragraph('venue-detail__hint', `No matches are scheduled for ${venue.name} yet.`));
       return;
     }
 
@@ -90,9 +84,7 @@ export function createTourView(document, api) {
       const date = document.createElement('span');
       date.textContent = game.localDate ?? 'Date to be confirmed';
       const score = document.createElement('span');
-      score.textContent = game.played && game.homeScore !== null && game.awayScore !== null
-        ? `${game.homeScore} – ${game.awayScore}`
-        : 'Not played yet';
+      score.textContent = formatScore(game);
       row.append(date, score);
       list.append(row);
     }
@@ -111,7 +103,9 @@ export function createTourView(document, api) {
   }
 
   function selectVenue(venueId) {
-    state = reduceTourState(state, { type: 'VENUE_SELECTED', venueId });
+    const nextState = reduceTourState(state, { type: 'VENUE_SELECTED', venueId });
+    if (nextState === state) return;
+    state = nextState;
     const activeButton = markActiveButton();
     renderDetail(state.venues.find((venue) => venue.id === state.selectedVenueId) ?? null);
     activeButton?.scrollIntoView({ behavior: 'smooth' });
@@ -122,42 +116,41 @@ export function createTourView(document, api) {
     if (button) selectVenue(button.dataset.venueId);
   });
 
-  async function load() {
+  async function load(isCurrent) {
     state = reduceTourState(state, { type: 'LOAD_STARTED' });
 
-    let stadiums = [];
-    let stadiumsFailed = false;
-    try {
-      ({ data: stadiums } = await api.apiRequest('stadiums'));
-    } catch {
-      stadiumsFailed = true;
-    }
+    const [stadiums, games] = await Promise.all([
+      loadable.fetchOrFallback('stadiums'),
+      loadable.fetchOrFallback('games')
+    ]);
 
-    let games = [];
-    let gamesFailed = false;
-    try {
-      ({ data: games } = await api.apiRequest('games'));
-    } catch {
-      gamesFailed = true;
-    }
+    // A newer load() or reset() started while these fetches were in flight —
+    // this call is stale and must not overwrite fresher state.
+    if (!isCurrent()) return false;
 
-    state = reduceTourState(state, { type: 'DATA_LOADED', stadiums, games, gamesFailed });
+    state = reduceTourState(state, {
+      type: 'DATA_LOADED',
+      stadiums: stadiums.data,
+      games: games.data,
+      stadiumsFailed: stadiums.failed,
+      gamesFailed: games.failed
+    });
 
-    if (stadiumsFailed) {
+    if (state.stadiumsFailed) {
       renderFatalError('Venues could not be loaded. Try again later.');
     } else {
       renderList();
     }
     renderDetail(null);
+    return state.stadiumsFailed; // fatal failure: allow a future ensureLoaded() to retry
   }
 
   function ensureLoaded() {
-    if (!loadPromise) loadPromise = load();
-    return loadPromise;
+    return loadable.ensureLoaded(load);
   }
 
   function reset() {
-    loadPromise = null;
+    loadable.reset();
     state = createInitialTourState();
   }
 
