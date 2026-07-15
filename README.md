@@ -4,14 +4,13 @@ Aplicacion vanilla JavaScript para explorar el Mundial 2026 con una base de resi
 
 ## Comandos
 
-```bash
-npm start
-npm test
-npm run test:server
-```
+| Tarea | Comando exacto | Resultado esperado |
+|---|---|---|
+| Servir la app local | `npm start` | Inicia `node tools/app-server.mjs` en `http://127.0.0.1:4173`. |
+| Ejecutar la suite completa | `npm test` | Ejecuta `node --test test/*.mjs`. |
+| Levantar el servidor determinista | `npm run test:server` | Inicia `node tools/test-server.mjs` en `http://127.0.0.1:4174`. |
 
-- App local: `http://127.0.0.1:4173`
-- Test server determinista: `http://127.0.0.1:4174`
+La app local y el servidor determinista son procesos separados. Para pruebas manuales con datos sinteticos, inicia ambos y abre `http://127.0.0.1:4173/?testMode=1`.
 
 ## Alcance actual
 

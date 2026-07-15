@@ -24,6 +24,18 @@ test('session expiration resets module views before focusing the recovery panel'
   assert.match(app, /function resetModuleViews\(\) \{[\s\S]*tourView\.reset\(\);[\s\S]*timelineView\.reset\(\);[\s\S]*matrixView\.reset\(\);[\s\S]*\}/);
   assert.match(app, /async onSessionExpired\(\) \{\s*resetModuleViews\(\);\s*update\(\{ type: 'SESSION_EXPIRED' \}\);\s*view\.focusSession\(\);\s*\}/);
 });
+test('README lists the exact package commands and local URLs', async () => {
+  const readme = await readFile(new URL('../README.md', import.meta.url), 'utf8');
+  const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+
+  assert.equal(packageJson.scripts.start, 'node tools/app-server.mjs');
+  assert.equal(packageJson.scripts.test, 'node --test test/*.mjs');
+  assert.equal(packageJson.scripts['test:server'], 'node tools/test-server.mjs');
+  assert.match(readme, /`npm start`[\s\S]*`node tools\/app-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4173`/);
+  assert.match(readme, /`npm test`[\s\S]*`node --test test\/\*\.mjs`/);
+  assert.match(readme, /`npm run test:server`[\s\S]*`node tools\/test-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4174`/);
+  assert.match(readme, /`http:\/\/127\.0\.0\.1:4173\/\?testMode=1`/);
+});
 test('document declares the explicitly served favicon', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /<link rel="icon" href="favicon\.svg" type="image\/svg\+xml">/);

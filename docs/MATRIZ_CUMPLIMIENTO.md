@@ -95,7 +95,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | TIME-005 | Usa centinela al final | `index.html#timeline-sentinel`, `js/timeline-view.js` | Playwright confirma vista Timeline activa; centinela se oculta sin mas datos | IMPLEMENTADO | |
 | TIME-006 | No pagina la petición HTTP | `js/timeline-view.js:showNextBatch` | `test/timeline.test.mjs` confirma que load-more no refetch | IMPLEMENTADO | |
 | TIME-007 | Evita duplicados con ID estable | `js/timeline.js:uniqueSortedGames` | `test/timeline.test.mjs` | IMPLEMENTADO | |
-| TIME-008 | Desconecta observer al terminar | `js/timeline-view.js:disconnectObserver`, `syncObserver` | Codigo desconecta antes de resincronizar y al reset | IMPLEMENTADO | Falta test especifico con observer falso. |
+| TIME-008 | Desconecta observer al terminar | `js/timeline-view.js:disconnectObserver`, `syncObserver`, `reset` | `test/timeline.test.mjs` valida desconexion de IntersectionObserver activo al resetear | VERIFICADO | |
 | TIME-009 | Fallo inicial no deja observer esperando | `js/timeline-view.js:renderControls` | `test/timeline.test.mjs` confirma centinela oculto tras fallo | IMPLEMENTADO | |
 | TIME-010 | Fallo inicial muestra estado de error | `js/timeline-view.js:renderStatus` | `test/timeline.test.mjs`; Playwright muestra retry visible en anonimo | IMPLEMENTADO | |
 | TIME-011 | Existe botón de reintento manual | `index.html#timeline-retry`, `js/timeline-view.js:retry` | `test/timeline.test.mjs`; Playwright `RETRY_VISIBLE True` | IMPLEMENTADO | |
@@ -166,7 +166,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
-| QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 123/123 | VERIFICADO | |
+| QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 124/124 | VERIFICADO | |
 | QA-002 | Responsive verificado | | | NO INICIADO | |
 | QA-003 | Navegación por teclado verificada | Links/botones nativos; trap de Tab en modal 401 | `test/static-contract.test.mjs`; pendiente prueba manual completa | EN PROGRESO | Falta evidencia manual de teclado completo. |
 | QA-004 | aria-live en estados dinamicos | `index.html`, `js/timeline-view.js`, `js/matrix-view.js` | Countdown y avisos de cache actualizan regiones `role=status`/`aria-live`; `test/timeline.test.mjs`, `test/matrix.test.mjs` | IMPLEMENTADO | Pendiente prueba manual con lector de pantalla. |
@@ -175,7 +175,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | QA-007 | No hay observer duplicado | `js/timeline-view.js:syncObserver`, `js/timeline-view.js:reset` | `test/timeline.test.mjs` valida desconexion de IntersectionObserver activo al resetear | VERIFICADO | |
 | QA-008 | No hay intervalos huérfanos | `js/timeline-view.js:clearRetryCountdown` | `test/timeline.test.mjs` valida limpieza tras recuperacion y reset | VERIFICADO | |
 | QA-009 | No hay archivos o dependencias innecesarias | | | NO INICIADO | |
-| QA-010 | README contiene comandos exactos | | | NO INICIADO | |
+| QA-010 | README contiene comandos exactos | `README.md`, `package.json` | `test/static-contract.test.mjs` valida `npm start`, `npm test`, `npm run test:server` y URLs locales | VERIFICADO | |
 
 ## Especificaciones transversales agregadas
 
