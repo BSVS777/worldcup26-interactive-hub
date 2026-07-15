@@ -147,18 +147,18 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | TST-008 | Modo de pruebas está desactivado por defecto | `js/config.js:isTestMode` | `test/config.test.mjs` | VERIFICADO | |
 | TST-009 | Modo de pruebas muestra insignia | `js/ui.js`, `index.html#test-mode-badge` | Playwright testMode: `testBadgeHidden=false` | VERIFICADO | |
 | TST-010 | Producción conserva API real | `js/config.js:resolveApiBaseUrl` | `test/config.test.mjs` confirma testMode aislado/local | VERIFICADO | |
-| DEF-001 | Guía explica flujo general | | | NO INICIADO | |
-| DEF-002 | Guía lista endpoints por módulo | | | NO INICIADO | |
-| DEF-003 | Guía lista campos reales cruzados | | | NO INICIADO | |
-| DEF-004 | Guía copia retos casi literalmente | | | NO INICIADO | |
-| DEF-005 | Guía responde qué pasa si falla por módulo | | | NO INICIADO | |
-| DEF-006 | Guía explica 401 | | | NO INICIADO | |
-| DEF-007 | Guía explica 429 | | | NO INICIADO | |
-| DEF-008 | Guía explica 500 | | | NO INICIADO | |
-| DEF-009 | Guía explica JWT expirado con observer | | | NO INICIADO | |
-| DEF-010 | Guía explica clics repetidos | | | NO INICIADO | |
-| DEF-011 | Guía explica caché corrupta | | | NO INICIADO | |
-| DEF-012 | Guía explica actualización parcial de matriz | | | NO INICIADO | |
+| DEF-001 | Guia explica flujo general | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida la seccion `Flujo general del sistema` | VERIFICADO | |
+| DEF-002 | Guia lista endpoints por modulo | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida endpoints por Tour, Agenda, Timeline, Dashboard y Matriz | VERIFICADO | |
+| DEF-003 | Guia lista campos reales cruzados | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida cruces sede/partidos, partido/equipos y matriz | VERIFICADO | |
+| DEF-004 | Guia copia retos casi literalmente | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida preguntas `Que pasa...` para fallos y resiliencia | VERIFICADO | |
+| DEF-005 | Guia responde que pasa si falla por modulo | `docs/GUIA_DEFENSA_INFJ_T.md` | Guia cubre Tour, Agenda, Timeline, Dashboard y Matriz; `test/static-contract.test.mjs` valida retos clave | VERIFICADO | |
+| DEF-006 | Guia explica 401 | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida `Que pasa con 401`; `test/api.test.mjs` cubre limpieza/token | VERIFICADO | |
+| DEF-007 | Guia explica 429 | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida `Que pasa con 429`; `test/api.test.mjs` cubre backoff | VERIFICADO | |
+| DEF-008 | Guia explica 500 | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida `Que pasa con 500`; `test/api.test.mjs` cubre fallback/cache | VERIFICADO | |
+| DEF-009 | Guia explica JWT expirado con observer | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida la respuesta; `test/timeline.test.mjs` cubre disconnect/reset | VERIFICADO | |
+| DEF-010 | Guia explica clics repetidos | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida la respuesta; Tour/Agenda/Timeline cubren idempotencia | VERIFICADO | |
+| DEF-011 | Guia explica cache corrupta | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida la respuesta; `test/cache.test.mjs` cubre entradas invalidas | VERIFICADO | |
+| DEF-012 | Guia explica actualizacion parcial de matriz | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida la respuesta; `test/matrix.test.mjs` cubre refresh parcial | VERIFICADO | |
 | DEV-001 | 401 se reproduce en Console | | | NO INICIADO | |
 | DEV-002 | 401 se reproduce en Network | | | NO INICIADO | |
 | DEV-003 | 429 y reintentos se observan en Network | | | NO INICIADO | |
@@ -166,7 +166,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
-| QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 126/126 | VERIFICADO | |
+| QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 127/127 | VERIFICADO | |
 | QA-002 | Responsive verificado | | | NO INICIADO | |
 | QA-003 | Navegación por teclado verificada | Links/botones nativos; trap de Tab en modal 401 | `test/static-contract.test.mjs`; pendiente prueba manual completa | EN PROGRESO | Falta evidencia manual de teclado completo. |
 | QA-004 | aria-live en estados dinamicos | `index.html`, `js/timeline-view.js`, `js/matrix-view.js` | Countdown y avisos de cache actualizan regiones `role=status`/`aria-live`; `test/timeline.test.mjs`, `test/matrix.test.mjs` | IMPLEMENTADO | Pendiente prueba manual con lector de pantalla. |

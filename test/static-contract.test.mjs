@@ -101,6 +101,31 @@ test('hidden modules cannot be re-displayed by component display rules', async (
   assert.match(css, /\[hidden\]\s*\{\s*display:\s*none\s*!important;\s*\}/s);
 });
 
+test('defense guide covers module endpoints, crossed fields, and resilience challenges', async () => {
+  const guide = await readFile(new URL('../docs/GUIA_DEFENSA_INFJ_T.md', import.meta.url), 'utf8');
+
+  for (const phrase of [
+    '## Flujo general del sistema',
+    '## Endpoints por modulo',
+    'Tour Virtual | `/get/stadiums`, `/get/games`',
+    'Agenda Simultanea | `/get/games`, `/get/teams`',
+    'Timeline Infinito | `/get/games`',
+    'Dashboard del Fanatico | `/get/teams`, `/get/games`, `/get/groups`',
+    'Matriz de Enfrentamientos | `/get/groups`, `/get/teams`, `/get/games`',
+    '## Campos reales cruzados',
+    'stadium.id` con `game.stadiumId',
+    'game.homeTeamId`, `game.awayTeamId` con `team.id',
+    'Que pasa con 401',
+    'Que pasa con 429',
+    'Que pasa con 500',
+    'Que pasa con JWT expirado y observer activo',
+    'Que pasa con clics repetidos',
+    'Que pasa con cache corrupta',
+    'Que pasa si la matriz recibe nuevos resultados'
+  ]) {
+    assert.ok(guide.includes(phrase), `Missing defense guide phrase: ${phrase}`);
+  }
+});
 test('document language is Spanish for the WC26 command center', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /<html lang="es">/);
