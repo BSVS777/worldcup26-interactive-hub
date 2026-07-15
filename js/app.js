@@ -30,6 +30,7 @@ const api = createApiClient({
   session,
   cacheStorage: window.localStorage,
   async onSessionExpired() {
+    resetModuleViews();
     update({ type: 'SESSION_EXPIRED' });
     view.focusSession();
   }
@@ -40,6 +41,14 @@ const agendaView = createAgendaView(document, api);
 const timelineView = createTimelineView(document, api);
 const fanDashboardView = createFanDashboardView(document, api);
 const matrixView = createMatrixView(document, api);
+
+function resetModuleViews() {
+  tourView.reset();
+  agendaView.reset();
+  timelineView.reset();
+  fanDashboardView.reset();
+  matrixView.reset();
+}
 
 function loadActiveModule() {
   if (state.route === 'tour') tourView.ensureLoaded();
@@ -53,11 +62,7 @@ async function handleLogin(credentials) {
   update({ type: 'LOGIN_STARTED' });
   try {
     await api.authenticate(credentials);
-    tourView.reset();
-    agendaView.reset();
-    timelineView.reset();
-    fanDashboardView.reset();
-    matrixView.reset();
+    resetModuleViews();
     update({ type: 'LOGIN_SUCCEEDED' }, { announceMessage: 'Signed in. Live match data is available.' });
     view.focusCurrentView();
     loadActiveModule();

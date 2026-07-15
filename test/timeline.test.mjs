@@ -258,6 +258,42 @@ test('timeline reset clears an active retry countdown before stale recovery reso
   await loadPromise;
   assert.equal(status.textContent, 'No matches are available yet.');
 });
+test('timeline reset disconnects an active IntersectionObserver before session recovery continues', async () => {
+  const { document, sentinel, list } = createFakeDocument();
+  const instances = [];
+  class FakeIntersectionObserver {
+    constructor(callback) {
+      this.callback = callback;
+      this.observed = [];
+      this.disconnected = false;
+      instances.push(this);
+    }
+
+    observe(element) {
+      this.observed.push(element);
+    }
+
+    disconnect() {
+      this.disconnected = true;
+    }
+  }
+  const api = {
+    async apiRequest() {
+      return { data: games(21) };
+    }
+  };
+  const view = createTimelineView(document, api, { IntersectionObserverImpl: FakeIntersectionObserver });
+  await view.ensureLoaded();
+
+  assert.equal(instances.length, 1);
+  assert.deepEqual(instances[0].observed, [sentinel]);
+  assert.equal(list.children.length, 10);
+
+  view.reset();
+
+  assert.equal(instances[0].disconnected, true);
+  assert.equal(list.children.length, 0);
+});
 test('timeline announces when matches came from endpoint cache', async () => {
   const { document, status } = createFakeDocument();
   const api = {

@@ -23,6 +23,7 @@ No se declara conformidad WCAG 2.2 AA completa hasta terminar pruebas manuales c
 | A11Y-046 | Skeleton aria-hidden | Test agenda | Implementado | `test/agenda.test.mjs` | IMPLEMENTADO |
 | A11Y-047 | Avisos de datos cacheados | Tests Matrix/Timeline sobre status live | Implementado parcial | `test/matrix.test.mjs`, `test/timeline.test.mjs` | IMPLEMENTADO |
 | A11Y-060 | Modal 401 accesible | Inspeccion estatica y flujo 401 | Implementado parcial | `js/ui.js`; `test/static-contract.test.mjs`; Playwright modal 401; pendiente prueba manual SR | EN PROGRESO |
+| A11Y-061 | Recuperacion de sesion corta observers activos | Tests app/Timeline | Implementado | `test/static-contract.test.mjs`, `test/timeline.test.mjs` | VERIFICADO |
 | A11Y-070 | No declarar AA sin evidencia | Documento vivo | Cumplido | Esta auditoria | IMPLEMENTADO |
 
 ## Keyboard path
@@ -35,7 +36,7 @@ Foco visible existe. Gestion de foco tras login existe. El 401 activa modal dedi
 
 ## Modal
 
-Implementado modal dinamico de sesion expirada con `role="dialog"`, `aria-modal`, fondo inerte y trap de Tab. Pendiente validacion manual con lector de pantalla.
+Implementado modal dinamico de sesion expirada con `role="dialog"`, `aria-modal`, fondo inerte y trap de Tab. La expiracion resetea las vistas antes de enfocar el panel para desconectar observers activos. Pendiente validacion manual con lector de pantalla.
 
 ## Zoom y reflow
 
@@ -65,7 +66,7 @@ Usa botones disabled y skeleton oculto; pendiente convertir fecha a `<time datet
 
 ### Timeline
 
-Implementado con lista ordenada, boton fallback "Load 10 more matches", retry persistente, countdown de retry en status `aria-live`, aviso de datos cacheados en el mismo status y limpieza de intervalos en recuperacion/reset. Pendiente prueba manual de screen reader e IntersectionObserver real con datos autenticados.
+Implementado con lista ordenada, boton fallback "Load 10 more matches", retry persistente, countdown de retry en status `aria-live`, aviso de datos cacheados en el mismo status, limpieza de intervalos y desconexion de IntersectionObserver en recuperacion/reset. Pendiente prueba manual de screen reader e IntersectionObserver real con datos autenticados.
 
 ### Dashboard
 

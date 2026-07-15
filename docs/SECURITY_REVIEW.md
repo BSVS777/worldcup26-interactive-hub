@@ -86,6 +86,7 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 ## Modal 401
 
 - El estado `expired` activa un dialogo modal sin persistir token.
+- `onSessionExpired` resetea las vistas antes de enfocar el panel de recuperacion, para cortar observers/timers activos y descartar cargas obsoletas.
 - El fondo queda inerte y `aria-hidden` mientras se reautentica.
 - El trap de Tab se registra una vez al construir `createShellView`.
 
@@ -99,6 +100,7 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 - `createTimelineView` usa `generation` para descartar cargas obsoletas.
 - Load-more es local y no dispara fetch adicional.
 - Retry usa `forceRetry` y mantiene el endpoint allowlisted `games`.
+- `reset()` desconecta un `IntersectionObserver` activo antes de limpiar el estado visual.
 - Cuando `games` viene de cache valida, el status live muestra que los partidos se estan viendo desde cache.
 
 ## Cached data notices

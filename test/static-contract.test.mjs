@@ -19,6 +19,11 @@ test('embedded sign-in uses section semantics and exposes accessibility hooks', 
   assert.match(ui, /event\.key !== 'Tab'/);
 });
 
+test('session expiration resets module views before focusing the recovery panel', async () => {
+  const app = await readFile(new URL('../js/app.js', import.meta.url), 'utf8');
+  assert.match(app, /function resetModuleViews\(\) \{[\s\S]*tourView\.reset\(\);[\s\S]*timelineView\.reset\(\);[\s\S]*matrixView\.reset\(\);[\s\S]*\}/);
+  assert.match(app, /async onSessionExpired\(\) \{\s*resetModuleViews\(\);\s*update\(\{ type: 'SESSION_EXPIRED' \}\);\s*view\.focusSession\(\);\s*\}/);
+});
 test('document declares the explicitly served favicon', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /<link rel="icon" href="favicon\.svg" type="image\/svg\+xml">/);
