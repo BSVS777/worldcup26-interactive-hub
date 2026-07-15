@@ -75,6 +75,8 @@ test('README lists the exact package commands and local URLs', async () => {
   assert.equal(packageJson.scripts['test:motion'], 'python tools/motion-audit.py');
   assert.equal(packageJson.scripts['test:offline'], 'python tools/offline-audit.py');
   assert.equal(packageJson.scripts['test:failures'], 'python tools/failure-audit.py');
+  assert.equal(packageJson.scripts['test:timeline-observer'], 'python tools/timeline-observer-audit.py');
+  assert.equal(packageJson.scripts['test:cached-notices'], 'python tools/cached-notice-audit.py');
   assert.match(readme, /`npm start`[\s\S]*`node tools\/app-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4173`/);
   assert.match(readme, /`npm test`[\s\S]*`node --test test\/\*\.mjs`/);
   assert.match(readme, /`npm run test:server`[\s\S]*`node tools\/test-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4174`/);

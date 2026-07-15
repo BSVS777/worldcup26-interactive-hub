@@ -44,7 +44,7 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 
 ## Cache poisoning
 
-Cubierto por pruebas de cache corrupta, version incorrecta, endpoint incorrecto, fecha invalida y claves independientes para `stadiums`, `games`, `teams` y `groups`. Los metadatos `stale`, `cachedAt` y `source` se propagan desde el cliente API hacia las vistas mediante `createLoadableView`, y Matrix/Timeline tienen tests que verifican aviso visible de `cached data`. `tools/offline-audit.py` demuestra en navegador que Agenda usa cache de `games` sin red y que Timeline sin cache queda en estado recuperable con Retry.
+Cubierto por pruebas de cache corrupta, version incorrecta, endpoint incorrecto, fecha invalida y claves independientes para `stadiums`, `games`, `teams` y `groups`. Los metadatos `stale`, `cachedAt` y `source` se propagan desde el cliente API hacia las vistas mediante `createLoadableView`. `tools/cached-notice-audit.py` calienta cache real, bloquea `/get/*` y verifica avisos visibles de cache en Tour, Agenda, Timeline, Fan Dashboard y Matrix. `tools/offline-audit.py` demuestra en navegador que Agenda usa cache de `games` sin red y que Timeline sin cache queda en estado recuperable con Retry.
 
 ## URLs
 
@@ -120,7 +120,7 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 
 - `createLoadableView.fetchOrFallback` conserva `stale`, `cachedAt` y `source` sin exponer payload crudo.
 - Tour, Agenda, Timeline, Fan Dashboard y Matrix muestran avisos visibles cuando algun endpoint publico responde desde cache.
-- Matrix y Timeline tienen cobertura unitaria directa de esos avisos; los demas modulos quedan cubiertos por propagacion comun y pendientes de evidencia Playwright por modulo.
+- `tools/cached-notice-audit.py` cubre los cinco modulos en Chromium con endpoints publicos bloqueados, confirmando que el fallback sale de cache versionada y se anuncia visualmente.
 
 ## Evidencia DevTools HTTP
 

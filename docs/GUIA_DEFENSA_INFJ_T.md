@@ -22,6 +22,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 13. Offline se demuestra en browser: con cache muestra datos stale, sin cache conserva estado recuperable con Retry sin recarga.
 14. DevTools HTTP se demuestra con Playwright: 401 abre modal, 429 muestra countdown y 429/500 se recuperan con response 200 posterior.
 15. Timeline Infinito se demuestra con Playwright: el `IntersectionObserver` observa el sentinel, agrega el segundo bloque local y no repite `/get/games`.
+16. Los avisos de cache se demuestran con Playwright en los cinco modulos bloqueando `/get/*` despues de calentar cache real.
 
 ## Endpoints por modulo
 
@@ -61,6 +62,7 @@ Si un campo no existe o no pasa normalizacion, el modulo usa estado recuperable 
 | Que pasa con JWT expirado y observer activo | La expiracion resetea vistas; Timeline limpia countdown y desconecta `IntersectionObserver` antes de recuperar sesion. |
 | Que pasa con clics repetidos | Reducers idempotentes y render con `replaceChildren` evitan duplicados; el mismo venue/favorito no crea contenido duplicado. |
 | Que pasa con cache corrupta | `js/cache.js` valida version, endpoint, fecha y shape; si falla, elimina solo esa entrada y reporta miss. |
+| Como se ve que estoy usando cache valida | Cada modulo muestra un aviso visible de `cached data`; `tools/cached-notice-audit.py` bloquea `/get/*` y confirma Tour, Agenda, Timeline, Dashboard y Matrix desde cache. |
 | Que pasa si la matriz recibe nuevos resultados | Si la estructura del grupo sigue igual, conserva referencias internas y actualiza solo celdas afectadas. |
 
 ## Respuestas de defensa
