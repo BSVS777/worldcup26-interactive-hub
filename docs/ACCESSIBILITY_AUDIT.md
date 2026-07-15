@@ -18,18 +18,18 @@ No se declara conformidad WCAG 2.2 AA completa hasta terminar pruebas manuales c
 |---|---|---|---|---|---|
 | A11Y-001 | `html lang=es` | Inspeccion HTML y Playwright | Implementado | `index.html`; Playwright reporto `HTML_LANG es` | IMPLEMENTADO |
 | A11Y-002 | Landmarks semanticos | Test estatico | Verificado | `test/static-contract.test.mjs` valida `main/header/nav/footer/section`, sin `role=application` | VERIFICADO |
-| A11Y-005 | Skip link | Inspeccion HTML/CSS | Implementado | `.skip-link` | IMPLEMENTADO |
+| A11Y-005 | Skip link | Playwright teclado | Verificado | `tools/keyboard-audit.py` enfoca `.skip-link` con Tab y activa `#main-content` con Enter | VERIFICADO |
 | A11Y-010 | Foco visible | Inspeccion CSS | Implementado | `:focus-visible` | IMPLEMENTADO |
 | A11Y-012 | aria-current en navegacion | Test shell | Implementado | `test/shell.test.mjs` | IMPLEMENTADO |
 | A11Y-046 | Skeleton aria-hidden | Test agenda | Implementado | `test/agenda.test.mjs` | IMPLEMENTADO |
 | A11Y-047 | Avisos de datos cacheados | Tests Matrix/Timeline sobre status live | Implementado parcial | `test/matrix.test.mjs`, `test/timeline.test.mjs` | IMPLEMENTADO |
-| A11Y-060 | Modal 401 accesible | Inspeccion estatica y flujo 401 | Implementado parcial | `js/ui.js`; `test/static-contract.test.mjs`; Playwright modal 401; pendiente prueba manual SR | EN PROGRESO |
+| A11Y-060 | Modal 401 accesible | Inspeccion estatica y flujo 401 | Verificado por teclado; pendiente lector | `js/ui.js`; `test/static-contract.test.mjs`; `tools/keyboard-audit.py` valida role dialog, aria-modal, foco inicial y trap Tab | EN PROGRESO |
 | A11Y-061 | Recuperacion de sesion corta observers activos | Tests app/Timeline | Implementado | `test/static-contract.test.mjs`, `test/timeline.test.mjs` | VERIFICADO |
 | A11Y-070 | No declarar AA sin evidencia | Documento vivo | Cumplido | Esta auditoria | IMPLEMENTADO |
 
 ## Keyboard path
 
-Pendiente prueba manual completa. La navegacion usa enlaces y botones nativos.
+`tools/keyboard-audit.py` verifica con Playwright: skip link, login completo con Tab/Enter, foco tras login en `main`, activacion por Enter de las cinco rutas, controles de Tour/Agenda/Timeline/Dashboard/Matrix y trap Shift+Tab/Tab en modal 401. Queda pendiente prueba manual con lector de pantalla.
 
 ## Focus
 
@@ -85,8 +85,10 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 - Sin overflow horizontal global en 320x720, 390x844, 768x1024, 1366x768 y 1920x1080 para las cinco rutas autenticadas (`RESPONSIVE_AUDIT_PASS viewports=5 routes=5 checks=25`).
 - La superficie de dependencias se mantiene reducida: `test/static-contract.test.mjs` valida cero dependencias npm, sin lockfiles/node_modules y sin scripts/styles remotos.
 - Modal 401 verificado en Playwright: role=dialog, aria-modal=true, foco inicial en email, fondo inerte, Tab cicla dentro del modal y sin errores de consola.
+- Navegacion por teclado verificada en Playwright: `KEYBOARD_AUDIT_PASS routes=5 login=keyboard modal_trap=verified`.
 
 ## Gaps pendientes
 
 - Zoom de navegador/lector de pantalla.
 - Contraste AA manual completo en todos los modulos.
+

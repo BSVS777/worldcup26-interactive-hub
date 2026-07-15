@@ -17,6 +17,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 8.1. El shell conserva landmarks nativos (header, nav, main, sections y footer), sin `role=application` ni handlers inline.
 9. La evidencia vive en `npm test`, busquedas de sinks, matriz, security review y accessibility audit.
 10. El proyecto se mantiene sin dependencias runtime, sin CDN y sin lockfiles porque usa JavaScript/CSS vanilla y Node nativo.
+11. La navegacion por teclado se demuestra con Playwright: Tab/Shift+Tab/Enter cubren skip link, login, rutas, controles y modal 401 sin recarga.
 
 ## Endpoints por modulo
 
@@ -144,3 +145,4 @@ Tecnica: `tools/test-server.mjs`, `test/test-server.test.mjs`, `npm start`, `npm
 - Lector de pantalla y contraste manual completo fuera del Dashboard.
 - Reproducciones DevTools de Network/Console para 401, 429, 500 y offline.
 - Validacion contra API viva con credenciales validas.
+

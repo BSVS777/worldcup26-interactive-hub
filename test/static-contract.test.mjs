@@ -71,10 +71,12 @@ test('README lists the exact package commands and local URLs', async () => {
   assert.equal(packageJson.scripts.test, 'node --test test/*.mjs');
   assert.equal(packageJson.scripts['test:server'], 'node tools/test-server.mjs');
   assert.equal(packageJson.scripts['test:responsive'], 'python tools/responsive-audit.py');
+  assert.equal(packageJson.scripts['test:keyboard'], 'python tools/keyboard-audit.py');
   assert.match(readme, /`npm start`[\s\S]*`node tools\/app-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4173`/);
   assert.match(readme, /`npm test`[\s\S]*`node --test test\/\*\.mjs`/);
   assert.match(readme, /`npm run test:server`[\s\S]*`node tools\/test-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4174`/);
   assert.match(readme, /`npm run test:responsive`[\s\S]*`python tools\/responsive-audit\.py`/);
+  assert.match(readme, /`npm run test:keyboard`[\s\S]*`python tools\/keyboard-audit\.py`/);
   assert.match(readme, /`http:\/\/127\.0\.0\.1:4173\/\?testMode=1`/);
 });
 
@@ -208,3 +210,4 @@ test('document language is Spanish for the WC26 command center', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /<html lang="es">/);
 });
+
