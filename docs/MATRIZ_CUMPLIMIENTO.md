@@ -11,10 +11,10 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 
 | ID | Requisito | Archivo y función | Evidencia | Estado | Gap |
 |---|---|---|---|---|---|
-| ARC-001 | Aplicación única con cinco módulos | | | NO INICIADO | |
+| ARC-001 | Aplicación única con cinco módulos | `index.html`, `js/router.js`, `js/ui.js`, `js/modules/*` | Playwright navego las cinco rutas sin errores de consola | IMPLEMENTADO | Timeline, Fan Dashboard y Matrix aun son placeholders. |
 | ARC-002 | HTML semántico y reducido | | | NO INICIADO | |
 | ARC-003 | CSS minimalista y responsive | | | NO INICIADO | |
-| ARC-004 | Navegación entre módulos | | | NO INICIADO | |
+| ARC-004 | Navegación entre módulos | `js/router.js`, `js/ui.js` | Playwright: aria-current cambia en las cinco rutas | IMPLEMENTADO | Falta navegacion movil avanzada/drawer. |
 | ARC-005 | Fetch separado de presentación | | | NO INICIADO | |
 | API-001 | Endpoint real de autenticación verificado | | | NO INICIADO | |
 | API-002 | Payload de autenticación verificado | | | NO INICIADO | |
@@ -28,7 +28,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | ASY-002 | Cada respuesta revisa response.ok/status | | | NO INICIADO | |
 | ASY-003 | No existe .then() en código ejecutable | | | NO INICIADO | |
 | ASY-004 | No existe .catch() en código ejecutable | | | NO INICIADO | |
-| SEC-001 | JWT se almacena y recupera centralmente | | | NO INICIADO | |
+| SEC-001 | JWT se almacena y recupera centralmente | `js/session.js`, `js/auth.js` | `npm test`; `test/session.test.mjs` | IMPLEMENTADO | Token vive solo en memoria; tras recarga se requiere login. |
 | SEC-002 | Authorization Bearer en stadiums | | | NO INICIADO | |
 | SEC-003 | Authorization Bearer en games | | | NO INICIADO | |
 | SEC-004 | Authorization Bearer en teams | | | NO INICIADO | |
@@ -166,11 +166,11 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
-| QA-001 | Aplicación inicia sin errores de sintaxis | | | NO INICIADO | |
+| QA-001 | Aplicación inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 94/94 | VERIFICADO | |
 | QA-002 | Responsive verificado | | | NO INICIADO | |
-| QA-003 | Navegación por teclado verificada | | | NO INICIADO | |
+| QA-003 | Navegación por teclado verificada | Links y botones nativos en shell | Pendiente prueba manual completa de Tab/Shift+Tab | EN PROGRESO | Falta evidencia manual de teclado completo. |
 | QA-004 | aria-live en estados dinámicos | | | NO INICIADO | |
-| QA-005 | prefers-reduced-motion respetado | | | NO INICIADO | |
+| QA-005 | prefers-reduced-motion respetado | `css/styles.css`, `js/accessibility.js` | CSS contiene media query; preferencias manuales base disponibles | IMPLEMENTADO | Falta verificacion visual en browser con media emulada. |
 | QA-006 | No hay listeners duplicados | | | NO INICIADO | |
 | QA-007 | No hay observer duplicado | | | NO INICIADO | |
 | QA-008 | No hay intervalos huérfanos | | | NO INICIADO | |
@@ -185,3 +185,5 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | SPEC-SEC-001 | Seguridad y privacidad son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define SEC-HARD-001..SEC-HARD-010 | IMPLEMENTADO | Pendiente ejecutar auditoria final de headers, storage y rutas. |
 | SPEC-RES-001 | Resiliencia tipo "intumbable" se define como degradacion segura, contencion de fallos y recuperacion sin recarga | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define RES-001..RES-008 | IMPLEMENTADO | Pendiente Playwright por modulo para validar comportamiento real. |
 | QA-011 | Elementos con `hidden` no ocupan layout ni foco | `css/styles.css` (`[hidden]`) | `test/static-contract.test.mjs` verifica `display: none !important` | IMPLEMENTADO | |
+
+
