@@ -16,13 +16,13 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | ARC-003 | CSS minimalista y responsive | `css/styles.css`, `tools/responsive-audit.py` | Playwright testMode autenticado: 5 viewports x 5 rutas sin overflow global; H1 hero ajustado para 320px | VERIFICADO | |
 | ARC-004 | Navegación entre módulos | `js/router.js`, `js/ui.js`, `css/styles.css`, `index.html` | Playwright: `tools/keyboard-audit.py` activa las cinco rutas por teclado; `tools/mobile-drawer-audit.py` verifica drawer movil, Escape, foco restaurado, cierre al navegar y desktop intacto | VERIFICADO | |
 | ARC-005 | Fetch separado de presentacion | `js/api.js`, vistas `js/*-view.js` | `test/static-contract.test.mjs` valida que las vistas no usen `fetch(` directo y que el cliente API central maneje red | VERIFICADO | |
-| API-001 | Endpoint real de autenticación verificado | | | NO INICIADO | |
-| API-002 | Payload de autenticación verificado | | | NO INICIADO | |
-| API-003 | Campo real del token verificado | | | NO INICIADO | |
-| API-004 | Esquema de stadiums verificado | | | NO INICIADO | |
-| API-005 | Esquema de games verificado | | | NO INICIADO | |
-| API-006 | Esquema de teams verificado | | | NO INICIADO | |
-| API-007 | Esquema de groups verificado | | | NO INICIADO | |
+| API-001 | Endpoint real de autenticación verificado | `tools/live-api-probe.mjs`, `js/config.js:AUTH_ENDPOINT` | Probe live preparado; sin credenciales imprime `LIVE_API_PROBE_SKIPPED`; requiere `LIVE_API_PROBE_PASS` para verificar | EN PROGRESO | Pendiente credenciales validas de API viva. |
+| API-002 | Payload de autenticación verificado | `tools/live-api-probe.mjs`, `js/api.js:authenticate` | Probe envia `{ email, password }` a `/auth/authenticate` usando variables de entorno | EN PROGRESO | Pendiente corrida live exitosa. |
+| API-003 | Campo real del token verificado | `tools/live-api-probe.mjs`, `js/api.js:authenticate` | Probe exige `token` string no vacio y nunca lo imprime (`token=present`) | EN PROGRESO | Pendiente corrida live exitosa. |
+| API-004 | Esquema de stadiums verificado | `tools/live-api-probe.mjs`, `js/normalizers.js:normalizePayload` | Probe usa normalizador real de `stadiums` contra payload live | EN PROGRESO | Pendiente corrida live exitosa. |
+| API-005 | Esquema de games verificado | `tools/live-api-probe.mjs`, `js/normalizers.js:normalizePayload` | Probe usa normalizador real de `games` contra payload live | EN PROGRESO | Pendiente corrida live exitosa. |
+| API-006 | Esquema de teams verificado | `tools/live-api-probe.mjs`, `js/normalizers.js:normalizePayload` | Probe usa normalizador real de `teams` contra payload live | EN PROGRESO | Pendiente corrida live exitosa. |
+| API-007 | Esquema de groups verificado | `tools/live-api-probe.mjs`, `js/normalizers.js:normalizePayload` | Probe usa normalizador real de `groups` contra payload live | EN PROGRESO | Pendiente corrida live exitosa. |
 | API-008 | Normalizadores aislan JSON crudo | `js/api.js:apiRequest`, `js/normalizers.js:normalizePayload` | `test/static-contract.test.mjs` valida `normalizePayload(endpointKey, payload)` en el cliente; `test/normalizers.test.mjs` valida modelos estables | VERIFICADO | |
 | ASY-001 | Async/await exclusivo en codigo ejecutable | `index.html`, `js/**`, `tools/**` | `test/static-contract.test.mjs` escanea runtime y falla si encuentra `.then(` o `.catch(` | VERIFICADO | |
 | ASY-002 | Cada respuesta revisa response.ok/status | `js/api.js:apiRequest`, `js/api.js:authenticate` | `test/static-contract.test.mjs` valida `response.ok`; `test/api.test.mjs` cubre 401/429/500/no retry/status typed | VERIFICADO | |

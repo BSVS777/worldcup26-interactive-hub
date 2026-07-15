@@ -24,6 +24,10 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 | T-09 | API lenta/caida | Retry 429/500, cache fallback y errores recuperables | Unit + Playwright API resilience audit | `test/api.test.mjs`, `tools/api-resilience-audit.py`, `tools/offline-audit.py` | VERIFICADO |
 | T-10 | Navegacion movil rompe foco o agrega HTML dinamico | Drawer con boton nativo, `aria-expanded`, dataset controlado y listeners centralizados; sin HTML crudo | Playwright drawer y busquedas de sinks | `tools/mobile-drawer-audit.py`, `test/static-contract.test.mjs`, `js/ui.js` | VERIFICADO |
 
+## Live API probe
+
+- `tools/live-api-probe.mjs` valida el contrato live cuando existen `WC26_API_EMAIL` y `WC26_API_PASSWORD`: autentica, exige `token` presente sin imprimirlo, llama `stadiums`, `games`, `teams` y `groups` con Bearer, revisa JSON y normaliza con el codigo real de la app. Sin credenciales imprime `LIVE_API_PROBE_SKIPPED` y no marca verificacion live.
+
 ## Endpoint authorization
 
 - `apiRequest` obtiene el JWT vigente desde `sessionStore` y rechaza peticiones de datos sin token antes de llamar a `fetchImpl`.
@@ -149,7 +153,7 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 ## Riesgos pendientes
 
 - Completar modulos restantes.
-- Validar API viva y Content-Type real.
+- Validar API viva y Content-Type real con `tools/live-api-probe.mjs` y credenciales validas.
 - Agregar prueba DOM XSS dedicada.
 - Auditar secretos antes de entrega final.
 
