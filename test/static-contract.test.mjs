@@ -80,6 +80,7 @@ test('README lists the exact package commands and local URLs', async () => {
   assert.equal(packageJson.scripts['test:mobile-drawer'], 'python tools/mobile-drawer-audit.py');
   assert.equal(packageJson.scripts['test:fan-theme'], 'python tools/fan-theme-audit.py');
   assert.equal(packageJson.scripts['test:console-401'], 'python tools/console-401-audit.py');
+  assert.equal(packageJson.scripts['test:tour-partial-failure'], 'python tools/tour-partial-failure-audit.py');
   assert.match(readme, /`npm start`[\s\S]*`node tools\/app-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4173`/);
   assert.match(readme, /`npm test`[\s\S]*`node --test test\/\*\.mjs`/);
   assert.match(readme, /`npm run test:server`[\s\S]*`node tools\/test-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4174`/);
@@ -88,6 +89,8 @@ test('README lists the exact package commands and local URLs', async () => {
   assert.match(readme, /`npm run test:motion`[\s\S]*`python tools\/motion-audit\.py`/);
   assert.match(readme, /`npm run test:offline`[\s\S]*`python tools\/offline-audit\.py`/);
   assert.match(readme, /`npm run test:failures`[\s\S]*`python tools\/failure-audit\.py`/);
+  assert.match(readme, /`npm run test:console-401`[\s\S]*`python tools\/console-401-audit\.py`/);
+  assert.match(readme, /`npm run test:tour-partial-failure`[\s\S]*`python tools\/tour-partial-failure-audit\.py`/);
   assert.match(readme, /`npm run test:mobile-drawer`[\s\S]*`python tools\/mobile-drawer-audit\.py`/);
   assert.match(readme, /`npm run test:fan-theme`[\s\S]*`python tools\/fan-theme-audit\.py`/);
   assert.match(readme, /`http:\/\/127\.0\.0\.1:4173\/\?testMode=1`/);

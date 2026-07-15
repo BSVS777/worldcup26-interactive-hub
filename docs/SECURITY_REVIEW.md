@@ -77,6 +77,11 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 - La actualizacion parcial usa referencias internas a celdas por ID de grupo/equipo, sin HTML crudo ni selectores derivados de datos no confiables.
 
 
+## Tour partial failure
+
+- `tools/tour-partial-failure-audit.py` fuerza `/get/games` 500 en Chromium y confirma que `/get/stadiums` sigue renderizando sedes clicables.
+- La seleccion de sedes bajo fallo de partidos actualiza `aria-pressed` y muestra alertas locales por sede, sin errores JS inesperados ni HTML crudo.
+
 ## Test server determinista
 
 - `tools/test-server.mjs` usa Node nativo y fixtures sinteticos para `/auth/authenticate`, `/get/stadiums`, `/get/games`, `/get/teams` y `/get/groups`.

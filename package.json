@@ -16,6 +16,7 @@
     "test:cached-notices": "python tools/cached-notice-audit.py",
     "test:mobile-drawer": "python tools/mobile-drawer-audit.py",
     "test:fan-theme": "python tools/fan-theme-audit.py",
-    "test:console-401": "python tools/console-401-audit.py"
+    "test:console-401": "python tools/console-401-audit.py",
+    "test:tour-partial-failure": "python tools/tour-partial-failure-audit.py"
   }
 }
