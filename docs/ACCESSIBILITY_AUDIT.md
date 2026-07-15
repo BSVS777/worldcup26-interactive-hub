@@ -95,6 +95,7 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 - Layout de Agenda verificado en Playwright: `AGENDA_LAYOUT_AUDIT_PASS date=2026-06-12 columns=2 next=2026-06-13 grid=separate-tracks`.
 - Sesion en memoria verificada en Playwright: `SESSION_STORAGE_AUDIT_PASS token=memory-only storage=no-sensitive-values reload=requires-login`, confirmando que tras recarga el login vuelve a estar disponible.
 - Endpoint injection verificado en Playwright: `ENDPOINT_INJECTION_AUDIT_PASS apiBase=ignored data_host=127.0.0.1:4174 proxy_query=404`, manteniendo test mode local y predecible.
+- Headers anti-frame verificados en Playwright: `SECURITY_HEADERS_AUDIT_PASS paths=4 frame_ancestors=none x_frame=DENY`, sin errores de consola al cargar la app local.
 - Consola 401 verificada en Playwright: `CONSOLE_401_AUDIT_PASS console=failed-resource-401 network=401 modal=recovery`, sin errores JS inesperados durante el foco de recuperacion.
 - Timeline IntersectionObserver verificado en Playwright: `TIMELINE_OBSERVER_AUDIT_PASS before=10 after=20 games_requests=1`, con fallback visible antes del trigger.
 - Avisos de cache verificados en Playwright para Tour, Agenda, Timeline, Dashboard y Matrix: `CACHED_NOTICE_AUDIT_PASS routes=5 cache_keys=4 blocked_network=get-endpoints`.

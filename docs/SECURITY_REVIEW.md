@@ -20,7 +20,7 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 | T-03 | Cache poisoning | Cache versionada por endpoint, claves aisladas y avisos visibles para datos stale | `npm test` cache/matrix/timeline | `test/cache.test.mjs`, `test/matrix.test.mjs`, `test/timeline.test.mjs` | VERIFICADO |
 | T-04 | Endpoint injection | `ENDPOINTS` inmutable; API recibe endpointKey y proxy rechaza queries target | Unit + Playwright endpoint audit | `js/config.js`, `test/config.test.mjs`, `tools/endpoint-injection-audit.py` | VERIFICADO |
 | T-05 | Test mode expuesto | `testMode=1` solo en origen local y usa base fija | Unit + Playwright endpoint audit | `isTestMode`, `tools/endpoint-injection-audit.py` | VERIFICADO |
-| T-07 | Clickjacking | `frame-ancestors 'none'` en servidor local | `npm test` app-server | `tools/app-server.mjs` | IMPLEMENTADO |
+| T-07 | Clickjacking | `frame-ancestors 'none'` y `X-Frame-Options: DENY` en servidor local | Playwright security headers audit | `tools/app-server.mjs`, `tools/security-headers-audit.py` | VERIFICADO |
 | T-09 | API lenta/caida | Retry 429/500, cache fallback, abort | `npm test` api | `test/api.test.mjs` | IMPLEMENTADO |
 | T-10 | Navegacion movil rompe foco o agrega HTML dinamico | Drawer con boton nativo, `aria-expanded`, dataset controlado y listeners centralizados; sin HTML crudo | Playwright drawer y busquedas de sinks | `tools/mobile-drawer-audit.py`, `test/static-contract.test.mjs`, `js/ui.js` | VERIFICADO |
 
@@ -54,7 +54,7 @@ Cubierto por pruebas de cache corrupta, version incorrecta, endpoint incorrecto,
 
 ## CSP y headers
 
-Servidor local configura CSP, Referrer-Policy, X-Content-Type-Options y frame protections. Produccion depende del hosting.
+Servidor local configura CSP, Referrer-Policy, X-Content-Type-Options y frame protections. `tools/security-headers-audit.py` verifica en Chromium que `/`, assets y rutas de error incluyan `frame-ancestors 'none'` y `X-Frame-Options: DENY`. Produccion depende del hosting.
 
 ## Test mode
 

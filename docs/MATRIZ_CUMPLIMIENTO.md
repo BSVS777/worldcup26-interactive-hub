@@ -182,7 +182,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | ID | Requisito | Archivo y funcion | Evidencia | Estado | Gap |
 |---|---|---|---|---|---|
 | SPEC-ACC-001 | Accesibilidad e inclusion son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define ACC-001..ACC-012 y Definition of Done; Matrix verificada en movil 390x844 | IMPLEMENTADO | Pendiente auditoria manual con teclado, zoom, contraste y lector. |
-| SPEC-SEC-001 | Seguridad y privacidad son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define SEC-HARD-001..SEC-HARD-010; test server valida bearer, CORS local y allowlists | IMPLEMENTADO | Pendiente auditoria final contra hosting/API viva. |
+| SPEC-SEC-001 | Seguridad y privacidad son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md`, `tools/security-headers-audit.py` | Spec define SEC-HARD-001..SEC-HARD-010; test server valida bearer, CORS local y allowlists; Playwright verifica headers anti-frame locales (`SECURITY_HEADERS_AUDIT_PASS`) | IMPLEMENTADO | Pendiente auditoria final contra hosting/API viva. |
 | SPEC-RES-001 | Resiliencia tipo "intumbable" se define como degradacion segura, contencion de fallos y recuperacion sin recarga | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define RES-001..RES-008; test server cubre auth/datos/401/429/500/reset deterministas | IMPLEMENTADO | Pendiente Playwright de fallos por modulo y validacion en produccion. |
 | QA-011 | Elementos con `hidden` no ocupan layout ni foco | `css/styles.css` (`[hidden]`) | `test/static-contract.test.mjs` verifica `display: none !important` | IMPLEMENTADO | |
 

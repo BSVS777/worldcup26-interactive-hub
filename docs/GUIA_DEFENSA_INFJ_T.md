@@ -29,6 +29,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 20. El layout de Agenda se demuestra con Playwright: cada partido simultaneo se renderiza como columna visible y la navegacion conserva el patron.
 21. El JWT en memoria se demuestra con Playwright: tras login no aparece en storage y recargar vuelve a pedir sesion.
 22. La defensa contra endpoint injection se demuestra con Playwright: `apiBase` malicioso no recibe trafico y el proxy rechaza queries target.
+23. La defensa anti-clickjacking local se demuestra con Playwright: CSP incluye `frame-ancestors 'none'` y `X-Frame-Options: DENY`.
 
 ## Endpoints por modulo
 
@@ -168,6 +169,14 @@ Tecnica: `js/matrix-view.js:refresh`, `test/matrix.test.mjs`.
 30 segundos: `testMode=1` solo funciona en origen local. El servidor de pruebas autentica, sirve fixtures sinteticos de los cuatro endpoints de datos y permite reproducir fallos controlados con reset de contadores, sin tocar la API real.
 
 Tecnica: `tools/test-server.mjs`, `test/test-server.test.mjs`, `npm start`, `npm run test:server`.
+
+### Como defiendo clickjacking en local
+
+15 segundos: El servidor local no permite que la app sea embebida en frames.
+
+30 segundos: `tools/app-server.mjs` emite CSP con `frame-ancestors 'none'` y tambien `X-Frame-Options: DENY` para navegacion, assets y errores del proxy. `tools/security-headers-audit.py` lo prueba contra respuestas HTTP reales del servidor local.
+
+Tecnica: `tools/app-server.mjs`, `tools/security-headers-audit.py`, `docs/SECURITY_REVIEW.md:T-07`.
 
 ## Preguntas que siguen pendientes de evidencia manual
 
