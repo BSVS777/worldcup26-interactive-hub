@@ -14,6 +14,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 6. `js/cache.js` guarda solo datos publicos versionados por endpoint y los entrega como respaldo stale cuando corresponde.
 7. Las vistas renderizan con `createElement`, `textContent`, `append` y `replaceChildren`, nunca con HTML crudo.
 8. Los estados dinamicos se anuncian con `role=status` o `aria-live`, y los errores dejan una accion recuperable.
+8.1. El shell conserva landmarks nativos (header, nav, main, sections y footer), sin `role=application` ni handlers inline.
 9. La evidencia vive en `npm test`, busquedas de sinks, matriz, security review y accessibility audit.
 
 ## Endpoints por modulo

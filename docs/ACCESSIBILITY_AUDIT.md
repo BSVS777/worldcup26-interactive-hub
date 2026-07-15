@@ -17,6 +17,7 @@ No se declara conformidad WCAG 2.2 AA completa hasta terminar pruebas manuales c
 | ID | Prueba | Procedimiento | Resultado | Evidencia | Estado |
 |---|---|---|---|---|---|
 | A11Y-001 | `html lang=es` | Inspeccion HTML y Playwright | Implementado | `index.html`; Playwright reporto `HTML_LANG es` | IMPLEMENTADO |
+| A11Y-002 | Landmarks semanticos | Test estatico | Verificado | `test/static-contract.test.mjs` valida `main/header/nav/footer/section`, sin `role=application` | VERIFICADO |
 | A11Y-005 | Skip link | Inspeccion HTML/CSS | Implementado | `.skip-link` | IMPLEMENTADO |
 | A11Y-010 | Foco visible | Inspeccion CSS | Implementado | `:focus-visible` | IMPLEMENTADO |
 | A11Y-012 | aria-current en navegacion | Test shell | Implementado | `test/shell.test.mjs` | IMPLEMENTADO |

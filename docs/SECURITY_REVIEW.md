@@ -38,6 +38,7 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 ## DOM XSS
 
 - sinks: busqueda runtime excluyendo `docs/**`, `test/**` y Markdown sin hallazgos; `alert(1)` existe solo como payload de prueba.
+- superficie inline: `test/static-contract.test.mjs` valida que `index.html` no use handlers inline ni `<style>` embebido, y que cargue un unico script modular local.
 - fixture: `test/matrix.test.mjs` incluye nombres de grupo/equipo con `<img onerror>` y `<script>`, verificados como texto no ejecutable.
 - resultado: verificado por test unitario de render Matrix; pendiente prueba manual/browser con payload equivalente en API viva.
 

@@ -171,6 +171,22 @@ test('defense guide covers module endpoints, crossed fields, and resilience chal
   }
 });
 
+
+
+test('document shell uses semantic landmarks and reduced inline surface', async () => {
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+  assert.equal((html.match(/<main\b/g) ?? []).length, 1);
+  assert.match(html, /<header class="site-header">/);
+  assert.match(html, /<nav class="route-nav" aria-label="World Cup views">/);
+  assert.match(html, /<footer class="site-footer">/);
+  assert.match(html, /<section class="hero" aria-labelledby="view-title">/);
+  assert.match(html, /<section class="module-stage" aria-labelledby="module-heading">/);
+  assert.doesNotMatch(html, /role="application"/);
+  assert.doesNotMatch(html, /\son[a-z]+="/i);
+  assert.doesNotMatch(html, /<style\b/i);
+  assert.ok(html.includes('<script type="module" src="js/app.js"></script>'));
+});
+
 test('document language is Spanish for the WC26 command center', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /<html lang="es">/);
