@@ -111,6 +111,7 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 
 - `createTimelineView` usa `generation` para descartar cargas obsoletas.
 - Load-more es local y no dispara fetch adicional.
+- `tools/timeline-observer-audit.py` valida en navegador que la interseccion del sentinel agrega el siguiente bloque local sin una segunda peticion a `/get/games`.
 - Retry usa `forceRetry` y mantiene el endpoint allowlisted `games`.
 - `reset()` desconecta un `IntersectionObserver` activo antes de limpiar el estado visual.
 - Cuando `games` viene de cache valida, el status live muestra que los partidos se estan viendo desde cache.

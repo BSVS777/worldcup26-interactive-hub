@@ -11,6 +11,7 @@
     "test:keyboard": "python tools/keyboard-audit.py",
     "test:motion": "python tools/motion-audit.py",
     "test:offline": "python tools/offline-audit.py",
-    "test:failures": "python tools/failure-audit.py"
+    "test:failures": "python tools/failure-audit.py",
+    "test:timeline-observer": "python tools/timeline-observer-audit.py"
   }
 }

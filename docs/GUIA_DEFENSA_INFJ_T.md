@@ -21,6 +21,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 12. Movimiento reducido se demuestra emulando `prefers-reduced-motion: reduce`: scroll auto y transiciones minimas en browser; animaciones minimas e iteracion unica por contrato CSS estatico.
 13. Offline se demuestra en browser: con cache muestra datos stale, sin cache conserva estado recuperable con Retry sin recarga.
 14. DevTools HTTP se demuestra con Playwright: 401 abre modal, 429 muestra countdown y 429/500 se recuperan con response 200 posterior.
+15. Timeline Infinito se demuestra con Playwright: el `IntersectionObserver` observa el sentinel, agrega el segundo bloque local y no repite `/get/games`.
 
 ## Endpoints por modulo
 
@@ -53,6 +54,7 @@ Si un campo no existe o no pasa normalizacion, el modulo usa estado recuperable 
 | Que pasa si falla `games` en Tour | Las sedes siguen clicables porque `stadiums` y `games` se cargan por separado; el detalle muestra error local de partidos. |
 | Que pasa si Agenda no tiene red ni cache | La agenda conserva skeletons, controles deshabilitados y no inventa fechas ni equipos. |
 | Que pasa si Timeline falla al inicio | Oculta centinela, muestra estado de error persistente y deja boton de reintento manual. |
+| Que pasa cuando el sentinel del Timeline entra al viewport | `IntersectionObserver` dispara `SHOW_NEXT`, agrega 10 partidos locales y mantiene una sola peticion HTTP a `/get/games`; el boton fallback queda como respaldo manual. |
 | Que pasa con 401 | Borra solo el token afectado, abre modal accesible de sesion expirada y reautentica sin `location.reload()`. |
 | Que pasa con 429 | El cliente central reintenta con 1 s, 2 s y 4 s, maximo cuatro intentos, y Timeline anuncia countdown visible. |
 | Que pasa con 500 | Reintenta igual que 429; si agota intentos y hay cache valida por endpoint, muestra datos stale con aviso. |

@@ -67,7 +67,7 @@ Usa botones disabled, skeleton oculto y fecha activa en `<time datetime>`.
 
 ### Timeline
 
-Implementado con lista ordenada, boton fallback "Load 10 more matches", retry persistente, countdown de retry en status `aria-live`, aviso de datos cacheados en el mismo status, limpieza de intervalos y desconexion de IntersectionObserver en recuperacion/reset. Pendiente prueba manual de screen reader e IntersectionObserver real con datos autenticados.
+Implementado con lista ordenada, boton fallback "Load 10 more matches", retry persistente, countdown de retry en status `aria-live`, aviso de datos cacheados en el mismo status, limpieza de intervalos y desconexion de IntersectionObserver en recuperacion/reset. `tools/timeline-observer-audit.py` verifica en Chromium que el sentinel es observado y que una interseccion controlada agrega el segundo bloque sin refetch. Pendiente prueba manual de screen reader.
 
 ### Dashboard
 
@@ -89,6 +89,7 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 - Movimiento reducido verificado en Playwright: `MOTION_AUDIT_PASS reduced_motion=emulated scroll=auto transitions<=0.01ms`; `test/static-contract.test.mjs` valida `animation-duration` e `animation-iteration-count`.
 - Offline sin cache conserva estado operable: `tools/offline-audit.py` verifica mensaje recuperable y boton Retry visible en Timeline.
 - Recuperacion 401 verificada bajo response HTTP real interceptada: `tools/failure-audit.py` confirma modal con `aria-modal` y foco inicial.
+- Timeline IntersectionObserver verificado en Playwright: `TIMELINE_OBSERVER_AUDIT_PASS before=10 after=20 games_requests=1`, con fallback visible antes del trigger.
 
 ## Gaps pendientes
 
