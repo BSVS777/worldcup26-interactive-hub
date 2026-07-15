@@ -63,6 +63,12 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 - Handlers inline: sin resultados en HTML.
 - Secretos: la busqueda marco nombres de variables/tests y filas de docs; no encontro valores tipo `Bearer <token real>` ni credenciales de produccion.
 
+## Fan Dashboard
+
+- Persiste solo `wc26:favorite-team:v1` y snapshots derivados; no persiste JWT ni Authorization.
+- Renderiza API/snapshot con `createElement`, `textContent`, `append` y `replaceChildren`.
+- No consume URLs externas de banderas ni colores de equipos, para evitar contratos inseguros no verificados.
+
 ## Modal 401
 
 - El estado `expired` activa un dialogo modal sin persistir token.

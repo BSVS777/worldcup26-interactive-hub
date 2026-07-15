@@ -66,9 +66,16 @@ Tecnica: `js/timeline-view.js:load`, `retry`, `test/timeline.test.mjs`.
 
 Tecnica: `js/api.js`, `js/session.js`, `js/router.js`, `js/ui.js`, `test/api.test.mjs`, `test/static-contract.test.mjs`.
 
+### Como funciona Dashboard
+
+15 segundos: El usuario elige un favorito; guardo solo el ID y calculo metricas con teams, games y groups.
+
+30 segundos: El dashboard cruza el equipo favorito con partidos y standings. Si la API cae y existe snapshot local, lo muestra como dato no actualizado sin inventar informacion nueva.
+
+Tecnica: `js/fan-dashboard.js`, `js/fan-dashboard-view.js`, `test/fan-dashboard.test.mjs`.
+
 ## Preguntas que faltan dominar
 
 - Timeline con retry manual y observer.
-- Dashboard con snapshot stale.
 - Matriz con actualizacion parcial de celdas.
 

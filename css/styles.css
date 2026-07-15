@@ -620,6 +620,112 @@ main {
   border-style: dashed;
   animation: agenda-skeleton-shimmer 1.4s ease-in-out infinite;
 }
+
+.fan-dashboard {
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+.fan-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.fan-toolbar label {
+  color: var(--pitch);
+  font: 700 0.72rem/1 var(--utility);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.fan-select {
+  min-width: min(100%, 18rem);
+  min-height: 2.75rem;
+  padding: 0.6rem 0.75rem;
+  color: var(--night);
+  background: white;
+  border: 0.1rem solid var(--night);
+  border-radius: 0;
+}
+
+.status-banner {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  color: var(--night);
+  background: var(--sky);
+  border: 0.08rem solid var(--night);
+  font: 700 0.78rem/1.35 var(--utility);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fan-summary {
+  margin: 0;
+  font: clamp(1.4rem, 3vw, 2.4rem)/1 var(--display);
+  text-transform: uppercase;
+}
+
+.fan-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 0;
+}
+
+.fan-metrics dt,
+.fan-metrics dd {
+  margin: 0;
+  padding: 0.8rem;
+  background: white;
+  border: 0.08rem solid var(--night);
+}
+
+.fan-metrics dt {
+  align-self: end;
+  border-bottom: 0;
+  color: var(--pitch);
+  font: 700 0.68rem/1.2 var(--utility);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fan-metrics dd {
+  margin-top: -0.8rem;
+  border-top: 0;
+  box-shadow: 0.25rem 0.25rem 0 var(--night);
+  font: clamp(1.5rem, 3vw, 2.4rem)/1 var(--display);
+}
+
+.fan-matches {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fan-match {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-left: 0.28rem solid var(--ticket);
+}
+
+.fan-match--empty {
+  border-left-color: var(--sky);
+}
+
+.fan-match__date,
+.fan-match__score {
+  font: 0.78rem/1.3 var(--utility);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 .session-panel {
   position: relative;
   display: grid;
@@ -846,6 +952,14 @@ main {
 
   .agenda-columns {
     grid-template-columns: 1fr;
+  }
+
+  .fan-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fan-match {
+    flex-direction: column;
   }
 
   .agenda-nav {

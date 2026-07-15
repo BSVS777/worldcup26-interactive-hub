@@ -68,7 +68,7 @@ Implementado con lista ordenada, boton fallback "Load 10 more matches", retry pe
 
 ### Dashboard
 
-Placeholder actual; pendiente selector y metricas reales en `<dl>`.
+Implementado con selector nativo, status `aria-live`, metricas en `<dl>` y lista de partidos. Pendiente prueba manual con teclado y lector de pantalla.
 
 ### Matrix
 
@@ -84,7 +84,7 @@ Placeholder con tabla/caption; pendiente matriz 4x4 real y celdas con scope comp
 
 ## Gaps pendientes
 
-- Dashboard y Matrix completos.
+- Matrix completo.
 - Tests responsive y lector de pantalla.
 - Contraste AA medido.
 

@@ -11,7 +11,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 
 | ID | Requisito | Archivo y función | Evidencia | Estado | Gap |
 |---|---|---|---|---|---|
-| ARC-001 | Aplicación única con cinco módulos | `index.html`, `js/router.js`, `js/ui.js`, `js/modules/*` | Playwright navego las cinco rutas sin errores de consola | IMPLEMENTADO | Fan Dashboard y Matrix aun son placeholders. |
+| ARC-001 | Aplicación única con cinco módulos | `index.html`, `js/router.js`, `js/ui.js`, `js/modules/*` | Playwright navego las cinco rutas sin errores de consola | IMPLEMENTADO | Matrix aun es placeholder. |
 | ARC-002 | HTML semántico y reducido | | | NO INICIADO | |
 | ARC-003 | CSS minimalista y responsive | | | NO INICIADO | |
 | ARC-004 | Navegación entre módulos | `js/router.js`, `js/ui.js` | Playwright: aria-current cambia en las cinco rutas | IMPLEMENTADO | Falta navegacion movil avanzada/drawer. |
@@ -102,22 +102,22 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | TIME-012 | Reintento manual dispara backoff | `js/timeline-view.js:retry` (`forceRetry: true`) | `test/timeline.test.mjs` confirma `forceRetry`; backoff central cubierto por `test/api.test.mjs` | IMPLEMENTADO | |
 | TIME-013 | Recuperación reinicia desde el principio | `js/timeline-view.js:retry`, `js/timeline.js:DATA_LOADED` | `test/timeline.test.mjs` recupera 3 partidos luego de fallo | IMPLEMENTADO | |
 | TIME-014 | Recuperación no duplica partidos | `js/timeline.js:uniqueSortedGames` | `test/timeline.test.mjs` cubre dedupe por ID | IMPLEMENTADO | |
-| FAN-001 | Obtiene teams | | | NO INICIADO | |
-| FAN-002 | Obtiene games | | | NO INICIADO | |
-| FAN-003 | Obtiene groups | | | NO INICIADO | |
-| FAN-004 | Selector único de equipo favorito | | | NO INICIADO | |
-| FAN-005 | Favorito se guarda en localStorage | | | NO INICIADO | |
-| FAN-006 | Favorito se restaura tras recarga | | | NO INICIADO | |
-| FAN-007 | Filtra solo partidos del favorito | | | NO INICIADO | |
-| FAN-008 | Cruza favorito con grupo | | | NO INICIADO | |
-| FAN-009 | Muestra puntos | | | NO INICIADO | |
-| FAN-010 | Muestra goles a favor | | | NO INICIADO | |
-| FAN-011 | Muestra goles en contra | | | NO INICIADO | |
-| FAN-012 | Repinta variables CSS | | | NO INICIADO | |
-| FAN-013 | Mantiene contraste legible | | | NO INICIADO | |
-| FAN-014 | Sin API usa snapshot del favorito | | | NO INICIADO | |
-| FAN-015 | Snapshot muestra datos no actualizados | | | NO INICIADO | |
-| FAN-016 | Dashboard nunca queda vacío | | | NO INICIADO | |
+| FAN-001 | Obtiene teams | `js/fan-dashboard-view.js:load` | `test/fan-dashboard.test.mjs` confirma llamada a `teams` | IMPLEMENTADO | Pendiente API autenticada real. |
+| FAN-002 | Obtiene games | `js/fan-dashboard-view.js:load` | `test/fan-dashboard.test.mjs` confirma llamada a `games` | IMPLEMENTADO | |
+| FAN-003 | Obtiene groups | `js/fan-dashboard-view.js:load` | `test/fan-dashboard.test.mjs` confirma llamada a `groups` | IMPLEMENTADO | |
+| FAN-004 | Selector único de equipo favorito | `index.html#fan-team-select`, `js/fan-dashboard-view.js` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | |
+| FAN-005 | Favorito se guarda en localStorage | `js/fan-dashboard.js:writeFavoriteTeamId` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | Solo se guarda ID de equipo, no JWT. |
+| FAN-006 | Favorito se restaura tras recarga | `js/fan-dashboard.js:readFavoriteTeamId` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | |
+| FAN-007 | Filtra solo partidos del favorito | `js/fan-dashboard.js:teamGames` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | |
+| FAN-008 | Cruza favorito con grupo | `js/fan-dashboard.js:findStanding` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | |
+| FAN-009 | Muestra puntos | `js/fan-dashboard.js:buildDashboard`, `js/fan-dashboard-view.js:renderMetrics` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | |
+| FAN-010 | Muestra goles a favor | `js/fan-dashboard.js:buildDashboard` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | Usa standing o calculo desde partidos jugados. |
+| FAN-011 | Muestra goles en contra | `js/fan-dashboard.js:buildDashboard` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | Usa standing o calculo desde partidos jugados. |
+| FAN-012 | Repinta variables CSS | | | NO INICIADO | No se implemento tematizacion por equipo porque no hay contrato seguro de colores en API. |
+| FAN-013 | Mantiene contraste legible | `css/styles.css:.fan-*` | Paleta existente sin colores externos de equipo | EN PROGRESO | Falta medicion numerica de contraste. |
+| FAN-014 | Sin API usa snapshot del favorito | `js/fan-dashboard.js:readFanSnapshot`, `js/fan-dashboard-view.js:load` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | Snapshot se usa cuando `teams` no esta disponible. |
+| FAN-015 | Snapshot muestra datos no actualizados | `js/fan-dashboard-view.js:renderStatus`, `renderSummary` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | |
+| FAN-016 | Dashboard nunca queda vacío | `js/fan-dashboard-view.js:renderMetrics`, `renderMatches` | `test/fan-dashboard.test.mjs`; `npm test` | IMPLEMENTADO | |
 | MAT-001 | Obtiene groups | | | NO INICIADO | |
 | MAT-002 | Obtiene teams | | | NO INICIADO | |
 | MAT-003 | Obtiene games | | | NO INICIADO | |
@@ -166,7 +166,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
-| QA-001 | Aplicación inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 100/100 | VERIFICADO | |
+| QA-001 | Aplicación inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 105/105 | VERIFICADO | |
 | QA-002 | Responsive verificado | | | NO INICIADO | |
 | QA-003 | Navegación por teclado verificada | Links/botones nativos; trap de Tab en modal 401 | `test/static-contract.test.mjs`; pendiente prueba manual completa | EN PROGRESO | Falta evidencia manual de teclado completo. |
 | QA-004 | aria-live en estados dinámicos | | | NO INICIADO | |

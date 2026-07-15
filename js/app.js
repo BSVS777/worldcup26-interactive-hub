@@ -7,6 +7,7 @@ import { createAuthStore } from './auth.js';
 import { createTourView } from './tour-view.js';
 import { createAgendaView } from './agenda-view.js';
 import { createTimelineView } from './timeline-view.js';
+import { createFanDashboardView } from './fan-dashboard-view.js';
 import { createShellView } from './ui.js';
 
 applyAccessibilityPreferences(document.documentElement, readAccessibilityPreferences(window.localStorage));
@@ -36,11 +37,13 @@ const api = createApiClient({
 const tourView = createTourView(document, api);
 const agendaView = createAgendaView(document, api);
 const timelineView = createTimelineView(document, api);
+const fanDashboardView = createFanDashboardView(document, api);
 
 function loadActiveModule() {
   if (state.route === 'tour') tourView.ensureLoaded();
   if (state.route === 'agenda') agendaView.ensureLoaded();
   if (state.route === 'timeline') timelineView.ensureLoaded();
+  if (state.route === 'fan-dashboard') fanDashboardView.ensureLoaded();
 }
 
 async function handleLogin(credentials) {
@@ -50,6 +53,7 @@ async function handleLogin(credentials) {
     tourView.reset();
     agendaView.reset();
     timelineView.reset();
+    fanDashboardView.reset();
     update({ type: 'LOGIN_SUCCEEDED' }, { announceMessage: 'Signed in. Live match data is available.' });
     view.focusCurrentView();
     loadActiveModule();
