@@ -35,3 +35,8 @@ test('styles preserve focus visibility, pointer scrolling, and device safe areas
   assert.match(css, /env\(safe-area-inset-left\)/);
   assert.match(css, /env\(safe-area-inset-bottom\)/);
 });
+
+test('hidden modules cannot be re-displayed by component display rules', async () => {
+  const css = await readFile(new URL('../css/styles.css', import.meta.url), 'utf8');
+  assert.match(css, /\[hidden\]\s*\{\s*display:\s*none\s*!important;\s*\}/s);
+});

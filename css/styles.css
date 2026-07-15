@@ -70,6 +70,10 @@ a {
   box-shadow: 0 0 0 0.42rem white;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .skip-link {
   position: fixed;
   top: max(0.75rem, env(safe-area-inset-top));
