@@ -20,6 +20,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 11. La navegacion por teclado se demuestra con Playwright: Tab/Shift+Tab/Enter cubren skip link, login, rutas, controles y modal 401 sin recarga.
 12. Movimiento reducido se demuestra emulando `prefers-reduced-motion: reduce`: scroll auto y transiciones minimas en browser; animaciones minimas e iteracion unica por contrato CSS estatico.
 13. Offline se demuestra en browser: con cache muestra datos stale, sin cache conserva estado recuperable con Retry sin recarga.
+14. DevTools HTTP se demuestra con Playwright: 401 abre modal, 429 muestra countdown y 429/500 se recuperan con response 200 posterior.
 
 ## Endpoints por modulo
 

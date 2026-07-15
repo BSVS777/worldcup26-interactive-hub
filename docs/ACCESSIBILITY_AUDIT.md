@@ -88,6 +88,7 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 - Navegacion por teclado verificada en Playwright: `KEYBOARD_AUDIT_PASS routes=5 login=keyboard modal_trap=verified`.
 - Movimiento reducido verificado en Playwright: `MOTION_AUDIT_PASS reduced_motion=emulated scroll=auto transitions<=0.01ms`; `test/static-contract.test.mjs` valida `animation-duration` e `animation-iteration-count`.
 - Offline sin cache conserva estado operable: `tools/offline-audit.py` verifica mensaje recuperable y boton Retry visible en Timeline.
+- Recuperacion 401 verificada bajo response HTTP real interceptada: `tools/failure-audit.py` confirma modal con `aria-modal` y foco inicial.
 
 ## Gaps pendientes
 

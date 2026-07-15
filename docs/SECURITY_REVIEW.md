@@ -121,6 +121,10 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 - Tour, Agenda, Timeline, Fan Dashboard y Matrix muestran avisos visibles cuando algun endpoint publico responde desde cache.
 - Matrix y Timeline tienen cobertura unitaria directa de esos avisos; los demas modulos quedan cubiertos por propagacion comun y pendientes de evidencia Playwright por modulo.
 
+## Evidencia DevTools HTTP
+
+`tools/failure-audit.py` fuerza 401, 429 y 500 sobre `/get/games` en Chromium. La auditoria observa responses 401/429/500 en Network, confirma que 401 abre el modal accesible, que 429 muestra countdown de retry y que 429/500 recuperan con un 200 posterior sin recarga.
+
 ## Riesgos pendientes
 
 - Completar modulos restantes.

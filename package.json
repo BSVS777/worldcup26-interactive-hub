@@ -10,6 +10,7 @@
     "test": "node --test test/*.mjs",
     "test:keyboard": "python tools/keyboard-audit.py",
     "test:motion": "python tools/motion-audit.py",
-    "test:offline": "python tools/offline-audit.py"
+    "test:offline": "python tools/offline-audit.py",
+    "test:failures": "python tools/failure-audit.py"
   }
 }
