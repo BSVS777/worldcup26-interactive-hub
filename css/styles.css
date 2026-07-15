@@ -726,6 +726,94 @@ main {
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+
+.matrix-view {
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+.matrix-grid {
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.matrix-card {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.matrix-card h3 {
+  margin: 0;
+  font: clamp(1.25rem, 2.4vw, 1.9rem)/1 var(--display);
+  text-transform: uppercase;
+}
+
+.matrix-table-shell {
+  overflow-x: auto;
+  border: 0.08rem solid var(--night);
+  background: white;
+  overscroll-behavior-inline: contain;
+  touch-action: pan-x;
+}
+
+.matrix-table {
+  width: 100%;
+  min-width: 36rem;
+  border-collapse: collapse;
+  color: var(--night);
+}
+
+.matrix-table caption {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  color: var(--pitch);
+  font: 700 0.72rem/1.2 var(--utility);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.matrix-table th,
+.matrix-table td {
+  min-width: 7rem;
+  padding: 0.75rem;
+  border: 0.06rem solid var(--night);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.matrix-table th {
+  background: var(--sky);
+  font: 700 0.72rem/1.2 var(--utility);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.matrix-cell {
+  font: 700 0.84rem/1.2 var(--utility);
+}
+
+.matrix-cell[data-status="played"] {
+  background: var(--grass);
+  color: white;
+}
+
+.matrix-cell[data-status="pending"],
+.matrix-cell[data-status="unknown"] {
+  background: var(--paper);
+}
+
+.matrix-cell--diagonal {
+  color: var(--pitch);
+  background: repeating-linear-gradient(135deg, var(--paper), var(--paper) 0.4rem, var(--sky) 0.4rem, var(--sky) 0.8rem);
+}
+
+.matrix-skeleton {
+  min-height: 8rem;
+  background: linear-gradient(90deg, var(--paper), var(--sky), var(--paper));
+  border: 0.08rem dashed var(--night);
+  animation: agenda-skeleton-shimmer 1.4s ease-in-out infinite;
+}
 .session-panel {
   position: relative;
   display: grid;
@@ -900,7 +988,8 @@ main {
     width: min(100%, 24rem);
   }
 
-  .session-panel {
+
+.session-panel {
     grid-template-columns: 1fr;
     border-radius: 5rem 0 0;
   }

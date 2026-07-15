@@ -11,7 +11,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 
 | ID | Requisito | Archivo y función | Evidencia | Estado | Gap |
 |---|---|---|---|---|---|
-| ARC-001 | Aplicación única con cinco módulos | `index.html`, `js/router.js`, `js/ui.js`, `js/modules/*` | Playwright navego las cinco rutas sin errores de consola | IMPLEMENTADO | Matrix aun es placeholder. |
+| ARC-001 | Aplicación única con cinco módulos | `index.html`, `js/router.js`, `js/ui.js`, `js/modules/*` | Playwright navego las cinco rutas sin errores de consola | IMPLEMENTADO | Cinco modulos implementados; falta verificacion con API viva completa. |
 | ARC-002 | HTML semántico y reducido | | | NO INICIADO | |
 | ARC-003 | CSS minimalista y responsive | | | NO INICIADO | |
 | ARC-004 | Navegación entre módulos | `js/router.js`, `js/ui.js` | Playwright: aria-current cambia en las cinco rutas | IMPLEMENTADO | Falta navegacion movil avanzada/drawer. |
@@ -118,25 +118,25 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | FAN-014 | Sin API usa snapshot del favorito | `js/fan-dashboard.js:readFanSnapshot`, `js/fan-dashboard-view.js:load` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | Snapshot se usa cuando `teams` no esta disponible. |
 | FAN-015 | Snapshot muestra datos no actualizados | `js/fan-dashboard-view.js:renderStatus`, `renderSummary` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | |
 | FAN-016 | Dashboard nunca queda vacío | `js/fan-dashboard-view.js:renderMetrics`, `renderMatches` | `test/fan-dashboard.test.mjs`; `npm test` | IMPLEMENTADO | |
-| MAT-001 | Obtiene groups | | | NO INICIADO | |
-| MAT-002 | Obtiene teams | | | NO INICIADO | |
-| MAT-003 | Obtiene games | | | NO INICIADO | |
-| MAT-004 | Construye 12 matrices | | | NO INICIADO | |
-| MAT-005 | Cada matriz es 4x4 | | | NO INICIADO | |
-| MAT-006 | Filas representan equipos del grupo | | | NO INICIADO | |
-| MAT-007 | Columnas representan equipos del grupo | | | NO INICIADO | |
-| MAT-008 | Cruza grupos con equipos | | | NO INICIADO | |
-| MAT-009 | Cruza equipos con partidos | | | NO INICIADO | |
-| MAT-010 | Partido jugado muestra resultado | | | NO INICIADO | |
-| MAT-011 | Partido no jugado muestra Pendiente | | | NO INICIADO | |
-| MAT-012 | Diagonal está deshabilitada visualmente | | | NO INICIADO | |
-| MAT-013 | Diagonal está marcada semánticamente | | | NO INICIADO | |
-| MAT-014 | Vista es usable en móvil | | | NO INICIADO | |
-| MAT-015 | Sin games dibuja matriz completa | | | NO INICIADO | |
-| MAT-016 | Sin games todas las celdas quedan Pendiente | | | NO INICIADO | |
-| MAT-017 | Conserva referencias a celdas | | | NO INICIADO | |
-| MAT-018 | Recuperación actualiza solo celdas afectadas | | | NO INICIADO | |
-| MAT-019 | Recuperación no reconstruye tablas | | | NO INICIADO | |
+| MAT-001 | Obtiene groups | `js/matrix-view.js:load` | `test/matrix.test.mjs`; `npm test` | IMPLEMENTADO | Pendiente API autenticada real. |
+| MAT-002 | Obtiene teams | `js/matrix-view.js:load` | `test/matrix.test.mjs`; `npm test` | IMPLEMENTADO | Pendiente API autenticada real. |
+| MAT-003 | Obtiene games | `js/matrix-view.js:load` | `test/matrix.test.mjs`; `npm test` | IMPLEMENTADO | Pendiente API autenticada real. |
+| MAT-004 | Construye 12 matrices | `js/matrix.js:buildGroupMatrices` | `test/matrix.test.mjs` prueba matriz por grupo | EN PROGRESO | Implementa una matriz por `group`; falta API viva para confirmar 12 grupos. |
+| MAT-005 | Cada matriz es 4x4 | `js/matrix.js:buildGroupMatrices` | `test/matrix.test.mjs` | IMPLEMENTADO | Cuando el group trae cuatro equipos; si API trae otra cantidad, caption lo declara. |
+| MAT-006 | Filas representan equipos del grupo | `js/matrix.js`, `js/matrix-view.js` | `test/matrix.test.mjs` | IMPLEMENTADO | |
+| MAT-007 | Columnas representan equipos del grupo | `js/matrix-view.js:renderStructure` | `test/matrix.test.mjs` | IMPLEMENTADO | |
+| MAT-008 | Cruza grupos con equipos | `js/matrix.js:teamsForGroup` | `test/matrix.test.mjs` | IMPLEMENTADO | Usa standings del group o `team.groupId`. |
+| MAT-009 | Cruza equipos con partidos | `js/matrix.js:indexGames`, `buildCell` | `test/matrix.test.mjs` | IMPLEMENTADO | |
+| MAT-010 | Partido jugado muestra resultado | `js/matrix.js:scoreForTeam` | `test/matrix.test.mjs` | IMPLEMENTADO | Resultado desde perspectiva del equipo de la fila. |
+| MAT-011 | Partido no jugado muestra Pendiente | `js/matrix.js:buildCell` | `test/matrix.test.mjs` | IMPLEMENTADO | |
+| MAT-012 | Diagonal está deshabilitada visualmente | `css/styles.css:.matrix-cell--diagonal` | `test/matrix.test.mjs` | IMPLEMENTADO | |
+| MAT-013 | Diagonal está marcada semánticamente | `js/matrix-view.js:updateCells` | `test/matrix.test.mjs` | IMPLEMENTADO | Usa `aria-disabled="true"` y label same-team. |
+| MAT-014 | Vista es usable en móvil | `css/styles.css:.matrix-table-shell` | Playwright 390x844: docWidth=viewportWidth, tabla scrollea dentro del shell | VERIFICADO | |
+| MAT-015 | Sin games dibuja matriz completa | `js/matrix.js:buildGroupMatrices` | `test/matrix.test.mjs` | IMPLEMENTADO | |
+| MAT-016 | Sin games todas las celdas quedan Pendiente | `js/matrix.js:buildCell` | `test/matrix.test.mjs` | IMPLEMENTADO | Celdas no diagonales quedan `Pending`/`unknown`. |
+| MAT-017 | Conserva referencias a celdas | `js/matrix-view.js:cellRefs` | `test/matrix.test.mjs` | IMPLEMENTADO | |
+| MAT-018 | Recuperación actualiza solo celdas afectadas | `js/matrix-view.js:refresh`, `updateCells` | `test/matrix.test.mjs` | IMPLEMENTADO | |
+| MAT-019 | Recuperación no reconstruye tablas | `js/matrix-view.js:render` estructura estable | `test/matrix.test.mjs` | IMPLEMENTADO | |
 | TST-001 | Servidor local usa Node nativo | | | NO INICIADO | |
 | TST-002 | /test/401 devuelve HTTP 401 real | | | NO INICIADO | |
 | TST-003 | /test/429 devuelve HTTP 429 real | | | NO INICIADO | |
@@ -166,7 +166,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
-| QA-001 | Aplicación inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 105/105 | VERIFICADO | |
+| QA-001 | Aplicación inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 111/111 | VERIFICADO | |
 | QA-002 | Responsive verificado | | | NO INICIADO | |
 | QA-003 | Navegación por teclado verificada | Links/botones nativos; trap de Tab en modal 401 | `test/static-contract.test.mjs`; pendiente prueba manual completa | EN PROGRESO | Falta evidencia manual de teclado completo. |
 | QA-004 | aria-live en estados dinámicos | | | NO INICIADO | |
@@ -185,6 +185,3 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | SPEC-SEC-001 | Seguridad y privacidad son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define SEC-HARD-001..SEC-HARD-010 | IMPLEMENTADO | Pendiente ejecutar auditoria final de headers, storage y rutas. |
 | SPEC-RES-001 | Resiliencia tipo "intumbable" se define como degradacion segura, contencion de fallos y recuperacion sin recarga | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define RES-001..RES-008 | IMPLEMENTADO | Pendiente Playwright por modulo para validar comportamiento real. |
 | QA-011 | Elementos con `hidden` no ocupan layout ni foco | `css/styles.css` (`[hidden]`) | `test/static-contract.test.mjs` verifica `display: none !important` | IMPLEMENTADO | |
-
-
-

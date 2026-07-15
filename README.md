@@ -17,7 +17,7 @@ npm run test:server
 
 - App shell con navegacion entre cinco modulos.
 - Tour Virtual y Agenda Simultanea implementados con datos de API normalizados.
-- Timeline Infinito esta implementado con carga unica de games, bloques locales de 10, fallback manual y retry. Dashboard del Fanatico esta implementado con favorito persistido, metricas desde API y snapshot local. Matriz mantiene placeholder funcional mientras se implementa su flujo completo.
+- Timeline Infinito esta implementado con carga unica de games, bloques locales de 10, fallback manual y retry. Dashboard del Fanatico esta implementado con favorito persistido, metricas desde API y snapshot local. Matriz de Enfrentamientos esta implementada con tablas 4x4 por grupo, resultados, pendientes y actualizacion parcial de celdas.
 - Cliente HTTP central con JWT en memoria, endpoint allowlist, retry 429/500 y cache publica por endpoint.
 - Accesibilidad, inclusion, seguridad y resiliencia quedan como criterio de listo en `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md`; la meta "intumbable" se mide como degradacion con gracia, fallos contenidos y recuperacion sin recarga.
 - Test mode local con servidor determinista para 401, 429, 500 y reset.

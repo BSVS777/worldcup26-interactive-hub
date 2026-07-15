@@ -63,6 +63,12 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 - Handlers inline: sin resultados en HTML.
 - Secretos: la busqueda marco nombres de variables/tests y filas de docs; no encontro valores tipo `Bearer <token real>` ni credenciales de produccion.
 
+## Group Matrix
+
+- Renderiza grupos, equipos y partidos con APIs DOM seguras: createElement, textContent, append y replaceChildren.
+- No persiste datos nuevos ni tokens; solo consume el cliente API central y sus fallbacks.
+- La actualizacion parcial usa referencias internas a celdas por ID de grupo/equipo, sin HTML crudo ni selectores derivados de datos no confiables.
+
 ## Fan Dashboard
 
 - Persiste solo `wc26:favorite-team:v1` y snapshots derivados; no persiste JWT ni Authorization.
@@ -86,5 +92,3 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 - Validar API viva y Content-Type real.
 - Agregar prueba DOM XSS dedicada.
 - Auditar secretos antes de entrega final.
-
-

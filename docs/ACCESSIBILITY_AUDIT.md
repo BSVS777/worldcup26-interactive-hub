@@ -72,20 +72,17 @@ Implementado con selector nativo, status `aria-live`, metricas en `<dl>` y lista
 
 ### Matrix
 
-Placeholder con tabla/caption; pendiente matriz 4x4 real y celdas con scope completo.
+Implementada con tablas nativas, caption, encabezados de columna, encabezados de fila con `scope="row"`, diagonal `aria-disabled`, estado `aria-live` y contenedor horizontal acotado para movil.
 
 ## Evidencia Playwright
 
 - App arranca en `http://127.0.0.1:4173` sin errores de consola.
-- Rutas navegables: `tour`, `agenda`, `timeline`, `fan-dashboard`, `group-matrix`. Timeline fue verificado en Playwright como vista activa con placeholder oculto y retry visible en estado anonimo.
+- Rutas navegables: `tour`, `agenda`, `timeline`, `fan-dashboard`, `group-matrix`. Timeline fue verificado en Playwright como vista activa con placeholder oculto y retry visible en estado anonimo. Matrix fue verificada en movil 390x844 con 16 celdas, diagonal `aria-disabled`, resultado/pending y overflow contenido en el shell de tabla.
 - `aria-current="page"` cambia en cada ruta.
 - Sin overflow horizontal global en 1366x768.
 - Modal 401 verificado en Playwright: role=dialog, aria-modal=true, foco inicial en email, fondo inerte, Tab cicla dentro del modal y sin errores de consola.
 
 ## Gaps pendientes
 
-- Matrix completo.
 - Tests responsive y lector de pantalla.
 - Contraste AA medido.
-
-

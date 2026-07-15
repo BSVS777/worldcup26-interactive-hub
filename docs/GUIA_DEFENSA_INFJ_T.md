@@ -74,8 +74,15 @@ Tecnica: `js/api.js`, `js/session.js`, `js/router.js`, `js/ui.js`, `test/api.tes
 
 Tecnica: `js/fan-dashboard.js`, `js/fan-dashboard-view.js`, `test/fan-dashboard.test.mjs`.
 
+### Como funciona Matriz
+
+15 segundos: Por cada grupo construyo una tabla de cruces equipo contra equipo; la diagonal queda deshabilitada y las celdas muestran resultado o Pendiente.
+
+30 segundos: La matriz cruza groups, teams y games sin inventar datos. Si games falla, conserva la estructura completa del grupo y marca los cruces como pendientes/unknown; cuando se refrescan partidos con la misma estructura, actualiza celdas sin reconstruir tablas.
+
+Tecnica: js/matrix.js, js/matrix-view.js, 	est/matrix.test.mjs.
+
 ## Preguntas que faltan dominar
 
 - Timeline con retry manual y observer.
-- Matriz con actualizacion parcial de celdas.
-
+- Contraste numerico y pruebas manuales de lector de pantalla.
