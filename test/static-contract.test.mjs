@@ -70,9 +70,11 @@ test('README lists the exact package commands and local URLs', async () => {
   assert.equal(packageJson.scripts.start, 'node tools/app-server.mjs');
   assert.equal(packageJson.scripts.test, 'node --test test/*.mjs');
   assert.equal(packageJson.scripts['test:server'], 'node tools/test-server.mjs');
+  assert.equal(packageJson.scripts['test:responsive'], 'python tools/responsive-audit.py');
   assert.match(readme, /`npm start`[\s\S]*`node tools\/app-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4173`/);
   assert.match(readme, /`npm test`[\s\S]*`node --test test\/\*\.mjs`/);
   assert.match(readme, /`npm run test:server`[\s\S]*`node tools\/test-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4174`/);
+  assert.match(readme, /`npm run test:responsive`[\s\S]*`python tools\/responsive-audit\.py`/);
   assert.match(readme, /`http:\/\/127\.0\.0\.1:4173\/\?testMode=1`/);
 });
 

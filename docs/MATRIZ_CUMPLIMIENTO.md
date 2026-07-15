@@ -13,7 +13,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 |---|---|---|---|---|---|
 | ARC-001 | Aplicación única con cinco módulos | `index.html`, `js/router.js`, `js/ui.js`, `js/modules/*` | Playwright navego las cinco rutas sin errores de consola | IMPLEMENTADO | Cinco modulos implementados; falta verificacion con API viva completa. |
 | ARC-002 | HTML semántico y reducido | | | NO INICIADO | |
-| ARC-003 | CSS minimalista y responsive | | | NO INICIADO | |
+| ARC-003 | CSS minimalista y responsive | `css/styles.css`, `tools/responsive-audit.py` | Playwright testMode autenticado: 5 viewports x 5 rutas sin overflow global; H1 hero ajustado para 320px | VERIFICADO | |
 | ARC-004 | Navegación entre módulos | `js/router.js`, `js/ui.js` | Playwright: aria-current cambia en las cinco rutas | IMPLEMENTADO | Falta navegacion movil avanzada/drawer. |
 | ARC-005 | Fetch separado de presentacion | `js/api.js`, vistas `js/*-view.js` | `test/static-contract.test.mjs` valida que las vistas no usen `fetch(` directo y que el cliente API central maneje red | VERIFICADO | |
 | API-001 | Endpoint real de autenticación verificado | | | NO INICIADO | |
@@ -167,7 +167,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
 | QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 128/128 | VERIFICADO | |
-| QA-002 | Responsive verificado | | | NO INICIADO | |
+| QA-002 | Responsive verificado | `tools/responsive-audit.py`, `css/styles.css` | `with_server.py` + `python tools/responsive-audit.py`: 320x720, 390x844, 768x1024, 1366x768, 1920x1080 en cinco rutas; 25/25 sin overflow global | VERIFICADO | |
 | QA-003 | Navegación por teclado verificada | Links/botones nativos; trap de Tab en modal 401 | `test/static-contract.test.mjs`; pendiente prueba manual completa | EN PROGRESO | Falta evidencia manual de teclado completo. |
 | QA-004 | aria-live en estados dinamicos | `index.html`, `js/timeline-view.js`, `js/matrix-view.js` | Countdown y avisos de cache actualizan regiones `role=status`/`aria-live`; `test/timeline.test.mjs`, `test/matrix.test.mjs` | IMPLEMENTADO | Pendiente prueba manual con lector de pantalla. |
 | QA-005 | prefers-reduced-motion respetado | `css/styles.css`, `js/accessibility.js` | CSS contiene media query; preferencias manuales base disponibles | IMPLEMENTADO | Falta verificacion visual en browser con media emulada. |

@@ -10,7 +10,7 @@ No se declara conformidad WCAG 2.2 AA completa hasta terminar pruebas manuales c
 - SO: Windows.
 - lector: pendiente NVDA/Chrome o NVDA/Firefox.
 - zoom: pendiente 200% y 400%.
-- viewport: verificado 390x844 para Matrix y 1366x768 para shell; pendientes 768x1024, 1920x1080 y zoom.
+- viewport: verificado con Playwright en testMode autenticado para 320x720, 390x844, 768x1024, 1366x768 y 1920x1080 sobre las cinco rutas; zoom con navegador/lector sigue pendiente.
 
 ## Pruebas
 
@@ -40,7 +40,7 @@ Implementado modal dinamico de sesion expirada con `role="dialog"`, `aria-modal`
 
 ## Zoom y reflow
 
-Playwright verifico 1366x768 sin overflow global (`scrollWidth` 1366, `clientWidth` 1366). Pendiente 390x844, 768x1024, 1920x1080 y zoom.
+`tools/responsive-audit.py` verifico 25 combinaciones: 320x720, 390x844, 768x1024, 1366x768 y 1920x1080 sobre `tour`, `agenda`, `timeline`, `fan-dashboard` y `group-matrix`, autenticado contra testMode. Cada ruta reporto `scrollWidth == clientWidth` y sin elementos visibles fuera del viewport salvo contenedores con scroll horizontal intencional. Zoom de navegador/lector sigue pendiente.
 
 ## Contraste
 
@@ -81,10 +81,10 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 - App arranca en `http://127.0.0.1:4173` sin errores de consola.
 - Rutas navegables: `tour`, `agenda`, `timeline`, `fan-dashboard`, `group-matrix`. Timeline fue verificado en Playwright como vista activa con placeholder oculto y retry visible en estado anonimo. Matrix fue verificada en movil 390x844 con 16 celdas, diagonal `aria-disabled`, resultado/pending y overflow contenido en el shell de tabla.
 - `aria-current="page"` cambia en cada ruta.
-- Sin overflow horizontal global en 1366x768.
+- Sin overflow horizontal global en 320x720, 390x844, 768x1024, 1366x768 y 1920x1080 para las cinco rutas autenticadas (`RESPONSIVE_AUDIT_PASS viewports=5 routes=5 checks=25`).
 - Modal 401 verificado en Playwright: role=dialog, aria-modal=true, foco inicial en email, fondo inerte, Tab cicla dentro del modal y sin errores de consola.
 
 ## Gaps pendientes
 
-- Tests responsive adicionales, zoom y lector de pantalla.
+- Zoom de navegador/lector de pantalla.
 - Contraste AA medido.

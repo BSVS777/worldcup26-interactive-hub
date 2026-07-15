@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node tools/app-server.mjs",
     "test:server": "node tools/test-server.mjs",
+    "test:responsive": "python tools/responsive-audit.py",
     "test": "node --test test/*.mjs"
   }
 }

@@ -9,8 +9,9 @@ Aplicacion vanilla JavaScript para explorar el Mundial 2026 con una base de resi
 | Servir la app local | `npm start` | Inicia `node tools/app-server.mjs` en `http://127.0.0.1:4173`. |
 | Ejecutar la suite completa | `npm test` | Ejecuta `node --test test/*.mjs`. |
 | Levantar el servidor determinista | `npm run test:server` | Inicia `node tools/test-server.mjs` en `http://127.0.0.1:4174`. |
+| Auditar responsive autenticado | `npm run test:responsive` | Ejecuta `python tools/responsive-audit.py`; requiere app local y servidor determinista activos. |
 
-La app local y el servidor determinista son procesos separados. Para pruebas manuales con datos sinteticos, inicia ambos y abre `http://127.0.0.1:4173/?testMode=1`.
+La app local y el servidor determinista son procesos separados. Para pruebas manuales con datos sinteticos, inicia ambos y abre `http://127.0.0.1:4173/?testMode=1`. La auditoria responsive se puede ejecutar con ambos servidores activos o con `python C:\Users\uyv31\.agents\skills\webapp-testing\scripts\with_server.py --server "npm start" --port 4173 --server "npm run test:server" --port 4174 -- python tools/responsive-audit.py`.
 
 ## Alcance actual
 

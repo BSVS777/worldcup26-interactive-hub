@@ -231,10 +231,16 @@ main {
 
 .hero {
   display: grid;
+  min-width: 0;
   grid-template-columns: minmax(0, 1.6fr) minmax(12rem, 0.7fr);
   gap: clamp(2rem, 6vw, 6rem);
   align-items: end;
   min-height: clamp(20rem, 45vw, 33rem);
+}
+
+.hero__copy,
+.hero__scoreboard {
+  min-width: 0;
 }
 
 .hero__marker,
@@ -248,6 +254,7 @@ main {
 
 .hero h1 {
   max-width: 11ch;
+  overflow-wrap: anywhere;
   margin: 0;
   font: clamp(4.3rem, 10vw, 9.5rem)/0.78 var(--display);
   letter-spacing: -0.035em;
@@ -1023,7 +1030,7 @@ main {
   }
 
   .hero h1 {
-    font-size: clamp(3.65rem, 19vw, 5rem);
+    font-size: clamp(3rem, 16vw, 5rem);
   }
 
   .module-stage__header,
