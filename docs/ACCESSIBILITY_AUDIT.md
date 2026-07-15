@@ -64,7 +64,7 @@ Usa botones disabled y skeleton oculto; pendiente convertir fecha a `<time datet
 
 ### Timeline
 
-Implementado con lista ordenada, boton fallback "Load 10 more matches", retry persistente y status `aria-live`. Pendiente prueba manual de screen reader e IntersectionObserver real con datos autenticados.
+Implementado con lista ordenada, boton fallback "Load 10 more matches", retry persistente, countdown de retry en status `aria-live` y limpieza de intervalos en recuperacion/reset. Pendiente prueba manual de screen reader e IntersectionObserver real con datos autenticados.
 
 ### Dashboard
 

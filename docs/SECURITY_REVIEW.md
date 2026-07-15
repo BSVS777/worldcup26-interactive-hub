@@ -89,6 +89,11 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 - El fondo queda inerte y `aria-hidden` mientras se reautentica.
 - El trap de Tab se registra una vez al construir `createShellView`.
 
+## Retry countdown
+
+- `timeline-status` es un `role="status"` con `aria-live="polite"`; el countdown de retry se anuncia sin insertar HTML crudo.
+- `clearRetryCountdown` limpia el intervalo al recuperar datos, fallar definitivamente o resetear la vista, reduciendo riesgo de timers huerfanos.
+
 ## Timeline
 
 - `createTimelineView` usa `generation` para descartar cargas obsoletas.

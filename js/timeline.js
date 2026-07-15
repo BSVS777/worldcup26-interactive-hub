@@ -63,6 +63,12 @@ export function reduceTimelineState(state, action) {
         retrySecondsRemaining: Math.max(0, Math.ceil((Number(action.delayMs) || 0) / 1000)),
         announcement: `Retry ${Number(action.attempt) || state.retryAttempt} scheduled.`
       });
+    case 'RETRY_COUNTDOWN':
+      return Object.freeze({
+        ...state,
+        retrySecondsRemaining: Math.max(0, Number(action.secondsRemaining) || 0),
+        announcement: state.retrying ? `Retrying in ${Math.max(0, Number(action.secondsRemaining) || 0)} seconds.` : state.announcement
+      });
     case 'DATA_LOADED': {
       const games = uniqueSortedGames(action.games ?? []);
       const visibleCount = Math.min(BATCH_SIZE, games.length);

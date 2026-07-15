@@ -7,7 +7,11 @@ import {
 } from './timeline.js';
 import { formatScore } from './loadable-view.js';
 
-export function createTimelineView(document, api, { IntersectionObserverImpl = globalThis.IntersectionObserver } = {}) {
+export function createTimelineView(document, api, {
+  IntersectionObserverImpl = globalThis.IntersectionObserver,
+  setIntervalImpl = globalThis.setInterval,
+  clearIntervalImpl = globalThis.clearInterval
+} = {}) {
   const elements = {
     status: requireElement(document, 'timeline-status', 'timeline element'),
     list: requireElement(document, 'timeline-list', 'timeline element'),
@@ -19,6 +23,7 @@ export function createTimelineView(document, api, { IntersectionObserverImpl = g
   let generation = 0;
   let loadPromise = null;
   let observer = null;
+  let retryCountdownTimer = null;
 
   function createSkeletonRow() {
     const row = document.createElement('li');
@@ -51,6 +56,29 @@ export function createTimelineView(document, api, { IntersectionObserverImpl = g
   function disconnectObserver() {
     observer?.disconnect?.();
     observer = null;
+  }
+
+  function clearRetryCountdown() {
+    if (retryCountdownTimer === null) return;
+    clearIntervalImpl?.(retryCountdownTimer);
+    retryCountdownTimer = null;
+  }
+
+  function startRetryCountdown(delayMs, activeGeneration) {
+    clearRetryCountdown();
+    if (typeof setIntervalImpl !== 'function') return;
+    let secondsRemaining = Math.max(0, Math.ceil((Number(delayMs) || 0) / 1000));
+    if (secondsRemaining <= 0) return;
+    retryCountdownTimer = setIntervalImpl(() => {
+      if (activeGeneration !== generation) {
+        clearRetryCountdown();
+        return;
+      }
+      secondsRemaining = Math.max(0, secondsRemaining - 1);
+      state = reduceTimelineState(state, { type: 'RETRY_COUNTDOWN', secondsRemaining });
+      renderStatus();
+      if (secondsRemaining === 0) clearRetryCountdown();
+    }, 1000);
   }
 
   function showNextBatch() {
@@ -122,14 +150,17 @@ export function createTimelineView(document, api, { IntersectionObserverImpl = g
           if (myGeneration !== generation) return;
           state = reduceTimelineState(state, { type: 'RETRY_TICK', attempt: event.attempt, delayMs: event.delayMs });
           renderStatus();
+          startRetryCountdown(event.delayMs, myGeneration);
         }
       });
       if (myGeneration !== generation) return false;
+      clearRetryCountdown();
       state = reduceTimelineState(state, { type: 'DATA_LOADED', games: result.data });
       render();
       return false;
     } catch {
       if (myGeneration !== generation) return false;
+      clearRetryCountdown();
       state = reduceTimelineState(state, { type: 'LOAD_FAILED' });
       render();
       loadPromise = null;
@@ -152,6 +183,7 @@ export function createTimelineView(document, api, { IntersectionObserverImpl = g
   function reset() {
     generation++;
     disconnectObserver();
+    clearRetryCountdown();
     loadPromise = null;
     state = reduceTimelineState(state, { type: 'RESET' });
     render();

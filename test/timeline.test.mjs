@@ -168,3 +168,93 @@ test('timeline retry uses forceRetry and renders recovered matches without dupli
   ]);
   assert.equal(list.children.length, 3);
 });
+
+function deferred() {
+  let resolve;
+  const promise = new Promise((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
+
+test('timeline retry countdown updates the live status and clears after recovery', async () => {
+  const { document, status } = createFakeDocument();
+  const pending = deferred();
+  const timers = new Map();
+  const cleared = [];
+  let nextTimerId = 1;
+  const api = {
+    async apiRequest(endpoint, options = {}) {
+      assert.equal(endpoint, 'games');
+      options.onRetry({ attempt: 1, delayMs: 3000 });
+      await pending.promise;
+      return { data: games(1) };
+    }
+  };
+  const view = createTimelineView(document, api, {
+    IntersectionObserverImpl: undefined,
+    setIntervalImpl(handler, delayMs) {
+      assert.equal(delayMs, 1000);
+      const id = nextTimerId;
+      nextTimerId += 1;
+      timers.set(id, handler);
+      return id;
+    },
+    clearIntervalImpl(id) {
+      cleared.push(id);
+      timers.delete(id);
+    }
+  });
+
+  const loadPromise = view.retry();
+  await Promise.resolve();
+  assert.match(status.textContent, /Retrying in 3s\./);
+
+  timers.get(1)();
+  assert.match(status.textContent, /Retrying in 2s\./);
+  timers.get(1)();
+  assert.match(status.textContent, /Retrying in 1s\./);
+
+  pending.resolve();
+  await loadPromise;
+  assert.match(status.textContent, /1 of 1 matches shown\./);
+  assert.deepEqual(cleared, [1]);
+  assert.equal(timers.size, 0);
+});
+
+test('timeline reset clears an active retry countdown before stale recovery resolves', async () => {
+  const { document, status } = createFakeDocument();
+  const pending = deferred();
+  const timers = new Map();
+  const cleared = [];
+  const api = {
+    async apiRequest(endpoint, options = {}) {
+      options.onRetry({ attempt: 1, delayMs: 2000 });
+      await pending.promise;
+      return { data: games(1) };
+    }
+  };
+  const view = createTimelineView(document, api, {
+    IntersectionObserverImpl: undefined,
+    setIntervalImpl(handler) {
+      timers.set(7, handler);
+      return 7;
+    },
+    clearIntervalImpl(id) {
+      cleared.push(id);
+      timers.delete(id);
+    }
+  });
+
+  const loadPromise = view.retry();
+  await Promise.resolve();
+  assert.match(status.textContent, /Retrying in 2s\./);
+
+  view.reset();
+  assert.deepEqual(cleared, [7]);
+  assert.equal(timers.size, 0);
+
+  pending.resolve();
+  await loadPromise;
+  assert.equal(status.textContent, 'No matches are available yet.');
+});
