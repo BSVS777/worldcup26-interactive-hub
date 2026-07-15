@@ -29,10 +29,10 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | ASY-003 | No existe .then() en código ejecutable | | | NO INICIADO | |
 | ASY-004 | No existe .catch() en código ejecutable | | | NO INICIADO | |
 | SEC-001 | JWT se almacena y recupera centralmente | `js/session.js`, `js/auth.js` | `npm test`; `test/session.test.mjs` | IMPLEMENTADO | Token vive solo en memoria; tras recarga se requiere login. |
-| SEC-002 | Authorization Bearer en stadiums | | | NO INICIADO | |
-| SEC-003 | Authorization Bearer en games | | | NO INICIADO | |
-| SEC-004 | Authorization Bearer en teams | | | NO INICIADO | |
-| SEC-005 | Authorization Bearer en groups | | | NO INICIADO | |
+| SEC-002 | Authorization Bearer en stadiums | `js/api.js:apiRequest`, `js/config.js:ENDPOINTS` | `test/api.test.mjs` valida Bearer y path `/get/stadiums` para todos los endpoints publicos | VERIFICADO | |
+| SEC-003 | Authorization Bearer en games | `js/api.js:apiRequest`, `js/config.js:ENDPOINTS` | `test/api.test.mjs` valida Bearer y path `/get/games` para todos los endpoints publicos | VERIFICADO | |
+| SEC-004 | Authorization Bearer en teams | `js/api.js:apiRequest`, `js/config.js:ENDPOINTS` | `test/api.test.mjs` valida Bearer y path `/get/teams` para todos los endpoints publicos | VERIFICADO | |
+| SEC-005 | Authorization Bearer en groups | `js/api.js:apiRequest`, `js/config.js:ENDPOINTS` | `test/api.test.mjs` valida Bearer y path `/get/groups` para todos los endpoints publicos | VERIFICADO | |
 | ERR-401-001 | 401 elimina token | `js/api.js`, `js/session.js` | `test/api.test.mjs` cubre limpieza en 401 | IMPLEMENTADO | |
 | ERR-401-002 | 401 muestra sesión expirada | `js/router.js`, `js/ui.js` | `test/shell.test.mjs`; `test/static-contract.test.mjs`; Playwright modal 401 | IMPLEMENTADO | Pendiente prueba contra 401 real de API viva. |
 | ERR-401-003 | Reautenticación sin recarga | `js/app.js:handleLogin`, `js/router.js:LOGIN_SUCCEEDED` | `test/shell.test.mjs`; `test/static-contract.test.mjs` | IMPLEMENTADO | |
@@ -166,7 +166,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
-| QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 124/124 | VERIFICADO | |
+| QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 125/125 | VERIFICADO | |
 | QA-002 | Responsive verificado | | | NO INICIADO | |
 | QA-003 | Navegación por teclado verificada | Links/botones nativos; trap de Tab en modal 401 | `test/static-contract.test.mjs`; pendiente prueba manual completa | EN PROGRESO | Falta evidencia manual de teclado completo. |
 | QA-004 | aria-live en estados dinamicos | `index.html`, `js/timeline-view.js`, `js/matrix-view.js` | Countdown y avisos de cache actualizan regiones `role=status`/`aria-live`; `test/timeline.test.mjs`, `test/matrix.test.mjs` | IMPLEMENTADO | Pendiente prueba manual con lector de pantalla. |

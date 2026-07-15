@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { ApiError, AuthenticationError, createApiClient } from '../js/api.js';
+import { ENDPOINTS } from '../js/config.js';
 import { createSessionStore } from '../js/session.js';
 
 function jwt(payload = { exp: 4_102_444_800 }) {
@@ -57,6 +58,23 @@ test('adds Bearer JWT, validates and normalizes a successful endpoint response, 
   assert.equal(calls.length, 1);
   assert.equal(calls[0].url, 'https://api.example.test/get/teams');
   assert.equal(new Headers(calls[0].options.headers).get('authorization'), `Bearer ${TEST_TOKEN}`);
+});
+
+test('adds Bearer JWT to every public data endpoint request', async () => {
+  const seen = [];
+  const { client } = setup(async (url, options) => {
+    seen.push({ url, authorization: new Headers(options.headers).get('authorization') });
+    return jsonResponse(200, { [seen.at(-1).url.split('/').at(-1)]: [] });
+  });
+
+  for (const endpoint of Object.keys(ENDPOINTS)) {
+    await client.apiRequest(endpoint);
+  }
+
+  assert.deepEqual(seen, Object.values(ENDPOINTS).map((config) => ({
+    url: `https://api.example.test${config.path}`,
+    authorization: `Bearer ${TEST_TOKEN}`
+  })));
 });
 
 test('rejects a data request without a token before calling fetch', async () => {

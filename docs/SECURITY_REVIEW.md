@@ -23,6 +23,11 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 | T-07 | Clickjacking | `frame-ancestors 'none'` en servidor local | `npm test` app-server | `tools/app-server.mjs` | IMPLEMENTADO |
 | T-09 | API lenta/caida | Retry 429/500, cache fallback, abort | `npm test` api | `test/api.test.mjs` | IMPLEMENTADO |
 
+## Endpoint authorization
+
+- `apiRequest` obtiene el JWT vigente desde `sessionStore` y rechaza peticiones de datos sin token antes de llamar a `fetchImpl`.
+- `test/api.test.mjs` valida que `stadiums`, `games`, `teams` y `groups` usen `Authorization: Bearer ...` y sus paths allowlisted de `ENDPOINTS`.
+
 ## Token
 
 - almacenamiento: memoria solamente.
