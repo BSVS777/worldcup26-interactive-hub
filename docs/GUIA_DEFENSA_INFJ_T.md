@@ -80,8 +80,16 @@ Tecnica: `js/fan-dashboard.js`, `js/fan-dashboard-view.js`, `test/fan-dashboard.
 
 30 segundos: La matriz cruza groups, teams y games sin inventar datos. Si games falla, conserva la estructura completa del grupo y marca los cruces como pendientes/unknown; cuando se refrescan partidos con la misma estructura, actualiza celdas sin reconstruir tablas.
 
-Tecnica: js/matrix.js, js/matrix-view.js, 	est/matrix.test.mjs.
+Tecnica: `js/matrix.js`, `js/matrix-view.js`, `test/matrix.test.mjs`.
 
+
+### Como pruebo sin tumbar la API real
+
+15 segundos: Uso un servidor local determinista que exige bearer y simula datos, 401, 429 y 500.
+
+30 segundos: `testMode=1` solo funciona en origen local. El servidor de pruebas autentica, sirve fixtures sinteticos de los cuatro endpoints de datos y permite reproducir fallos controlados con reset de contadores, sin tocar la API real.
+
+Tecnica: `tools/test-server.mjs`, `test/test-server.test.mjs`, Playwright con `npm start` y `npm run test:server`.
 ## Preguntas que faltan dominar
 
 - Timeline con retry manual y observer.

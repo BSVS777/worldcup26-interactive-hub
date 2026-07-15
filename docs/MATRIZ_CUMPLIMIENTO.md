@@ -121,7 +121,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | MAT-001 | Obtiene groups | `js/matrix-view.js:load` | `test/matrix.test.mjs`; `npm test` | IMPLEMENTADO | Pendiente API autenticada real. |
 | MAT-002 | Obtiene teams | `js/matrix-view.js:load` | `test/matrix.test.mjs`; `npm test` | IMPLEMENTADO | Pendiente API autenticada real. |
 | MAT-003 | Obtiene games | `js/matrix-view.js:load` | `test/matrix.test.mjs`; `npm test` | IMPLEMENTADO | Pendiente API autenticada real. |
-| MAT-004 | Construye 12 matrices | `js/matrix.js:buildGroupMatrices` | `test/matrix.test.mjs` prueba matriz por grupo | EN PROGRESO | Implementa una matriz por `group`; falta API viva para confirmar 12 grupos. |
+| MAT-004 | Construye 12 matrices | `js/matrix.js:buildGroupMatrices` | `test/matrix.test.mjs`; Playwright testMode 390x844 renderizo 12 matrices y 192 celdas | VERIFICADO | Verificado con fixtures deterministas; falta API viva para confirmar 12 grupos reales. |
 | MAT-005 | Cada matriz es 4x4 | `js/matrix.js:buildGroupMatrices` | `test/matrix.test.mjs` | IMPLEMENTADO | Cuando el group trae cuatro equipos; si API trae otra cantidad, caption lo declara. |
 | MAT-006 | Filas representan equipos del grupo | `js/matrix.js`, `js/matrix-view.js` | `test/matrix.test.mjs` | IMPLEMENTADO | |
 | MAT-007 | Columnas representan equipos del grupo | `js/matrix-view.js:renderStructure` | `test/matrix.test.mjs` | IMPLEMENTADO | |
@@ -137,16 +137,16 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | MAT-017 | Conserva referencias a celdas | `js/matrix-view.js:cellRefs` | `test/matrix.test.mjs` | IMPLEMENTADO | |
 | MAT-018 | Recuperación actualiza solo celdas afectadas | `js/matrix-view.js:refresh`, `updateCells` | `test/matrix.test.mjs` | IMPLEMENTADO | |
 | MAT-019 | Recuperación no reconstruye tablas | `js/matrix-view.js:render` estructura estable | `test/matrix.test.mjs` | IMPLEMENTADO | |
-| TST-001 | Servidor local usa Node nativo | | | NO INICIADO | |
-| TST-002 | /test/401 devuelve HTTP 401 real | | | NO INICIADO | |
-| TST-003 | /test/429 devuelve HTTP 429 real | | | NO INICIADO | |
-| TST-004 | /test/500 devuelve HTTP 500 real | | | NO INICIADO | |
-| TST-005 | 429 falla N veces y luego recupera | | | NO INICIADO | |
-| TST-006 | 500 falla N veces y luego recupera | | | NO INICIADO | |
-| TST-007 | /test/reset limpia contadores | | | NO INICIADO | |
-| TST-008 | Modo de pruebas está desactivado por defecto | | | NO INICIADO | |
-| TST-009 | Modo de pruebas muestra insignia | | | NO INICIADO | |
-| TST-010 | Producción conserva API real | | | NO INICIADO | |
+| TST-001 | Servidor local usa Node nativo | `tools/test-server.mjs:createTestServer` | `test/test-server.test.mjs`; `npm run test:server` via Playwright | VERIFICADO | |
+| TST-002 | /test/401 devuelve HTTP 401 real | `tools/test-server.mjs` | `test/api.test.mjs`; servidor de pruebas mantiene endpoint 401 | IMPLEMENTADO | |
+| TST-003 | /test/429 devuelve HTTP 429 real | `tools/test-server.mjs:failNTimes` | `test/test-server.test.mjs` valida 429 y `Retry-After` | VERIFICADO | |
+| TST-004 | /test/500 devuelve HTTP 500 real | `tools/test-server.mjs:failNTimes` | `test/test-server.test.mjs` valida 500 y recuperacion | VERIFICADO | |
+| TST-005 | 429 falla N veces y luego recupera | `tools/test-server.mjs:failNTimes` | `test/test-server.test.mjs` prueba `failures=1` y segundo 200 | VERIFICADO | |
+| TST-006 | 500 falla N veces y luego recupera | `tools/test-server.mjs:failNTimes` | `test/test-server.test.mjs` prueba `failures=1` y segundo 200 | VERIFICADO | |
+| TST-007 | /test/reset limpia contadores | `tools/test-server.mjs` | `test/test-server.test.mjs` resetea y reproduce fallo | VERIFICADO | |
+| TST-008 | Modo de pruebas está desactivado por defecto | `js/config.js:isTestMode` | `test/config.test.mjs` | VERIFICADO | |
+| TST-009 | Modo de pruebas muestra insignia | `js/ui.js`, `index.html#test-mode-badge` | Playwright testMode: `testBadgeHidden=false` | VERIFICADO | |
+| TST-010 | Producción conserva API real | `js/config.js:resolveApiBaseUrl` | `test/config.test.mjs` confirma testMode aislado/local | VERIFICADO | |
 | DEF-001 | Guía explica flujo general | | | NO INICIADO | |
 | DEF-002 | Guía lista endpoints por módulo | | | NO INICIADO | |
 | DEF-003 | Guía lista campos reales cruzados | | | NO INICIADO | |
@@ -166,7 +166,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
-| QA-001 | Aplicación inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 111/111 | VERIFICADO | |
+| QA-001 | Aplicación inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 115/115 | VERIFICADO | |
 | QA-002 | Responsive verificado | | | NO INICIADO | |
 | QA-003 | Navegación por teclado verificada | Links/botones nativos; trap de Tab en modal 401 | `test/static-contract.test.mjs`; pendiente prueba manual completa | EN PROGRESO | Falta evidencia manual de teclado completo. |
 | QA-004 | aria-live en estados dinámicos | | | NO INICIADO | |
@@ -181,7 +181,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 
 | ID | Requisito | Archivo y funcion | Evidencia | Estado | Gap |
 |---|---|---|---|---|---|
-| SPEC-ACC-001 | Accesibilidad e inclusion son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define ACC-001..ACC-012 y Definition of Done | IMPLEMENTADO | Pendiente auditar cada modulo contra la spec. |
-| SPEC-SEC-001 | Seguridad y privacidad son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define SEC-HARD-001..SEC-HARD-010 | IMPLEMENTADO | Pendiente ejecutar auditoria final de headers, storage y rutas. |
-| SPEC-RES-001 | Resiliencia tipo "intumbable" se define como degradacion segura, contencion de fallos y recuperacion sin recarga | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define RES-001..RES-008 | IMPLEMENTADO | Pendiente Playwright por modulo para validar comportamiento real. |
+| SPEC-ACC-001 | Accesibilidad e inclusion son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define ACC-001..ACC-012 y Definition of Done; Matrix verificada en movil 390x844 | IMPLEMENTADO | Pendiente auditoria manual con teclado, zoom, contraste y lector. |
+| SPEC-SEC-001 | Seguridad y privacidad son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define SEC-HARD-001..SEC-HARD-010; test server valida bearer, CORS local y allowlists | IMPLEMENTADO | Pendiente auditoria final contra hosting/API viva. |
+| SPEC-RES-001 | Resiliencia tipo "intumbable" se define como degradacion segura, contencion de fallos y recuperacion sin recarga | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define RES-001..RES-008; test server cubre auth/datos/401/429/500/reset deterministas | IMPLEMENTADO | Pendiente Playwright de fallos por modulo y validacion en produccion. |
 | QA-011 | Elementos con `hidden` no ocupan layout ni foco | `css/styles.css` (`[hidden]`) | `test/static-contract.test.mjs` verifica `display: none !important` | IMPLEMENTADO | |

@@ -69,6 +69,14 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 - No persiste datos nuevos ni tokens; solo consume el cliente API central y sus fallbacks.
 - La actualizacion parcial usa referencias internas a celdas por ID de grupo/equipo, sin HTML crudo ni selectores derivados de datos no confiables.
 
+
+## Test server determinista
+
+- `tools/test-server.mjs` usa Node nativo y fixtures sinteticos para `/auth/authenticate`, `/get/stadiums`, `/get/games`, `/get/teams` y `/get/groups`.
+- Los endpoints de datos exigen `Authorization: Bearer ...`; sin bearer responden 401.
+- CORS solo refleja origenes locales permitidos (`127.0.0.1:4173` y `localhost:4173`), no origenes arbitrarios.
+- Las respuestas agregan `no-store`, `nosniff`, metodos allowlisted y no aceptan rutas fuera del contrato.
+- `test/test-server.test.mjs` cubre auth, fixtures, bearer requerido, 429/500 recuperables, reset, metodos y rutas no permitidas.
 ## Fan Dashboard
 
 - Persiste solo `wc26:favorite-team:v1` y snapshots derivados; no persiste JWT ni Authorization.

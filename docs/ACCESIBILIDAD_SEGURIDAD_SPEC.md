@@ -4,7 +4,7 @@ Esta spec complementa la matriz de cumplimiento. Cualquier modulo nuevo debe cum
 
 ## Objetivo
 
-La pagina debe ser usable por personas con distintas capacidades, dispositivos, idiomas y condiciones de conectividad, y debe resistir fallos de API, errores de sesion, entradas malformadas y navegacion repetida sin romper el flujo. "Intumbable" se traduce aqui como una meta verificable: degradar con gracia, contener fallos, no exponer secretos y recuperar la UI sin recargar la aplicacion.
+La pagina debe ser usable por personas con distintas capacidades, dispositivos, idiomas y condiciones de conectividad, y debe resistir fallos de API, errores de sesion, entradas malformadas y navegacion repetida sin romper el flujo. "Intumbable" se traduce aqui como una meta verificable: degradar con gracia, contener fallos, no exponer secretos y recuperar la UI sin recargar la aplicacion. La meta no significa disponibilidad absoluta del hosting ni de la API externa; significa que el frontend contiene fallos previsibles y mantiene una salida accionable.
 
 ## Accesibilidad e inclusion
 

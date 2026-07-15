@@ -20,7 +20,7 @@ npm run test:server
 - Timeline Infinito esta implementado con carga unica de games, bloques locales de 10, fallback manual y retry. Dashboard del Fanatico esta implementado con favorito persistido, metricas desde API y snapshot local. Matriz de Enfrentamientos esta implementada con tablas 4x4 por grupo, resultados, pendientes y actualizacion parcial de celdas.
 - Cliente HTTP central con JWT en memoria, endpoint allowlist, retry 429/500 y cache publica por endpoint.
 - Accesibilidad, inclusion, seguridad y resiliencia quedan como criterio de listo en `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md`; la meta "intumbable" se mide como degradacion con gracia, fallos contenidos y recuperacion sin recarga.
-- Test mode local con servidor determinista para 401, 429, 500 y reset.
+- Test mode local con servidor determinista para autenticacion, fixtures de stadiums/games/teams/groups, 401, 429, 500 y reset.
 
 ## Seguridad
 
@@ -32,6 +32,6 @@ npm run test:server
 ## Gaps conocidos
 
 - El DOCX original `ProyectoFinal_ISW521_Categoria_B.docx` no esta presente en este repo.
-- Falta completar Matriz con datos reales.
+- Falta validar Matriz contra API viva; el testMode ya cubre 12 grupos sinteticos deterministas.
 - Falta auditoria manual completa WCAG 2.2 AA, screen reader y contrastes.
 - Falta verificacion real de esquemas contra API viva con credenciales validas.

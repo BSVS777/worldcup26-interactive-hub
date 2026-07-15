@@ -10,7 +10,7 @@ No se declara conformidad WCAG 2.2 AA completa hasta terminar pruebas manuales c
 - SO: Windows.
 - lector: pendiente NVDA/Chrome o NVDA/Firefox.
 - zoom: pendiente 200% y 400%.
-- viewport: pendiente 390x844, 768x1024, 1366x768, 1920x1080.
+- viewport: verificado 390x844 para Matrix y 1366x768 para shell; pendientes 768x1024, 1920x1080 y zoom.
 
 ## Pruebas
 
@@ -84,5 +84,5 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 
 ## Gaps pendientes
 
-- Tests responsive y lector de pantalla.
+- Tests responsive adicionales, zoom y lector de pantalla.
 - Contraste AA medido.
