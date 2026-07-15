@@ -63,6 +63,12 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 - Handlers inline: sin resultados en HTML.
 - Secretos: la busqueda marco nombres de variables/tests y filas de docs; no encontro valores tipo `Bearer <token real>` ni credenciales de produccion.
 
+## Modal 401
+
+- El estado `expired` activa un dialogo modal sin persistir token.
+- El fondo queda inerte y `aria-hidden` mientras se reautentica.
+- El trap de Tab se registra una vez al construir `createShellView`.
+
 ## Timeline
 
 - `createTimelineView` usa `generation` para descartar cargas obsoletas.

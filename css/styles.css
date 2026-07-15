@@ -636,6 +636,32 @@ main {
 .session-panel[hidden] {
   display: none;
 }
+.session-panel[role="dialog"] {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  align-content: center;
+  justify-content: center;
+  grid-template-columns: minmax(13rem, 22rem) minmax(18rem, 28rem);
+  max-width: none;
+  margin: 0;
+  padding: clamp(1rem, 4vw, 3rem);
+  overflow-y: auto;
+  background: rgb(7 25 43 / 82%);
+  border-radius: 0;
+}
+
+.session-panel[role="dialog"]::before {
+  position: absolute;
+  inset: clamp(0.75rem, 3vw, 2rem);
+  z-index: -1;
+  max-width: 58rem;
+  margin: auto;
+  background: var(--pitch);
+  border: 0.12rem solid white;
+  box-shadow: 0.6rem 0.6rem 0 var(--ticket);
+  content: "";
+}
 
 .session-panel .eyebrow {
   color: var(--sky);
@@ -771,6 +797,10 @@ main {
   .session-panel {
     grid-template-columns: 1fr;
     border-radius: 5rem 0 0;
+  }
+  .session-panel[role="dialog"] {
+    grid-template-columns: minmax(0, 32rem);
+    border-radius: 0;
   }
 
   .login-status {

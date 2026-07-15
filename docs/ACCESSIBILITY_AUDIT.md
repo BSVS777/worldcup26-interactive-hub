@@ -21,6 +21,7 @@ No se declara conformidad WCAG 2.2 AA completa hasta terminar pruebas manuales c
 | A11Y-010 | Foco visible | Inspeccion CSS | Implementado | `:focus-visible` | IMPLEMENTADO |
 | A11Y-012 | aria-current en navegacion | Test shell | Implementado | `test/shell.test.mjs` | IMPLEMENTADO |
 | A11Y-046 | Skeleton aria-hidden | Test agenda | Implementado | `test/agenda.test.mjs` | IMPLEMENTADO |
+| A11Y-060 | Modal 401 accesible | Inspeccion estatica y flujo 401 | Implementado parcial | `js/ui.js`; `test/static-contract.test.mjs`; Playwright modal 401; pendiente prueba manual SR | EN PROGRESO |
 | A11Y-070 | No declarar AA sin evidencia | Documento vivo | Cumplido | Esta auditoria | IMPLEMENTADO |
 
 ## Keyboard path
@@ -29,11 +30,11 @@ Pendiente prueba manual completa. La navegacion usa enlaces y botones nativos.
 
 ## Focus
 
-Foco visible existe. Gestion de foco tras login existe. Modal 401 dedicado todavia no existe; se usa panel de sesion.
+Foco visible existe. Gestion de foco tras login existe. El 401 activa modal dedicado y mueve foco al email para reautenticacion sin recarga.
 
 ## Modal
 
-Pendiente implementar modal de sesion expirada con trap de foco e inert.
+Implementado modal dinamico de sesion expirada con `role="dialog"`, `aria-modal`, fondo inerte y trap de Tab. Pendiente validacion manual con lector de pantalla.
 
 ## Zoom y reflow
 
@@ -79,10 +80,10 @@ Placeholder con tabla/caption; pendiente matriz 4x4 real y celdas con scope comp
 - Rutas navegables: `tour`, `agenda`, `timeline`, `fan-dashboard`, `group-matrix`. Timeline fue verificado en Playwright como vista activa con placeholder oculto y retry visible en estado anonimo.
 - `aria-current="page"` cambia en cada ruta.
 - Sin overflow horizontal global en 1366x768.
+- Modal 401 verificado en Playwright: role=dialog, aria-modal=true, foco inicial en email, fondo inerte, Tab cicla dentro del modal y sin errores de consola.
 
 ## Gaps pendientes
 
-- Modal 401 accesible.
 - Dashboard y Matrix completos.
 - Tests responsive y lector de pantalla.
 - Contraste AA medido.

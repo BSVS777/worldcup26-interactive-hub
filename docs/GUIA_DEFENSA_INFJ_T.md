@@ -57,10 +57,18 @@ Tecnica: `js/timeline.js:uniqueSortedGames`, `reduceTimelineState`, `test/timeli
 30 segundos: El fallo inicial pasa a estado `error`, oculta centinela y boton de cargar mas, y el retry usa `forceRetry` con la politica central de backoff.
 
 Tecnica: `js/timeline-view.js:load`, `retry`, `test/timeline.test.mjs`.
+
+### Como defiende el 401
+
+15 segundos: El 401 borra el token, abre un modal de sesion expirada y permite volver a iniciar sesion sin recargar.
+
+30 segundos: El cliente central limpia solo el token afectado. El shell cambia a estado `expired`, aplica `role="dialog"`, `aria-modal`, fondo inerte y trap de Tab; al login exitoso conserva la ruta y recarga el modulo activo.
+
+Tecnica: `js/api.js`, `js/session.js`, `js/router.js`, `js/ui.js`, `test/api.test.mjs`, `test/static-contract.test.mjs`.
+
 ## Preguntas que faltan dominar
 
 - Timeline con retry manual y observer.
 - Dashboard con snapshot stale.
 - Matriz con actualizacion parcial de celdas.
-- Modal 401 con trap de foco.
 

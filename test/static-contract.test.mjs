@@ -11,7 +11,12 @@ test('embedded sign-in uses section semantics and exposes accessibility hooks', 
   assert.match(html, /id="app-status"[^>]*role="status"[^>]*aria-live="polite"/);
   assert.match(app, /announceMessage:\s*'Signed in\./);
   assert.match(app, /view\.focusCurrentView\(\)/);
-  assert.match(ui, /getElementById\('main-content'\)|requireElement\(document, 'main-content'\)/);
+  assert.match(ui, /getElementById\('main-content'\)|requireElement\(document, 'main-content'/);
+  assert.match(ui, /setAttribute\('role', 'dialog'\)/);
+  assert.match(ui, /setAttribute\('aria-modal', 'true'\)/);
+  assert.match(ui, /element\.inert = inert/);
+  assert.match(ui, /addEventListener\('keydown'/);
+  assert.match(ui, /event\.key !== 'Tab'/);
 });
 
 test('document declares the explicitly served favicon', async () => {

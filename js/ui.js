@@ -48,9 +48,58 @@ export function createShellView(document, { onLogin }) {
     loginForm: requireElement(document, 'login-form', 'shell element'),
     loginButton: requireElement(document, 'login-button', 'shell element'),
     loginStatus: requireElement(document, 'login-status', 'shell element'),
-    appStatus: requireElement(document, 'app-status', 'shell element')
+    appStatus: requireElement(document, 'app-status', 'shell element'),
+    emailInput: requireElement(document, 'email', 'shell element')
   };
   const routeLinks = [...document.querySelectorAll('[data-route]')];
+  const modalSiblings = [
+    document.querySelector('.site-header'),
+    document.querySelector('.route-nav'),
+    requireElement(document, 'main-content', 'shell element'),
+    document.querySelector('.site-footer')
+  ].filter(Boolean);
+  let sessionModalActive = false;
+
+  function setElementInert(element, inert) {
+    element.inert = inert;
+    if (inert) element.setAttribute('aria-hidden', 'true');
+    else element.removeAttribute('aria-hidden');
+  }
+
+  function getFocusableSessionElements() {
+    return [...elements.sessionPanel.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+      .filter((element) => !element.hidden && element.getAttribute('aria-hidden') !== 'true');
+  }
+
+  function setSessionModal(active) {
+    sessionModalActive = active;
+    if (active) {
+      elements.sessionPanel.setAttribute('role', 'dialog');
+      elements.sessionPanel.setAttribute('aria-modal', 'true');
+    } else {
+      elements.sessionPanel.removeAttribute('role');
+      elements.sessionPanel.removeAttribute('aria-modal');
+    }
+    for (const element of modalSiblings) setElementInert(element, active);
+  }
+
+  elements.sessionPanel.addEventListener('keydown', (event) => {
+    if (!sessionModalActive || event.key !== 'Tab') return;
+    const focusable = getFocusableSessionElements();
+    if (focusable.length === 0) {
+      event.preventDefault();
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
 
   elements.loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -87,6 +136,7 @@ export function createShellView(document, { onLogin }) {
 
     const needsLogin = state.session !== 'authenticated';
     elements.sessionPanel.hidden = !needsLogin;
+    setSessionModal(state.session === 'expired');
     elements.sessionTitle.textContent = state.session === 'expired'
       ? 'Your session expired'
       : 'Sign in to load live match data';
@@ -103,8 +153,7 @@ export function createShellView(document, { onLogin }) {
   }
 
   function focusSession() {
-    const email = requireElement(document, 'email', 'shell element');
-    email.focus();
+    elements.emailInput.focus();
   }
 
   function focusCurrentView() {
