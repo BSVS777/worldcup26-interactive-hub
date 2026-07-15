@@ -26,6 +26,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 17. La navegacion movil se demuestra con Playwright: drawer por boton nativo, Escape restaura foco, seleccionar ruta cierra el panel y desktop conserva el track visible.
 18. La tematizacion del fanatico se demuestra con Playwright: el favorito escribe variables CSS locales y al seleccionar otro equipo cambian sin consumir colores externos de API.
 19. El fallo parcial de Tour se demuestra con Playwright: si `/get/games` falla, las sedes siguen clicables y cada seleccion muestra su error local.
+20. El layout de Agenda se demuestra con Playwright: cada partido simultaneo se renderiza como columna visible y la navegacion conserva el patron.
 
 ## Endpoints por modulo
 
@@ -56,7 +57,7 @@ Si un campo no existe o no pasa normalizacion, el modulo usa estado recuperable 
 | Reto | Respuesta defendible |
 |---|---|
 | Que pasa si falla `games` en Tour | Las sedes siguen clicables porque `stadiums` y `games` se cargan por separado; el detalle muestra error local de partidos, verificado por `tools/tour-partial-failure-audit.py`. |
-| Que pasa si Agenda no tiene red ni cache | La agenda conserva skeletons, controles deshabilitados y no inventa fechas ni equipos. |
+| Que pasa si Agenda no tiene red ni cache | La agenda conserva skeletons, controles deshabilitados y no inventa fechas ni equipos; con datos validos, `tools/agenda-layout-audit.py` verifica columnas reales por partido simultaneo. |
 | Que pasa si Timeline falla al inicio | Oculta centinela, muestra estado de error persistente y deja boton de reintento manual. |
 | Que pasa cuando el sentinel del Timeline entra al viewport | `IntersectionObserver` dispara `SHOW_NEXT`, agrega 10 partidos locales y mantiene una sola peticion HTTP a `/get/games`; el boton fallback queda como respaldo manual. |
 | Que pasa con 401 | Borra solo el token afectado, abre modal accesible de sesion expirada y reautentica sin `location.reload()`. |

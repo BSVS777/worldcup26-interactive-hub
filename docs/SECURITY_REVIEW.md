@@ -77,6 +77,11 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 - La actualizacion parcial usa referencias internas a celdas por ID de grupo/equipo, sin HTML crudo ni selectores derivados de datos no confiables.
 
 
+## Agenda layout evidence
+
+- `tools/agenda-layout-audit.py` verifica en Chromium que Agenda renderiza columnas con nodos DOM seguros y nombres de equipos normalizados, sin HTML crudo ni errores de consola.
+- La navegacion al siguiente dia simultaneo actualiza el `<time datetime>` y conserva dos columnas visibles sin nuevas URLs ni fetch directo desde la vista.
+
 ## Tour partial failure
 
 - `tools/tour-partial-failure-audit.py` fuerza `/get/games` 500 en Chromium y confirma que `/get/stadiums` sigue renderizando sedes clicables.
