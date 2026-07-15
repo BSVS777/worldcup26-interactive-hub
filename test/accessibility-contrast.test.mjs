@@ -34,10 +34,10 @@ test('fan dashboard color pairs meet WCAG AA contrast thresholds', async () => {
   const variables = extractRootVariables(css);
   const white = '#ffffff';
 
-  assert.match(css, /\.fan-toolbar label[\s\S]*color:\s*var\(--pitch\)/);
+  assert.match(css, /\.fan-toolbar label[\s\S]*color:\s*var\(--fan-primary\)/);
   assert.match(css, /\.fan-select[\s\S]*color:\s*var\(--night\);[\s\S]*background:\s*white/);
-  assert.match(css, /\.status-banner[\s\S]*color:\s*var\(--night\);[\s\S]*background:\s*var\(--sky\)/);
-  assert.match(css, /\.fan-metrics dt[\s\S]*color:\s*var\(--pitch\)/);
+  assert.match(css, /\.status-banner[\s\S]*color:\s*var\(--fan-contrast\);[\s\S]*background:\s*var\(--fan-accent\)/);
+  assert.match(css, /\.fan-metrics dt[\s\S]*color:\s*var\(--fan-primary\)/);
 
   const pairs = [
     ['dashboard body text on white panels', variables.night, white, 4.5],

@@ -1,6 +1,7 @@
 import { requireElement } from './dom.js';
 import { createLoadableView, formatScore } from './loadable-view.js';
 import {
+  createFanTheme,
   createInitialFanDashboardState,
   readFanSnapshot,
   readFavoriteTeamId,
@@ -11,6 +12,7 @@ import {
 
 export function createFanDashboardView(document, api, { storage = globalThis.localStorage } = {}) {
   const elements = {
+    root: requireElement(document, 'fan-dashboard-view', 'fan dashboard element'),
     status: requireElement(document, 'fan-status', 'fan dashboard element'),
     selector: requireElement(document, 'fan-team-select', 'fan dashboard element'),
     summary: requireElement(document, 'fan-summary', 'fan dashboard element'),
@@ -120,7 +122,22 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
     elements.status.textContent = state.dashboard ? 'Fan dashboard ready.' : 'Fan dashboard unavailable.';
   }
 
+  function applyTheme() {
+    const theme = createFanTheme(state.dashboard?.team);
+    if (!theme) {
+      elements.root.removeAttribute('data-fan-themed');
+      elements.root.style.removeProperty('--fan-primary');
+      elements.root.style.removeProperty('--fan-accent');
+      elements.root.style.removeProperty('--fan-contrast');
+      return;
+    }
+    elements.root.setAttribute('data-fan-themed', 'true');
+    elements.root.style.setProperty('--fan-primary', theme.primary);
+    elements.root.style.setProperty('--fan-accent', theme.accent);
+    elements.root.style.setProperty('--fan-contrast', theme.contrast);
+  }
   function render() {
+    applyTheme();
     renderSelector();
     renderStatus();
     renderSummary();

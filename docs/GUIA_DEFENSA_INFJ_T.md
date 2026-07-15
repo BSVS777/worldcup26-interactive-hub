@@ -24,6 +24,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 15. Timeline Infinito se demuestra con Playwright: el `IntersectionObserver` observa el sentinel, agrega el segundo bloque local y no repite `/get/games`.
 16. Los avisos de cache se demuestran con Playwright en los cinco modulos bloqueando `/get/*` despues de calentar cache real.
 17. La navegacion movil se demuestra con Playwright: drawer por boton nativo, Escape restaura foco, seleccionar ruta cierra el panel y desktop conserva el track visible.
+18. La tematizacion del fanatico se demuestra con Playwright: el favorito escribe variables CSS locales y al seleccionar otro equipo cambian sin consumir colores externos de API.
 
 ## Endpoints por modulo
 
@@ -65,6 +66,7 @@ Si un campo no existe o no pasa normalizacion, el modulo usa estado recuperable 
 | Que pasa con cache corrupta | `js/cache.js` valida version, endpoint, fecha y shape; si falla, elimina solo esa entrada y reporta miss. |
 | Como se ve que estoy usando cache valida | Cada modulo muestra un aviso visible de `cached data`; `tools/cached-notice-audit.py` bloquea `/get/*` y confirma Tour, Agenda, Timeline, Dashboard y Matrix desde cache. |
 | Que pasa con navegacion movil | El boton `Views` abre un drawer con `aria-expanded`; Escape lo cierra y devuelve foco, seleccionar ruta lo cierra y desktop mantiene la navegacion visible. |
+| Que pasa si la API trae colores de equipo | Se ignoran. `createFanTheme` deriva una paleta local allowlisted desde `team.id`/`team.name` y solo actualiza variables CSS acotadas al Dashboard. |
 | Que pasa si la matriz recibe nuevos resultados | Si la estructura del grupo sigue igual, conserva referencias internas y actualiza solo celdas afectadas. |
 
 ## Respuestas de defensa
@@ -85,6 +87,13 @@ Tecnica: `js/session.js:createSessionStore`, `test/session.test.mjs`, `docs/ACCE
 
 Tecnica: busqueda de sinks prohibidos, `test/static-contract.test.mjs`, `test/matrix.test.mjs` con payload malicioso.
 
+### Como defiendo tema del favorito
+
+15 segundos: No confio en colores de la API; uso una paleta local segura.
+
+30 segundos: El equipo elegido solo decide un indice estable de una paleta allowlisted. `fan-dashboard-view` escribe `--fan-primary`, `--fan-accent` y `--fan-contrast` en `#fan-dashboard-view`, asi que el cambio visual queda acotado al modulo y no introduce HTML ni CSS remoto.
+
+Tecnica: `js/fan-dashboard.js:createFanTheme`, `js/fan-dashboard-view.js:applyTheme`, `css/styles.css`, `test/fan-dashboard.test.mjs`, `tools/fan-theme-audit.py`.
 ### Como defiendo navegacion movil
 
 15 segundos: En movil uso un drawer con boton nativo, y Escape devuelve el foco al mismo boton.

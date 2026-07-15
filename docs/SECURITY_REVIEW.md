@@ -95,6 +95,8 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 - Persiste solo `wc26:favorite-team:v1` y snapshots derivados; no persiste JWT ni Authorization.
 - Renderiza API/snapshot con `createElement`, `textContent`, `append` y `replaceChildren`.
 - No consume URLs externas de banderas ni colores de equipos, para evitar contratos inseguros no verificados.
+- La tematizacion visual usa `createFanTheme` con una paleta local allowlisted derivada de `team.id`/`team.name`; ignora campos externos como `color` y solo escribe variables CSS acotadas a `#fan-dashboard-view`.
+- `tools/fan-theme-audit.py` verifica en browser que las variables `--fan-primary`, `--fan-accent` y `--fan-contrast` existen y cambian al seleccionar otro favorito.
 
 ## Mobile navigation drawer
 

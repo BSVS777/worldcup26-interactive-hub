@@ -34,6 +34,26 @@ function computeGoals(games, teamId) {
   return { goalsFor, goalsAgainst };
 }
 
+const FAN_THEME_PALETTES = Object.freeze([
+  Object.freeze({ primary: '#0b5d3b', accent: '#f26a2e', contrast: '#07192b' }),
+  Object.freeze({ primary: '#0046a8', accent: '#8bd3e6', contrast: '#07192b' }),
+  Object.freeze({ primary: '#7a1f2b', accent: '#f4c542', contrast: '#07192b' }),
+  Object.freeze({ primary: '#4d2c91', accent: '#57b894', contrast: '#07192b' }),
+  Object.freeze({ primary: '#0b4f6c', accent: '#f08f3e', contrast: '#07192b' }),
+  Object.freeze({ primary: '#31572c', accent: '#f7b801', contrast: '#07192b' })
+]);
+
+function stableThemeIndex(team) {
+  const seed = `${team?.id ?? ''}|${team?.name ?? ''}`.toLowerCase();
+  let hash = 0;
+  for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) % FAN_THEME_PALETTES.length;
+  return hash;
+}
+
+export function createFanTheme(team) {
+  if (!team?.id) return null;
+  return FAN_THEME_PALETTES[stableThemeIndex(team)];
+}
 function buildDashboard(teams, games, groups, favoriteTeamId, sources) {
   const selectedTeam = teams.find((team) => team.id === favoriteTeamId) ?? teams[0] ?? null;
   if (!selectedTeam) return null;

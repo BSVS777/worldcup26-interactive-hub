@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  createFanTheme,
   createInitialFanDashboardState,
   readFavoriteTeamId,
   readFanSnapshot,
@@ -54,6 +55,18 @@ test('fan dashboard falls back to computed goals when group standing is absent',
   assert.equal(state.dashboard.metrics.matches, 2);
 });
 
+test('fan theme uses a stable local palette instead of API color fields', () => {
+  const first = createFanTheme({ id: 't1', name: 'Argentina', color: '#ffffff' });
+  const second = createFanTheme({ id: 't1', name: 'Argentina', color: '#000000' });
+  const other = createFanTheme({ id: 't2', name: 'Canada' });
+
+  assert.deepEqual(first, second);
+  assert.match(first.primary, /^#[0-9a-f]{6}$/i);
+  assert.match(first.accent, /^#[0-9a-f]{6}$/i);
+  assert.match(first.contrast, /^#[0-9a-f]{6}$/i);
+  assert.notEqual(createFanTheme(null), first);
+  assert.ok(other);
+});
 test('favorite team and fan snapshot persist without storing sensitive data', () => {
   const storage = new MemoryStorage();
   writeFavoriteTeamId('t1', storage);
@@ -68,6 +81,12 @@ test('favorite team and fan snapshot persist without storing sensitive data', ()
   assert.equal(JSON.stringify([...storage.map.values()]).includes('Bearer'), false);
 });
 
+class FakeStyle {
+  constructor() { this.map = new Map(); }
+  setProperty(name, value) { this.map.set(name, String(value)); }
+  removeProperty(name) { this.map.delete(name); }
+  getPropertyValue(name) { return this.map.get(name) ?? ''; }
+}
 class FakeElement {
   constructor(tagName) {
     this.tagName = tagName;
@@ -82,10 +101,12 @@ class FakeElement {
     this.value = '';
     this.selected = false;
     this.dateTime = '';
+    this.style = new FakeStyle();
   }
 
   setAttribute(name, value) { this._attrs.set(name, String(value)); }
   getAttribute(name) { return this._attrs.has(name) ? this._attrs.get(name) : null; }
+  removeAttribute(name) { this._attrs.delete(name); }
 
   append(...nodes) {
     for (const node of nodes) {
@@ -113,12 +134,14 @@ class FakeElement {
 }
 
 function createFakeDocument() {
+  const root = new FakeElement('div');
   const status = new FakeElement('p');
   const selector = new FakeElement('select');
   const summary = new FakeElement('p');
   const metrics = new FakeElement('dl');
   const matches = new FakeElement('ul');
   const byId = new Map([
+    ['fan-dashboard-view', root],
     ['fan-status', status],
     ['fan-team-select', selector],
     ['fan-summary', summary],
@@ -129,11 +152,11 @@ function createFakeDocument() {
     getElementById: (id) => byId.get(id) ?? null,
     createElement: (tag) => new FakeElement(tag)
   };
-  return { document, status, selector, summary, metrics, matches };
+  return { document, root, status, selector, summary, metrics, matches };
 }
 
 test('fan dashboard view loads teams games and groups, then persists a changed favorite', async () => {
-  const { document, selector, summary, metrics, matches } = createFakeDocument();
+  const { document, root, selector, summary, metrics, matches } = createFakeDocument();
   const storage = new MemoryStorage();
   const calls = [];
   const api = {
@@ -150,6 +173,8 @@ test('fan dashboard view loads teams games and groups, then persists a changed f
   assert.deepEqual(calls.sort(), ['games', 'groups', 'teams']);
   assert.equal(selector.children.length, 3);
   assert.match(summary.textContent, /Argentina/);
+  assert.equal(root.getAttribute('data-fan-themed'), 'true');
+  assert.equal(root.style.getPropertyValue('--fan-primary'), createFanTheme(teams[0]).primary);
   assert.equal(metrics.children.length, 8);
   assert.equal(matches.children.length, 2);
 
@@ -157,6 +182,7 @@ test('fan dashboard view loads teams games and groups, then persists a changed f
   selector.trigger('change');
   assert.equal(readFavoriteTeamId(storage), 't2');
   assert.match(summary.textContent, /Canada/);
+  assert.equal(root.style.getPropertyValue('--fan-primary'), createFanTheme(teams[1]).primary);
 });
 
 test('fan dashboard view uses saved snapshot when live teams are unavailable', async () => {

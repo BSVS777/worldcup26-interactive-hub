@@ -645,9 +645,13 @@ main {
 }
 
 .fan-dashboard {
+  --fan-primary: var(--pitch);
+  --fan-accent: var(--ticket);
+  --fan-contrast: var(--night);
   display: grid;
   gap: clamp(1rem, 2.5vw, 1.5rem);
   padding: clamp(1.25rem, 3vw, 2.25rem);
+  border-top: 0.28rem solid var(--fan-primary);
 }
 
 .fan-toolbar {
@@ -658,7 +662,7 @@ main {
 }
 
 .fan-toolbar label {
-  color: var(--pitch);
+  color: var(--fan-primary);
   font: 700 0.72rem/1 var(--utility);
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -677,8 +681,8 @@ main {
 .status-banner {
   margin: 0;
   padding: 0.75rem 1rem;
-  color: var(--night);
-  background: var(--sky);
+  color: var(--fan-contrast);
+  background: var(--fan-accent);
   border: 0.08rem solid var(--night);
   font: 700 0.78rem/1.35 var(--utility);
   letter-spacing: 0.04em;
@@ -687,6 +691,7 @@ main {
 
 .fan-summary {
   margin: 0;
+  color: var(--fan-primary);
   font: clamp(1.4rem, 3vw, 2.4rem)/1 var(--display);
   text-transform: uppercase;
 }
@@ -709,7 +714,7 @@ main {
 .fan-metrics dt {
   align-self: end;
   border-bottom: 0;
-  color: var(--pitch);
+  color: var(--fan-primary);
   font: 700 0.68rem/1.2 var(--utility);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -718,7 +723,7 @@ main {
 .fan-metrics dd {
   margin-top: -0.8rem;
   border-top: 0;
-  box-shadow: 0.25rem 0.25rem 0 var(--night);
+  box-shadow: 0.25rem 0.25rem 0 var(--fan-primary);
   font: clamp(1.5rem, 3vw, 2.4rem)/1 var(--display);
 }
 
@@ -736,7 +741,7 @@ main {
   gap: 1rem;
   padding: 0.75rem 1rem;
   background: white;
-  border-left: 0.28rem solid var(--ticket);
+  border-left: 0.28rem solid var(--fan-accent);
 }
 
 .fan-match--empty {

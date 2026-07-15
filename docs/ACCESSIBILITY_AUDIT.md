@@ -47,7 +47,7 @@ Implementado modal dinamico de sesion expirada con `role="dialog"`, `aria-modal`
 
 ## Contraste
 
-Medicion numerica parcial implementada para Dashboard del Fanatico y foco: `test/accessibility-contrast.test.mjs` verifica texto principal, labels, status banner y foco contra umbrales WCAG AA. Queda pendiente auditoria manual completa de todos los modulos.
+Medicion numerica parcial implementada para Dashboard del Fanatico y foco: `test/accessibility-contrast.test.mjs` verifica texto principal, labels, status banner y foco contra umbrales WCAG AA. La tematizacion del favorito usa paleta local con variables `--fan-primary`, `--fan-accent` y `--fan-contrast`, no colores remotos de API. Queda pendiente auditoria manual completa de todos los modulos.
 
 ## Motion
 
@@ -94,6 +94,7 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 - Timeline IntersectionObserver verificado en Playwright: `TIMELINE_OBSERVER_AUDIT_PASS before=10 after=20 games_requests=1`, con fallback visible antes del trigger.
 - Avisos de cache verificados en Playwright para Tour, Agenda, Timeline, Dashboard y Matrix: `CACHED_NOTICE_AUDIT_PASS routes=5 cache_keys=4 blocked_network=get-endpoints`.
 - Drawer movil verificado en Playwright: `MOBILE_DRAWER_AUDIT_PASS mobile=390 desktop=1366 escape=restores-focus route=group-matrix`.
+- Tema del Dashboard del Fanatico verificado en Playwright: `FAN_THEME_AUDIT_PASS themed=true changed_on_select=true source=local-palette`.
 
 ## Gaps pendientes
 
