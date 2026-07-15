@@ -39,6 +39,7 @@ export function createShellView(document, { onLogin }) {
     modulePlaceholder: requireElement(document, 'module-placeholder', 'shell element'),
     tourView: requireElement(document, 'tour-view', 'shell element'),
     agendaView: requireElement(document, 'agenda-view', 'shell element'),
+    timelineView: requireElement(document, 'timeline-view', 'shell element'),
     moduleStatus: requireElement(document, 'module-status', 'shell element'),
     testBadge: requireElement(document, 'test-mode-badge', 'shell element'),
     sessionPanel: requireElement(document, 'session-panel', 'shell element'),
@@ -73,9 +74,11 @@ export function createShellView(document, { onLogin }) {
 
     const isTour = route.id === 'tour';
     const isAgenda = route.id === 'agenda';
-    elements.modulePlaceholder.hidden = isTour || isAgenda;
+    const isTimeline = route.id === 'timeline';
+    elements.modulePlaceholder.hidden = isTour || isAgenda || isTimeline;
     elements.tourView.hidden = !isTour;
     elements.agendaView.hidden = !isAgenda;
+    elements.timelineView.hidden = !isTimeline;
 
     for (const link of routeLinks) {
       if (link.dataset.route === route.id) link.setAttribute('aria-current', 'page');

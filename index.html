@@ -75,6 +75,15 @@
           </div>
           <div id="agenda-columns" class="agenda-columns"></div>
         </div>
+        <div id="timeline-view" class="timeline-view" hidden>
+          <p id="timeline-status" class="timeline-status" role="status" aria-live="polite">Timeline ready.</p>
+          <ol id="timeline-list" class="timeline-list" aria-label="Chronological match timeline"></ol>
+          <div class="timeline-actions">
+            <button id="timeline-load-more" type="button" class="timeline-button">Load 10 more matches</button>
+            <button id="timeline-retry" type="button" class="timeline-button">Retry timeline</button>
+          </div>
+          <div id="timeline-sentinel" class="timeline-sentinel" aria-hidden="true"></div>
+        </div>
       </section>
     </main>
 

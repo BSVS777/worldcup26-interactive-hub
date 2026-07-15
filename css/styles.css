@@ -514,6 +514,112 @@ main {
   100% { background-position: -200% 0; }
 }
 
+
+.timeline-view {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+.timeline-status {
+  margin: 0;
+  color: var(--pitch);
+  font: 700 0.78rem/1.4 var(--utility);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.timeline-list {
+  position: relative;
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0 0 0 1.15rem;
+  list-style: none;
+}
+
+.timeline-list::before {
+  position: absolute;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  left: 0.18rem;
+  width: 0.12rem;
+  background: var(--sky);
+  content: "";
+}
+
+.timeline-item {
+  position: relative;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  background: white;
+  border: 0.08rem solid var(--night);
+  box-shadow: 0.28rem 0.28rem 0 var(--night);
+}
+
+.timeline-item::before {
+  position: absolute;
+  top: 1rem;
+  left: -1.32rem;
+  width: 0.7rem;
+  aspect-ratio: 1;
+  background: var(--ticket);
+  border: 0.12rem solid white;
+  box-shadow: 0 0 0 0.08rem var(--night);
+  content: "";
+}
+
+.timeline-item__date,
+.timeline-item__meta {
+  color: var(--ink);
+  font: 0.75rem/1.3 var(--utility);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.timeline-item__title {
+  margin: 0;
+  font-weight: 800;
+}
+
+.timeline-item__meta {
+  margin: 0;
+  opacity: 0.75;
+}
+
+.timeline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.timeline-button {
+  min-height: 2.75rem;
+  padding: 0.65rem 1.1rem;
+  color: var(--night);
+  background: var(--sky);
+  border: 0.1rem solid var(--night);
+  box-shadow: 0.28rem 0.28rem 0 var(--night);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.timeline-button:hover:not(:disabled) {
+  background: white;
+}
+
+.timeline-sentinel {
+  min-height: 1px;
+}
+
+.timeline-skeleton {
+  min-height: 4.2rem;
+  background: linear-gradient(90deg, var(--floodlight) 25%, rgb(7 25 43 / 8%) 37%, var(--floodlight) 63%);
+  background-size: 200% 100%;
+  border-style: dashed;
+  animation: agenda-skeleton-shimmer 1.4s ease-in-out infinite;
+}
 .session-panel {
   position: relative;
   display: grid;
