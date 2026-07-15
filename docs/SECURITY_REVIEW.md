@@ -60,7 +60,7 @@ Solo local, URL fija `http://127.0.0.1:4174`, sin aceptar `apiBase` por query st
 
 ## Dependencias
 
-Sin dependencias runtime. Usa Node nativo para servidor y tests.
+Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-contract.test.mjs` valida que no existan `dependencies/devDependencies`, lockfiles, `node_modules` ni scripts/styles remotos en HTML.
 
 ## Evidencia de busquedas
 

@@ -16,6 +16,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 8. Los estados dinamicos se anuncian con `role=status` o `aria-live`, y los errores dejan una accion recuperable.
 8.1. El shell conserva landmarks nativos (header, nav, main, sections y footer), sin `role=application` ni handlers inline.
 9. La evidencia vive en `npm test`, busquedas de sinks, matriz, security review y accessibility audit.
+10. El proyecto se mantiene sin dependencias runtime, sin CDN y sin lockfiles porque usa JavaScript/CSS vanilla y Node nativo.
 
 ## Endpoints por modulo
 

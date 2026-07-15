@@ -173,6 +173,23 @@ test('defense guide covers module endpoints, crossed fields, and resilience chal
 
 
 
+
+
+test('project stays dependency-light and avoids bundled third-party surface', async () => {
+  const rootEntries = await readdir(new URL('../', import.meta.url));
+  const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+
+  assert.equal(packageJson.dependencies, undefined);
+  assert.equal(packageJson.devDependencies, undefined);
+  assert.equal(rootEntries.includes('node_modules'), false);
+  assert.equal(rootEntries.includes('package-lock.json'), false);
+  assert.equal(rootEntries.includes('yarn.lock'), false);
+  assert.equal(rootEntries.includes('pnpm-lock.yaml'), false);
+  assert.doesNotMatch(html, new RegExp(`<script[^>]+src=["']https?://`, 'i'));
+  assert.doesNotMatch(html, new RegExp(`<link[^>]+href=["']https?://`, 'i'));
+});
+
 test('document shell uses semantic landmarks and reduced inline surface', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.equal((html.match(/<main\b/g) ?? []).length, 1);

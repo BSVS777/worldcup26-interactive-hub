@@ -174,7 +174,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | QA-006 | No hay listeners duplicados | `js/app.js`, `js/ui.js`, vistas `js/*-view.js` | `test/static-contract.test.mjs` valida registros centralizados y evita listeners dentro de rutas repetibles | VERIFICADO | |
 | QA-007 | No hay observer duplicado | `js/timeline-view.js:syncObserver`, `js/timeline-view.js:reset` | `test/timeline.test.mjs` valida desconexion de IntersectionObserver activo al resetear | VERIFICADO | |
 | QA-008 | No hay intervalos huérfanos | `js/timeline-view.js:clearRetryCountdown` | `test/timeline.test.mjs` valida limpieza tras recuperacion y reset | VERIFICADO | |
-| QA-009 | No hay archivos o dependencias innecesarias | | | NO INICIADO | |
+| QA-009 | No hay archivos o dependencias innecesarias | `package.json`, `index.html`, `test/static-contract.test.mjs` | Test valida cero `dependencies/devDependencies`, ausencia de lockfiles/node_modules y sin scripts/styles remotos en HTML | VERIFICADO | |
 | QA-010 | README contiene comandos exactos | `README.md`, `package.json` | `test/static-contract.test.mjs` valida `npm start`, `npm test`, `npm run test:server` y URLs locales | VERIFICADO | |
 
 ## Especificaciones transversales agregadas

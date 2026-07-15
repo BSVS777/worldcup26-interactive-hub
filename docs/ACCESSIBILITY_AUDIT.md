@@ -83,6 +83,7 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 - Rutas navegables: `tour`, `agenda`, `timeline`, `fan-dashboard`, `group-matrix`. Timeline fue verificado en Playwright como vista activa con placeholder oculto y retry visible en estado anonimo. Matrix fue verificada en movil 390x844 con 16 celdas, diagonal `aria-disabled`, resultado/pending y overflow contenido en el shell de tabla.
 - `aria-current="page"` cambia en cada ruta.
 - Sin overflow horizontal global en 320x720, 390x844, 768x1024, 1366x768 y 1920x1080 para las cinco rutas autenticadas (`RESPONSIVE_AUDIT_PASS viewports=5 routes=5 checks=25`).
+- La superficie de dependencias se mantiene reducida: `test/static-contract.test.mjs` valida cero dependencias npm, sin lockfiles/node_modules y sin scripts/styles remotos.
 - Modal 401 verificado en Playwright: role=dialog, aria-modal=true, foco inicial en email, fondo inerte, Tab cicla dentro del modal y sin errores de consola.
 
 ## Gaps pendientes
