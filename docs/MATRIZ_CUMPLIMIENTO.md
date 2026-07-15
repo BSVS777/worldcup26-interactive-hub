@@ -15,7 +15,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | ARC-002 | HTML semántico y reducido | | | NO INICIADO | |
 | ARC-003 | CSS minimalista y responsive | | | NO INICIADO | |
 | ARC-004 | Navegación entre módulos | `js/router.js`, `js/ui.js` | Playwright: aria-current cambia en las cinco rutas | IMPLEMENTADO | Falta navegacion movil avanzada/drawer. |
-| ARC-005 | Fetch separado de presentación | | | NO INICIADO | |
+| ARC-005 | Fetch separado de presentacion | `js/api.js`, vistas `js/*-view.js` | `test/static-contract.test.mjs` valida que las vistas no usen `fetch(` directo y que el cliente API central maneje red | VERIFICADO | |
 | API-001 | Endpoint real de autenticación verificado | | | NO INICIADO | |
 | API-002 | Payload de autenticación verificado | | | NO INICIADO | |
 | API-003 | Campo real del token verificado | | | NO INICIADO | |
@@ -23,11 +23,11 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | API-005 | Esquema de games verificado | | | NO INICIADO | |
 | API-006 | Esquema de teams verificado | | | NO INICIADO | |
 | API-007 | Esquema de groups verificado | | | NO INICIADO | |
-| API-008 | Normalizadores aíslan JSON crudo | | | NO INICIADO | |
-| ASY-001 | Async/await exclusivo en código ejecutable | | | NO INICIADO | |
-| ASY-002 | Cada respuesta revisa response.ok/status | | | NO INICIADO | |
-| ASY-003 | No existe .then() en código ejecutable | | | NO INICIADO | |
-| ASY-004 | No existe .catch() en código ejecutable | | | NO INICIADO | |
+| API-008 | Normalizadores aislan JSON crudo | `js/api.js:apiRequest`, `js/normalizers.js:normalizePayload` | `test/static-contract.test.mjs` valida `normalizePayload(endpointKey, payload)` en el cliente; `test/normalizers.test.mjs` valida modelos estables | VERIFICADO | |
+| ASY-001 | Async/await exclusivo en codigo ejecutable | `index.html`, `js/**`, `tools/**` | `test/static-contract.test.mjs` escanea runtime y falla si encuentra `.then(` o `.catch(` | VERIFICADO | |
+| ASY-002 | Cada respuesta revisa response.ok/status | `js/api.js:apiRequest`, `js/api.js:authenticate` | `test/static-contract.test.mjs` valida `response.ok`; `test/api.test.mjs` cubre 401/429/500/no retry/status typed | VERIFICADO | |
+| ASY-003 | No existe .then() en codigo ejecutable | `index.html`, `js/**`, `tools/**` | `test/static-contract.test.mjs` escanea runtime sin hallazgos | VERIFICADO | |
+| ASY-004 | No existe .catch() en codigo ejecutable | `index.html`, `js/**`, `tools/**` | `test/static-contract.test.mjs` escanea runtime sin hallazgos | VERIFICADO | |
 | SEC-001 | JWT se almacena y recupera centralmente | `js/session.js`, `js/auth.js` | `npm test`; `test/session.test.mjs` | IMPLEMENTADO | Token vive solo en memoria; tras recarga se requiere login. |
 | SEC-002 | Authorization Bearer en stadiums | `js/api.js:apiRequest`, `js/config.js:ENDPOINTS` | `test/api.test.mjs` valida Bearer y path `/get/stadiums` para todos los endpoints publicos | VERIFICADO | |
 | SEC-003 | Authorization Bearer en games | `js/api.js:apiRequest`, `js/config.js:ENDPOINTS` | `test/api.test.mjs` valida Bearer y path `/get/games` para todos los endpoints publicos | VERIFICADO | |
@@ -166,7 +166,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
-| QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 125/125 | VERIFICADO | |
+| QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 126/126 | VERIFICADO | |
 | QA-002 | Responsive verificado | | | NO INICIADO | |
 | QA-003 | Navegación por teclado verificada | Links/botones nativos; trap de Tab en modal 401 | `test/static-contract.test.mjs`; pendiente prueba manual completa | EN PROGRESO | Falta evidencia manual de teclado completo. |
 | QA-004 | aria-live en estados dinamicos | `index.html`, `js/timeline-view.js`, `js/matrix-view.js` | Countdown y avisos de cache actualizan regiones `role=status`/`aria-live`; `test/timeline.test.mjs`, `test/matrix.test.mjs` | IMPLEMENTADO | Pendiente prueba manual con lector de pantalla. |

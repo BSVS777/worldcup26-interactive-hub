@@ -1,6 +1,29 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import test from 'node:test';
+
+async function collectRuntimeFiles(relativeDir) {
+  const root = new URL(`../${relativeDir}/`, import.meta.url);
+  const entries = await readdir(root, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const relativePath = `${relativeDir}/${entry.name}`;
+    if (entry.isDirectory()) {
+      files.push(...await collectRuntimeFiles(relativePath));
+      continue;
+    }
+    if (/\.(?:js|mjs|html)$/.test(entry.name)) files.push(relativePath);
+  }
+  return files;
+}
+
+async function readRuntimeFiles() {
+  const files = ['index.html', ...await collectRuntimeFiles('js'), ...await collectRuntimeFiles('tools')];
+  return Promise.all(files.map(async (file) => ({
+    file,
+    text: await readFile(new URL(`../${file}`, import.meta.url), 'utf8')
+  })));
+}
 
 test('embedded sign-in uses section semantics and exposes accessibility hooks', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
@@ -36,6 +59,21 @@ test('README lists the exact package commands and local URLs', async () => {
   assert.match(readme, /`npm run test:server`[\s\S]*`node tools\/test-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4174`/);
   assert.match(readme, /`http:\/\/127\.0\.0\.1:4173\/\?testMode=1`/);
 });
+
+test('runtime code keeps async and fetch responsibilities centralized', async () => {
+  const runtimeFiles = await readRuntimeFiles();
+  const forbiddenPromiseFiles = runtimeFiles.filter(({ text }) => /\.(?:then|catch)\s*\(/.test(text));
+  assert.deepEqual(forbiddenPromiseFiles.map(({ file }) => file), []);
+
+  const viewFilesWithFetch = runtimeFiles.filter(({ file, text }) => file.startsWith('js/') && /-view\.js$/.test(file) && /\bfetch\s*\(/.test(text));
+  assert.deepEqual(viewFilesWithFetch.map(({ file }) => file), []);
+
+  const api = runtimeFiles.find(({ file }) => file === 'js/api.js')?.text ?? '';
+  assert.match(api, /if \(response\.ok\)/);
+  assert.match(api, /normalizePayload\(endpointKey, payload\)/);
+  assert.match(api, /new Headers\(\{ Accept: 'application\/json', Authorization: `Bearer \$\{token\}` \}\)/);
+});
+
 test('document declares the explicitly served favicon', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /<link rel="icon" href="favicon\.svg" type="image\/svg\+xml">/);

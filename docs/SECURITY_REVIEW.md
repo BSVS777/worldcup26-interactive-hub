@@ -63,8 +63,8 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 
 ## Evidencia de busquedas
 
-- Sinks peligrosos: `rg` sobre codigo ejecutable no encontro `.then(`, `.catch(`, `alert(`, `location.reload(`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval(` ni `new Function`.
-- `fetch(`: solo aparece en `test/app-server.test.mjs`; la app usa `fetchImpl` centralizado en `js/api.js`.
+- Sinks peligrosos: `rg` sobre codigo ejecutable no encontro `.then(`, `.catch(`, `alert(`, `location.reload(`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval(` ni `new Function`; `test/static-contract.test.mjs` tambien falla si runtime vuelve a introducir `.then(`, `.catch(`, fetch directo en vistas, o si el cliente API deja de validar `response.ok`/normalizadores.
+- `fetch(`: solo aparece en tests de servidor/app; el runtime de la app usa `fetchImpl` centralizado en `js/api.js`.
 - Handlers inline: sin resultados en HTML.
 - Secretos: la busqueda marco nombres de variables/tests y filas de docs; no encontro valores tipo `Bearer <token real>` ni credenciales de produccion.
 

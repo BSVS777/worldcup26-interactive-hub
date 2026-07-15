@@ -36,7 +36,7 @@ La pagina debe ser usable por personas con distintas capacidades, dispositivos, 
 | SEC-HARD-007 | Validacion de contratos | Toda respuesta 2xx se normaliza y valida antes de llegar a vistas; si falla, se usa cache segura o error recuperable. |
 | SEC-HARD-008 | Errores seguros | Mensajes al usuario no filtran URLs internas, tokens, stack traces ni payloads crudos. |
 | SEC-HARD-009 | Sin dependencias innecesarias | No agregar librerias externas para trabajo que puede resolverse con plataforma web nativa y tests actuales. |
-| SEC-HARD-010 | Datos persistidos minimizados | LocalStorage solo guarda cache versionada, favorito/snapshot y token si el contrato de sesion lo exige; cada clave tiene esquema verificable. |
+| SEC-HARD-010 | Datos persistidos minimizados | LocalStorage solo guarda cache versionada, favorito/snapshot y preferencias no sensibles; JWT, Authorization y secretos nunca se persisten. Cada clave tiene esquema verificable. |
 
 ## Resiliencia y disponibilidad
 
@@ -55,7 +55,8 @@ La pagina debe ser usable por personas con distintas capacidades, dispositivos, 
 
 - Los avisos de datos cacheados forman parte del requisito ACC-004 y RES-004: Matrix y Timeline tienen pruebas directas sobre estados live, y Tour, Agenda, Fan Dashboard, Timeline y Matrix consumen la misma propagacion `stale` desde `createLoadableView`.
 - La seguridad de cache queda ligada a SEC-HARD-007: cada endpoint publico usa clave aislada, version y timestamp verificables antes de llegar a las vistas.
-- La meta de resiliencia no se declara como disponibilidad absoluta; se mide por contencion de fallos, fallback de cache valido, avisos visibles y recuperacion sin recarga.
+- La meta de resiliencia no se declara como disponibilidad absoluta; se mide por contencion de fallos, fallback de cache valido, avisos visibles, recuperacion sin recarga y pruebas que impiden regresiones de async/fetch/DOM seguro.
+
 ## Definicion de listo
 
 Un cambio queda listo solo si:
