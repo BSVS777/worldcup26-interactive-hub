@@ -62,10 +62,10 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | CAC-007 | JSON corrupto se captura | | | NO INICIADO | |
 | CAC-008 | Solo se elimina la clave corrupta | | | NO INICIADO | |
 | CAC-009 | Datos cacheados muestran aviso visible | | | NO INICIADO | |
-| PRO-001 | No existe alert() en código ejecutable | | | NO INICIADO | |
-| PRO-002 | No existe location.reload() en código ejecutable | | | NO INICIADO | |
-| PRO-003 | Búsqueda excluye Markdown y documentación | | | NO INICIADO | |
-| PRO-004 | Fetch directo limitado a lugares permitidos | | | NO INICIADO | |
+| PRO-001 | No existe alert() en código ejecutable | Codigo ejecutable `js/**`, `index.html` | `rg` de sinks peligrosos sin hallazgos; fixture maliciosa en `test/matrix.test.mjs` no crea nodos ejecutables | VERIFICADO | La palabra `alert` solo existe como payload de prueba/documentacion. |
+| PRO-002 | No existe location.reload() en código ejecutable | Codigo ejecutable `js/**`, `index.html` | `rg` de sinks peligrosos sin hallazgos en runtime | VERIFICADO | |
+| PRO-003 | Búsqueda excluye Markdown y documentación | Comando `rg` con `--glob !docs/** --glob !**/*.md` | Ejecutado en auditoria de seguridad; sin falsos positivos de docs | VERIFICADO | |
+| PRO-004 | Fetch directo limitado a lugares permitidos | `js/api.js`, tests | `rg fetch(` muestra fetch directo solo en tests; app usa cliente API central | VERIFICADO | |
 | TOUR-001 | Renderiza 16 sedes | `js/tour-view.js:renderList`, `js/tour.js:crossReferenceVenues` | `test/tour.test.mjs` (tests de cruce de datos); `renderList` mapea `state.venues` 1:1 desde el arreglo normalizado de sedes | IMPLEMENTADO | El conteo real de 16 sedes depende de los datos en vivo de la API; no verificado en navegador. |
 | TOUR-002 | Sedes se obtienen de /get/stadiums | `js/tour-view.js:load` (`api.apiRequest('stadiums')`) | Reutiliza el cliente API compartido (`js/api.js`); llamada dentro de `load()` | IMPLEMENTADO | |
 | TOUR-003 | Partidos se obtienen de /get/games | `js/tour-view.js:load` (`api.apiRequest('games')`) | Reutiliza el cliente API compartido; llamada independiente dentro de `load()` | IMPLEMENTADO | |
@@ -166,7 +166,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
-| QA-001 | Aplicación inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 117/117 | VERIFICADO | |
+| QA-001 | Aplicación inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 118/118 | VERIFICADO | |
 | QA-002 | Responsive verificado | | | NO INICIADO | |
 | QA-003 | Navegación por teclado verificada | Links/botones nativos; trap de Tab en modal 401 | `test/static-contract.test.mjs`; pendiente prueba manual completa | EN PROGRESO | Falta evidencia manual de teclado completo. |
 | QA-004 | aria-live en estados dinámicos | | | NO INICIADO | |

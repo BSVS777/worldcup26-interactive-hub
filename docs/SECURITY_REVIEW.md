@@ -15,7 +15,7 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 
 | ID | Amenaza | Control | Prueba | Evidencia | Estado |
 |---|---|---|---|---|---|
-| T-01 | DOM XSS por API/cache | Render con `createElement`/`textContent`; sinks prohibidos bajo busqueda | `rg` de sinks peligrosos | Sin hallazgos en busqueda de sinks peligrosos | EN PROGRESO |
+| T-01 | DOM XSS por API/cache | Render con `createElement`/`textContent`; sinks prohibidos bajo busqueda; fixture maliciosa | `rg` de sinks peligrosos; `test/matrix.test.mjs` | Sin sinks peligrosos; Matrix conserva `<img onerror>`/`<script>` como texto y no crea nodos `img`/`script` | VERIFICADO |
 | T-02 | Robo de JWT persistido | `createSessionStore` mantiene token solo en memoria y limpia legado | `npm test` session/api | `test/session.test.mjs` | IMPLEMENTADO |
 | T-03 | Cache poisoning | Cache versionada por endpoint y elimina clave corrupta | `npm test` cache | `test/cache.test.mjs` | IMPLEMENTADO |
 | T-04 | Endpoint injection | `ENDPOINTS` inmutable; API recibe endpointKey | `npm test` config/api | `js/config.js`, `test/config.test.mjs` | IMPLEMENTADO |
@@ -32,9 +32,9 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 
 ## DOM XSS
 
-- sinks: prohibidos por contrato; busqueda final pendiente tras este bloque.
-- fixture: pendiente agregar fixture malicioso dedicado.
-- resultado: no verificado manualmente todavia.
+- sinks: busqueda runtime excluyendo `docs/**`, `test/**` y Markdown sin hallazgos; `alert(1)` existe solo como payload de prueba.
+- fixture: `test/matrix.test.mjs` incluye nombres de grupo/equipo con `<img onerror>` y `<script>`, verificados como texto no ejecutable.
+- resultado: verificado por test unitario de render Matrix; pendiente prueba manual/browser con payload equivalente en API viva.
 
 ## Cache poisoning
 

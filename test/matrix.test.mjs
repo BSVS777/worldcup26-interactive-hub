@@ -164,3 +164,40 @@ test('matrix view refresh updates cells without rebuilding tables when structure
   assert.equal(refreshedTarget, target);
   assert.equal(refreshedTarget.textContent, '3 - 0');
 });
+
+function collectText(node) {
+  return [node.textContent, ...node.children.flatMap(collectText)].filter(Boolean).join(' ');
+}
+
+function collectTagNames(node) {
+  return [node.tagName, ...node.children.flatMap(collectTagNames)];
+}
+
+test('matrix view treats malicious API strings as text instead of executable HTML', async () => {
+  const maliciousTeamName = '<img src=x onerror=alert(1)> Team';
+  const maliciousGroupName = '<script>alert(1)</script> Group';
+  const maliciousTeams = [
+    { id: 'x1', name: maliciousTeamName, groupId: 'x' },
+    { id: 'x2', name: 'Plain Team', groupId: 'x' }
+  ];
+  const maliciousGroups = [
+    { id: 'x', name: maliciousGroupName, teams: maliciousTeams.map((team) => ({ teamId: team.id, points: 0, goalsFor: 0, goalsAgainst: 0 })) }
+  ];
+  const { document, grid } = createFakeDocument();
+  const api = {
+    async apiRequest(endpoint) {
+      if (endpoint === 'groups') return { data: maliciousGroups };
+      if (endpoint === 'teams') return { data: maliciousTeams };
+      return { data: [] };
+    }
+  };
+
+  const view = createMatrixView(document, api);
+  await view.ensureLoaded();
+
+  const renderedText = collectText(grid);
+  assert.match(renderedText, /<img src=x onerror=alert\(1\)> Team/);
+  assert.match(renderedText, /<script>alert\(1\)<\/script> Group/);
+  assert.equal(collectTagNames(grid).includes('script'), false);
+  assert.equal(collectTagNames(grid).includes('img'), false);
+});
