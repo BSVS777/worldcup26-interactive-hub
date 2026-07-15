@@ -25,6 +25,21 @@ async function readRuntimeFiles() {
   })));
 }
 
+function extractFunctionBody(source, name) {
+  const start = source.search(new RegExp(`(?:async\\s+)?function\\s+${name}\\s*\\(`));
+  if (start < 0) return '';
+  const bodyStart = source.indexOf('{', start);
+  if (bodyStart < 0) return '';
+  let depth = 0;
+  for (let index = bodyStart; index < source.length; index++) {
+    const char = source[index];
+    if (char === '{') depth++;
+    if (char === '}') depth--;
+    if (depth === 0) return source.slice(bodyStart + 1, index);
+  }
+  return '';
+}
+
 test('embedded sign-in uses section semantics and exposes accessibility hooks', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   const app = await readFile(new URL('../js/app.js', import.meta.url), 'utf8');
@@ -47,6 +62,7 @@ test('session expiration resets module views before focusing the recovery panel'
   assert.match(app, /function resetModuleViews\(\) \{[\s\S]*tourView\.reset\(\);[\s\S]*timelineView\.reset\(\);[\s\S]*matrixView\.reset\(\);[\s\S]*\}/);
   assert.match(app, /async onSessionExpired\(\) \{\s*resetModuleViews\(\);\s*update\(\{ type: 'SESSION_EXPIRED' \}\);\s*view\.focusSession\(\);\s*\}/);
 });
+
 test('README lists the exact package commands and local URLs', async () => {
   const readme = await readFile(new URL('../README.md', import.meta.url), 'utf8');
   const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
@@ -101,6 +117,32 @@ test('hidden modules cannot be re-displayed by component display rules', async (
   assert.match(css, /\[hidden\]\s*\{\s*display:\s*none\s*!important;\s*\}/s);
 });
 
+test('interactive listeners stay centralized and are not registered during render/reset paths', async () => {
+  const runtimeFiles = Object.fromEntries((await readRuntimeFiles()).map(({ file, text }) => [file, text]));
+  const listenerCounts = new Map([
+    ['js/app.js', 1],
+    ['js/ui.js', 2],
+    ['js/tour-view.js', 1],
+    ['js/agenda-view.js', 2],
+    ['js/timeline-view.js', 2],
+    ['js/fan-dashboard-view.js', 1],
+    ['js/matrix-view.js', 0]
+  ]);
+
+  for (const [file, expectedCount] of listenerCounts) {
+    const text = runtimeFiles[file] ?? '';
+    const actualCount = (text.match(/\.addEventListener\(/g) ?? []).length;
+    assert.equal(actualCount, expectedCount, `${file} listener count changed`);
+    for (const repeatableName of ['render', 'reset', 'load', 'ensureLoaded', 'retry', 'refresh']) {
+      assert.doesNotMatch(extractFunctionBody(text, repeatableName), /\.addEventListener\(/, file + ' registers listeners inside ' + repeatableName + '()');
+    }
+  }
+
+  const api = runtimeFiles['js/api.js'] ?? '';
+  assert.match(api, /signal\?\.addEventListener\('abort', handleAbort, \{ once: true \}\)/);
+  assert.match(api, /signal\?\.removeEventListener\('abort', handleAbort\)/);
+});
+
 test('defense guide covers module endpoints, crossed fields, and resilience challenges', async () => {
   const guide = await readFile(new URL('../docs/GUIA_DEFENSA_INFJ_T.md', import.meta.url), 'utf8');
 
@@ -126,6 +168,7 @@ test('defense guide covers module endpoints, crossed fields, and resilience chal
     assert.ok(guide.includes(phrase), `Missing defense guide phrase: ${phrase}`);
   }
 });
+
 test('document language is Spanish for the WC26 command center', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /<html lang="es">/);

@@ -37,7 +37,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | ERR-401-002 | 401 muestra sesión expirada | `js/router.js`, `js/ui.js` | `test/shell.test.mjs`; `test/static-contract.test.mjs`; Playwright modal 401 | IMPLEMENTADO | Pendiente prueba contra 401 real de API viva. |
 | ERR-401-003 | Reautenticación sin recarga | `js/app.js:handleLogin`, `js/router.js:LOGIN_SUCCEEDED` | `test/shell.test.mjs`; `test/static-contract.test.mjs` | IMPLEMENTADO | |
 | ERR-401-004 | Observer se detiene o pausa ante 401 | `js/app.js:onSessionExpired`, `js/timeline-view.js:reset` | `test/static-contract.test.mjs` valida reset de modulos antes del panel de recuperacion; `test/timeline.test.mjs` valida desconexion de IntersectionObserver activo | VERIFICADO | |
-| ERR-401-005 | Continuación sin listeners duplicados | `js/ui.js`, `js/app.js` | Listeners se registran una vez al construir vistas; pendiente prueba de integracion | EN PROGRESO | |
+| ERR-401-005 | Continuacion sin listeners duplicados | `js/ui.js`, `js/app.js`, vistas `js/*-view.js` | `test/static-contract.test.mjs` valida conteos de listeners fuera de render/reset/load; `test/timeline.test.mjs` cubre reset de observer | VERIFICADO | |
 | ERR-429-001 | 429 se clasifica explícitamente | `js/api.js:createApiClient` | `test/api.test.mjs` cubre retry 429 y error tipado tras agotar intentos | VERIFICADO | |
 | ERR-429-002 | Backoff 1s/2s/4s | `js/api.js:BACKOFF_MS` | `test/api.test.mjs` valida delays 1000/2000/4000 | VERIFICADO | |
 | ERR-429-003 | Máximo 4 intentos totales | `js/api.js:apiRequest` | `test/api.test.mjs` valida error 429 tras cuatro intentos | VERIFICADO | |
@@ -166,12 +166,12 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
-| QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 127/127 | VERIFICADO | |
+| QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 128/128 | VERIFICADO | |
 | QA-002 | Responsive verificado | | | NO INICIADO | |
 | QA-003 | Navegación por teclado verificada | Links/botones nativos; trap de Tab en modal 401 | `test/static-contract.test.mjs`; pendiente prueba manual completa | EN PROGRESO | Falta evidencia manual de teclado completo. |
 | QA-004 | aria-live en estados dinamicos | `index.html`, `js/timeline-view.js`, `js/matrix-view.js` | Countdown y avisos de cache actualizan regiones `role=status`/`aria-live`; `test/timeline.test.mjs`, `test/matrix.test.mjs` | IMPLEMENTADO | Pendiente prueba manual con lector de pantalla. |
 | QA-005 | prefers-reduced-motion respetado | `css/styles.css`, `js/accessibility.js` | CSS contiene media query; preferencias manuales base disponibles | IMPLEMENTADO | Falta verificacion visual en browser con media emulada. |
-| QA-006 | No hay listeners duplicados | | | NO INICIADO | |
+| QA-006 | No hay listeners duplicados | `js/app.js`, `js/ui.js`, vistas `js/*-view.js` | `test/static-contract.test.mjs` valida registros centralizados y evita listeners dentro de rutas repetibles | VERIFICADO | |
 | QA-007 | No hay observer duplicado | `js/timeline-view.js:syncObserver`, `js/timeline-view.js:reset` | `test/timeline.test.mjs` valida desconexion de IntersectionObserver activo al resetear | VERIFICADO | |
 | QA-008 | No hay intervalos huérfanos | `js/timeline-view.js:clearRetryCountdown` | `test/timeline.test.mjs` valida limpieza tras recuperacion y reset | VERIFICADO | |
 | QA-009 | No hay archivos o dependencias innecesarias | | | NO INICIADO | |
