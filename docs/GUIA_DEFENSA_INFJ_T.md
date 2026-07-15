@@ -28,6 +28,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 19. El fallo parcial de Tour se demuestra con Playwright: si `/get/games` falla, las sedes siguen clicables y cada seleccion muestra su error local.
 20. El layout de Agenda se demuestra con Playwright: cada partido simultaneo se renderiza como columna visible y la navegacion conserva el patron.
 21. El JWT en memoria se demuestra con Playwright: tras login no aparece en storage y recargar vuelve a pedir sesion.
+22. La defensa contra endpoint injection se demuestra con Playwright: `apiBase` malicioso no recibe trafico y el proxy rechaza queries target.
 
 ## Endpoints por modulo
 
@@ -39,7 +40,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 | Dashboard del Fanatico | `/get/teams`, `/get/games`, `/get/groups` | Calcula favorito, partidos, puntos, goles y snapshot no sensible. |
 | Matriz de Enfrentamientos | `/get/groups`, `/get/teams`, `/get/games` | Construye tablas grupo por grupo y actualiza resultados de celdas. |
 
-Todos los endpoints salen de `js/config.js:ENDPOINTS`; las vistas no construyen URLs arbitrarias.
+Todos los endpoints salen de `js/config.js:ENDPOINTS`; las vistas no construyen URLs arbitrarias. `tools/endpoint-injection-audit.py` prueba que `apiBase` por query string se ignora.
 
 ## Campos reales cruzados
 

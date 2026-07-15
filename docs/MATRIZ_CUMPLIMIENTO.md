@@ -146,7 +146,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | TST-007 | /test/reset limpia contadores | `tools/test-server.mjs` | `test/test-server.test.mjs` resetea y reproduce fallo | VERIFICADO | |
 | TST-008 | Modo de pruebas está desactivado por defecto | `js/config.js:isTestMode` | `test/config.test.mjs` | VERIFICADO | |
 | TST-009 | Modo de pruebas muestra insignia | `js/ui.js`, `index.html#test-mode-badge` | Playwright testMode: `testBadgeHidden=false` | VERIFICADO | |
-| TST-010 | Producción conserva API real | `js/config.js:resolveApiBaseUrl` | `test/config.test.mjs` confirma testMode aislado/local | VERIFICADO | |
+| TST-010 | Producción conserva API real | `js/config.js:resolveApiBaseUrl`, `tools/endpoint-injection-audit.py` | `test/config.test.mjs` confirma testMode aislado/local; Playwright agrega `apiBase=https://evil.example` y verifica cero requests externos, uso fijo de `127.0.0.1:4174` y proxy query rechazado (`ENDPOINT_INJECTION_AUDIT_PASS`) | VERIFICADO | |
 | DEF-001 | Guia explica flujo general | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida la seccion `Flujo general del sistema` | VERIFICADO | |
 | DEF-002 | Guia lista endpoints por modulo | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida endpoints por Tour, Agenda, Timeline, Dashboard y Matriz | VERIFICADO | |
 | DEF-003 | Guia lista campos reales cruzados | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida cruces sede/partidos, partido/equipos y matriz | VERIFICADO | |

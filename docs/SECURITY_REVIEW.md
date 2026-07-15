@@ -18,8 +18,8 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 | T-01 | DOM XSS por API/cache | Render con `createElement`/`textContent`; sinks prohibidos bajo busqueda; fixture maliciosa | `rg` de sinks peligrosos; `test/matrix.test.mjs` | Sin sinks peligrosos; Matrix conserva `<img onerror>`/`<script>` como texto y no crea nodos `img`/`script` | VERIFICADO |
 | T-02 | Robo de JWT persistido | `createSessionStore` mantiene token solo en memoria y limpia legado | Unit + Playwright storage audit | `test/session.test.mjs`, `tools/session-storage-audit.py` | VERIFICADO |
 | T-03 | Cache poisoning | Cache versionada por endpoint, claves aisladas y avisos visibles para datos stale | `npm test` cache/matrix/timeline | `test/cache.test.mjs`, `test/matrix.test.mjs`, `test/timeline.test.mjs` | VERIFICADO |
-| T-04 | Endpoint injection | `ENDPOINTS` inmutable; API recibe endpointKey | `npm test` config/api | `js/config.js`, `test/config.test.mjs` | IMPLEMENTADO |
-| T-05 | Test mode expuesto | `testMode=1` solo en origen local | `npm test` config | `isTestMode` | IMPLEMENTADO |
+| T-04 | Endpoint injection | `ENDPOINTS` inmutable; API recibe endpointKey y proxy rechaza queries target | Unit + Playwright endpoint audit | `js/config.js`, `test/config.test.mjs`, `tools/endpoint-injection-audit.py` | VERIFICADO |
+| T-05 | Test mode expuesto | `testMode=1` solo en origen local y usa base fija | Unit + Playwright endpoint audit | `isTestMode`, `tools/endpoint-injection-audit.py` | VERIFICADO |
 | T-07 | Clickjacking | `frame-ancestors 'none'` en servidor local | `npm test` app-server | `tools/app-server.mjs` | IMPLEMENTADO |
 | T-09 | API lenta/caida | Retry 429/500, cache fallback, abort | `npm test` api | `test/api.test.mjs` | IMPLEMENTADO |
 | T-10 | Navegacion movil rompe foco o agrega HTML dinamico | Drawer con boton nativo, `aria-expanded`, dataset controlado y listeners centralizados; sin HTML crudo | Playwright drawer y busquedas de sinks | `tools/mobile-drawer-audit.py`, `test/static-contract.test.mjs`, `js/ui.js` | VERIFICADO |
@@ -58,7 +58,7 @@ Servidor local configura CSP, Referrer-Policy, X-Content-Type-Options y frame pr
 
 ## Test mode
 
-Solo local, URL fija `http://127.0.0.1:4174`, sin aceptar `apiBase` por query string.
+Solo local, URL fija `http://127.0.0.1:4174`, sin aceptar `apiBase` por query string. `tools/endpoint-injection-audit.py` confirma que `?apiBase=https://evil.example` no produce requests externos y que `/api/get/games?target=...` se rechaza con 404.
 
 ## Dependencias
 

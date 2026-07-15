@@ -19,6 +19,7 @@
     "test:console-401": "python tools/console-401-audit.py",
     "test:tour-partial-failure": "python tools/tour-partial-failure-audit.py",
     "test:agenda-layout": "python tools/agenda-layout-audit.py",
-    "test:session-storage": "python tools/session-storage-audit.py"
+    "test:session-storage": "python tools/session-storage-audit.py",
+    "test:endpoint-injection": "python tools/endpoint-injection-audit.py"
   }
 }
