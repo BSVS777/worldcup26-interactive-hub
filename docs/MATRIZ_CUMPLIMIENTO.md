@@ -114,7 +114,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | FAN-010 | Muestra goles a favor | `js/fan-dashboard.js:buildDashboard` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | Usa standing o calculo desde partidos jugados. |
 | FAN-011 | Muestra goles en contra | `js/fan-dashboard.js:buildDashboard` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | Usa standing o calculo desde partidos jugados. |
 | FAN-012 | Repinta variables CSS | | | NO INICIADO | No se implemento tematizacion por equipo porque no hay contrato seguro de colores en API. |
-| FAN-013 | Mantiene contraste legible | `css/styles.css:.fan-*` | Paleta existente sin colores externos de equipo | EN PROGRESO | Falta medicion numerica de contraste. |
+| FAN-013 | Mantiene contraste legible | `css/styles.css:.fan-*`, `test/accessibility-contrast.test.mjs` | Test calcula ratios WCAG: texto nocturno sobre panel blanco, labels pitch sobre blanco, status night/sky y foco focus/white | VERIFICADO | |
 | FAN-014 | Sin API usa snapshot del favorito | `js/fan-dashboard.js:readFanSnapshot`, `js/fan-dashboard-view.js:load` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | Snapshot se usa cuando `teams` no esta disponible. |
 | FAN-015 | Snapshot muestra datos no actualizados | `js/fan-dashboard-view.js:renderStatus`, `renderSummary` | `test/fan-dashboard.test.mjs` | IMPLEMENTADO | |
 | FAN-016 | Dashboard nunca queda vacío | `js/fan-dashboard-view.js:renderMetrics`, `renderMatches` | `test/fan-dashboard.test.mjs`; `npm test` | IMPLEMENTADO | |

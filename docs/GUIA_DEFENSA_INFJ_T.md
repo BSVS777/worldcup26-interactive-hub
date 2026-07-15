@@ -139,6 +139,6 @@ Tecnica: `tools/test-server.mjs`, `test/test-server.test.mjs`, `npm start`, `npm
 
 ## Preguntas que siguen pendientes de evidencia manual
 
-- Contraste numerico completo y lector de pantalla.
+- Lector de pantalla y contraste manual completo fuera del Dashboard.
 - Reproducciones DevTools de Network/Console para 401, 429, 500 y offline.
 - Validacion contra API viva con credenciales validas.

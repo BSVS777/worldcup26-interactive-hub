@@ -44,7 +44,7 @@ Implementado modal dinamico de sesion expirada con `role="dialog"`, `aria-modal`
 
 ## Contraste
 
-Pendiente medicion numerica completa. Hay foco visible y paleta consistente.
+Medicion numerica parcial implementada para Dashboard del Fanatico y foco: `test/accessibility-contrast.test.mjs` verifica texto principal, labels, status banner y foco contra umbrales WCAG AA. Queda pendiente auditoria manual completa de todos los modulos.
 
 ## Motion
 
@@ -87,4 +87,4 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 ## Gaps pendientes
 
 - Zoom de navegador/lector de pantalla.
-- Contraste AA medido.
+- Contraste AA manual completo en todos los modulos.

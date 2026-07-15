@@ -86,6 +86,7 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 
 - Agenda representa la fecha activa con `<time datetime>` construido mediante DOM seguro, no HTML crudo.
 - Tour crea el heading de detalle con `createElement`, `textContent` y `tabIndex=-1`; la gestion de foco no copia datos externos a atributos sensibles ni persiste estado.
+- El contraste del Dashboard se verifica con calculo local de luminancia WCAG en `test/accessibility-contrast.test.mjs`, sin depender de colores externos de API.
 
 ## Fan Dashboard
 
