@@ -20,7 +20,9 @@ No se declara conformidad WCAG 2.2 AA completa hasta terminar pruebas manuales c
 | A11Y-002 | Landmarks semanticos | Test estatico | Verificado | `test/static-contract.test.mjs` valida `main/header/nav/footer/section`, sin `role=application` | VERIFICADO |
 | A11Y-005 | Skip link | Playwright teclado | Verificado | `tools/keyboard-audit.py` enfoca `.skip-link` con Tab y activa `#main-content` con Enter | VERIFICADO |
 | A11Y-010 | Foco visible | Inspeccion CSS | Implementado | `:focus-visible` | IMPLEMENTADO |
-| A11Y-012 | aria-current en navegacion | Test shell | Implementado | `test/shell.test.mjs` | IMPLEMENTADO |
+| A11Y-012 | aria-current en navegacion | Test shell y Playwright | Verificado | `test/shell.test.mjs`; `tools/keyboard-audit.py`; `tools/mobile-drawer-audit.py` | VERIFICADO |
+| A11Y-013 | Drawer movil operable por teclado | Playwright movil 390x844 | Verificado | `tools/mobile-drawer-audit.py` abre con Enter, cierra con Escape y navega a `group-matrix` | VERIFICADO |
+| A11Y-014 | Drawer restaura foco al cerrar | Playwright movil 390x844 | Verificado | `tools/mobile-drawer-audit.py` confirma foco de vuelta en `#route-drawer-toggle` tras Escape | VERIFICADO |
 | A11Y-046 | Skeleton aria-hidden | Test agenda | Implementado | `test/agenda.test.mjs` | IMPLEMENTADO |
 | A11Y-047 | Avisos de datos cacheados | Playwright y tests sobre status live | Verificado en cinco modulos | `tools/cached-notice-audit.py`, `test/matrix.test.mjs`, `test/timeline.test.mjs` | VERIFICADO |
 | A11Y-060 | Modal 401 accesible | Inspeccion estatica y flujo 401 | Verificado por teclado; pendiente lector | `js/ui.js`; `test/static-contract.test.mjs`; `tools/keyboard-audit.py` valida role dialog, aria-modal, foco inicial y trap Tab | EN PROGRESO |
@@ -29,7 +31,7 @@ No se declara conformidad WCAG 2.2 AA completa hasta terminar pruebas manuales c
 
 ## Keyboard path
 
-`tools/keyboard-audit.py` verifica con Playwright: skip link, login completo con Tab/Enter, foco tras login en `main`, activacion por Enter de las cinco rutas, controles de Tour/Agenda/Timeline/Dashboard/Matrix y trap Shift+Tab/Tab en modal 401. Queda pendiente prueba manual con lector de pantalla.
+`tools/keyboard-audit.py` verifica con Playwright: skip link, login completo con Tab/Enter, foco tras login en `main`, apertura del drawer movil cuando aplica, activacion por Enter de las cinco rutas, controles de Tour/Agenda/Timeline/Dashboard/Matrix y trap Shift+Tab/Tab en modal 401. `tools/mobile-drawer-audit.py` verifica Escape y restauracion de foco del drawer. Queda pendiente prueba manual con lector de pantalla.
 
 ## Focus
 
@@ -91,6 +93,7 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 - Recuperacion 401 verificada bajo response HTTP real interceptada: `tools/failure-audit.py` confirma modal con `aria-modal` y foco inicial.
 - Timeline IntersectionObserver verificado en Playwright: `TIMELINE_OBSERVER_AUDIT_PASS before=10 after=20 games_requests=1`, con fallback visible antes del trigger.
 - Avisos de cache verificados en Playwright para Tour, Agenda, Timeline, Dashboard y Matrix: `CACHED_NOTICE_AUDIT_PASS routes=5 cache_keys=4 blocked_network=get-endpoints`.
+- Drawer movil verificado en Playwright: `MOBILE_DRAWER_AUDIT_PASS mobile=390 desktop=1366 escape=restores-focus route=group-matrix`.
 
 ## Gaps pendientes
 

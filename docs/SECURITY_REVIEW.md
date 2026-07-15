@@ -22,6 +22,7 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 | T-05 | Test mode expuesto | `testMode=1` solo en origen local | `npm test` config | `isTestMode` | IMPLEMENTADO |
 | T-07 | Clickjacking | `frame-ancestors 'none'` en servidor local | `npm test` app-server | `tools/app-server.mjs` | IMPLEMENTADO |
 | T-09 | API lenta/caida | Retry 429/500, cache fallback, abort | `npm test` api | `test/api.test.mjs` | IMPLEMENTADO |
+| T-10 | Navegacion movil rompe foco o agrega HTML dinamico | Drawer con boton nativo, `aria-expanded`, dataset controlado y listeners centralizados; sin HTML crudo | Playwright drawer y busquedas de sinks | `tools/mobile-drawer-audit.py`, `test/static-contract.test.mjs`, `js/ui.js` | VERIFICADO |
 
 ## Endpoint authorization
 
@@ -95,6 +96,11 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 - Renderiza API/snapshot con `createElement`, `textContent`, `append` y `replaceChildren`.
 - No consume URLs externas de banderas ni colores de equipos, para evitar contratos inseguros no verificados.
 
+## Mobile navigation drawer
+
+- El drawer movil usa un boton nativo con `aria-controls="route-nav-track"` y `aria-expanded`; no crea nodos desde strings ni inserta HTML dinamico.
+- Los dos listeners nuevos viven en `createShellView` fuera de `render`, delegados en `.route-nav`; `test/static-contract.test.mjs` mantiene el conteo centralizado y falla si se agregan listeners en rutas repetibles.
+- `tools/mobile-drawer-audit.py` verifica apertura por teclado, cierre con Escape, restauracion de foco, cierre al navegar y que desktop mantenga la navegacion visible.
 ## Modal 401
 
 - El estado `expired` activa un dialogo modal sin persistir token.

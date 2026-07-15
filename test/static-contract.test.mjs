@@ -77,6 +77,7 @@ test('README lists the exact package commands and local URLs', async () => {
   assert.equal(packageJson.scripts['test:failures'], 'python tools/failure-audit.py');
   assert.equal(packageJson.scripts['test:timeline-observer'], 'python tools/timeline-observer-audit.py');
   assert.equal(packageJson.scripts['test:cached-notices'], 'python tools/cached-notice-audit.py');
+  assert.equal(packageJson.scripts['test:mobile-drawer'], 'python tools/mobile-drawer-audit.py');
   assert.match(readme, /`npm start`[\s\S]*`node tools\/app-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4173`/);
   assert.match(readme, /`npm test`[\s\S]*`node --test test\/\*\.mjs`/);
   assert.match(readme, /`npm run test:server`[\s\S]*`node tools\/test-server\.mjs`[\s\S]*`http:\/\/127\.0\.0\.1:4174`/);
@@ -85,6 +86,7 @@ test('README lists the exact package commands and local URLs', async () => {
   assert.match(readme, /`npm run test:motion`[\s\S]*`python tools\/motion-audit\.py`/);
   assert.match(readme, /`npm run test:offline`[\s\S]*`python tools\/offline-audit\.py`/);
   assert.match(readme, /`npm run test:failures`[\s\S]*`python tools\/failure-audit\.py`/);
+  assert.match(readme, /`npm run test:mobile-drawer`[\s\S]*`python tools\/mobile-drawer-audit\.py`/);
   assert.match(readme, /`http:\/\/127\.0\.0\.1:4173\/\?testMode=1`/);
 });
 
@@ -119,7 +121,7 @@ test('tour module exposes a live venue grid and detail region alongside the shar
 test('styles preserve focus visibility, pointer scrolling, and device safe areas', async () => {
   const css = await readFile(new URL('../css/styles.css', import.meta.url), 'utf8');
   assert.match(css, /--focus:/);
-  assert.match(css, /touch-action:\s*pan-x/);
+  assert.match(css, /touch-action:\s*pan-y/);
   assert.match(css, /env\(safe-area-inset-left\)/);
   assert.match(css, /env\(safe-area-inset-bottom\)/);
   assert.match(css, /animation-duration:\s*0\.01ms\s*!important/);
@@ -135,7 +137,7 @@ test('interactive listeners stay centralized and are not registered during rende
   const runtimeFiles = Object.fromEntries((await readRuntimeFiles()).map(({ file, text }) => [file, text]));
   const listenerCounts = new Map([
     ['js/app.js', 1],
-    ['js/ui.js', 2],
+    ['js/ui.js', 4],
     ['js/tour-view.js', 1],
     ['js/agenda-view.js', 2],
     ['js/timeline-view.js', 2],
@@ -206,7 +208,9 @@ test('document shell uses semantic landmarks and reduced inline surface', async 
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.equal((html.match(/<main\b/g) ?? []).length, 1);
   assert.match(html, /<header class="site-header">/);
-  assert.match(html, /<nav class="route-nav" aria-label="World Cup views">/);
+  assert.match(html, /<nav class="route-nav" aria-label="World Cup views" data-drawer-open="false">/);
+  assert.match(html, /id="route-drawer-toggle"[^>]*aria-controls="route-nav-track"[^>]*aria-expanded="false"/);
+  assert.match(html, /<ol id="route-nav-track" class="route-nav__track">/);
   assert.match(html, /<footer class="site-footer">/);
   assert.match(html, /<section class="hero" aria-labelledby="view-title">/);
   assert.match(html, /<section class="module-stage" aria-labelledby="module-heading">/);

@@ -14,7 +14,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | ARC-001 | Aplicación única con cinco módulos | `index.html`, `js/router.js`, `js/ui.js`, `js/modules/*` | Playwright navego las cinco rutas sin errores de consola | IMPLEMENTADO | Cinco modulos implementados; falta verificacion con API viva completa. |
 | ARC-002 | HTML semántico y reducido | `index.html`, `test/static-contract.test.mjs` | Test valida un solo `<main>`, landmarks `header/nav/footer/section`, ausencia de `role=application`, handlers inline y `<style>` inline | VERIFICADO | |
 | ARC-003 | CSS minimalista y responsive | `css/styles.css`, `tools/responsive-audit.py` | Playwright testMode autenticado: 5 viewports x 5 rutas sin overflow global; H1 hero ajustado para 320px | VERIFICADO | |
-| ARC-004 | Navegación entre módulos | `js/router.js`, `js/ui.js` | Playwright: aria-current cambia en las cinco rutas | IMPLEMENTADO | Falta navegacion movil avanzada/drawer. |
+| ARC-004 | Navegación entre módulos | `js/router.js`, `js/ui.js`, `css/styles.css`, `index.html` | Playwright: `tools/keyboard-audit.py` activa las cinco rutas por teclado; `tools/mobile-drawer-audit.py` verifica drawer movil, Escape, foco restaurado, cierre al navegar y desktop intacto | VERIFICADO | |
 | ARC-005 | Fetch separado de presentacion | `js/api.js`, vistas `js/*-view.js` | `test/static-contract.test.mjs` valida que las vistas no usen `fetch(` directo y que el cliente API central maneje red | VERIFICADO | |
 | API-001 | Endpoint real de autenticación verificado | | | NO INICIADO | |
 | API-002 | Payload de autenticación verificado | | | NO INICIADO | |

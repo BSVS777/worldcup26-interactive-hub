@@ -23,6 +23,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 14. DevTools HTTP se demuestra con Playwright: 401 abre modal, 429 muestra countdown y 429/500 se recuperan con response 200 posterior.
 15. Timeline Infinito se demuestra con Playwright: el `IntersectionObserver` observa el sentinel, agrega el segundo bloque local y no repite `/get/games`.
 16. Los avisos de cache se demuestran con Playwright en los cinco modulos bloqueando `/get/*` despues de calentar cache real.
+17. La navegacion movil se demuestra con Playwright: drawer por boton nativo, Escape restaura foco, seleccionar ruta cierra el panel y desktop conserva el track visible.
 
 ## Endpoints por modulo
 
@@ -63,6 +64,7 @@ Si un campo no existe o no pasa normalizacion, el modulo usa estado recuperable 
 | Que pasa con clics repetidos | Reducers idempotentes y render con `replaceChildren` evitan duplicados; el mismo venue/favorito no crea contenido duplicado. |
 | Que pasa con cache corrupta | `js/cache.js` valida version, endpoint, fecha y shape; si falla, elimina solo esa entrada y reporta miss. |
 | Como se ve que estoy usando cache valida | Cada modulo muestra un aviso visible de `cached data`; `tools/cached-notice-audit.py` bloquea `/get/*` y confirma Tour, Agenda, Timeline, Dashboard y Matrix desde cache. |
+| Que pasa con navegacion movil | El boton `Views` abre un drawer con `aria-expanded`; Escape lo cierra y devuelve foco, seleccionar ruta lo cierra y desktop mantiene la navegacion visible. |
 | Que pasa si la matriz recibe nuevos resultados | Si la estructura del grupo sigue igual, conserva referencias internas y actualiza solo celdas afectadas. |
 
 ## Respuestas de defensa
@@ -83,6 +85,13 @@ Tecnica: `js/session.js:createSessionStore`, `test/session.test.mjs`, `docs/ACCE
 
 Tecnica: busqueda de sinks prohibidos, `test/static-contract.test.mjs`, `test/matrix.test.mjs` con payload malicioso.
 
+### Como defiendo navegacion movil
+
+15 segundos: En movil uso un drawer con boton nativo, y Escape devuelve el foco al mismo boton.
+
+30 segundos: El shell mantiene un unico nav semantico. En pantallas pequenas el track se oculta por CSS hasta que el boton `Views` cambia `data-drawer-open` y `aria-expanded`. Al elegir una ruta el drawer se cierra, y en desktop el boton queda oculto pero el track sigue visible.
+
+Tecnica: `index.html`, `css/styles.css`, `js/ui.js`, `tools/mobile-drawer-audit.py`, `tools/keyboard-audit.py`.
 ### Como defiendo el 401
 
 15 segundos: El 401 borra el token, abre un modal de sesion expirada y permite volver a iniciar sesion sin recargar.

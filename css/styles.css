@@ -162,6 +162,22 @@ a {
   text-transform: uppercase;
 }
 
+.route-nav__toggle {
+  display: none;
+}
+
+.route-nav__toggle-bars {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.route-nav__toggle-bars span {
+  display: block;
+  width: 1rem;
+  height: 0.13rem;
+  background: currentColor;
+}
+
 .route-nav__track {
   position: relative;
   display: grid;
@@ -969,21 +985,80 @@ main {
   }
 
   .route-nav {
+    display: grid;
+    gap: 0.75rem;
     overflow: visible;
   }
 
+  .route-nav::after {
+    position: fixed;
+    inset: 0;
+    z-index: 24;
+    display: none;
+    background: rgb(7 25 43 / 48%);
+    content: "";
+  }
+
+  .route-nav[data-drawer-open="true"]::after {
+    display: block;
+  }
+
+  .route-nav__toggle {
+    position: relative;
+    z-index: 26;
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    gap: 0.55rem;
+    min-height: 3rem;
+    padding: 0 0.9rem;
+    color: white;
+    background: var(--night);
+    border: 0.1rem solid var(--night);
+    box-shadow: 0.22rem 0.22rem 0 var(--ticket);
+    font-weight: 800;
+  }
+
+  .route-nav__label {
+    margin: 0;
+  }
+
   .route-nav__track {
-    grid-template-columns: repeat(5, minmax(9rem, 1fr));
-    overflow-x: auto;
-    margin-inline: -0.4rem;
-    padding: 0.4rem 0.4rem 1rem;
-    overscroll-behavior-inline: contain;
-    scroll-snap-type: x proximity;
-    touch-action: pan-x;
+    position: fixed;
+    inset: 0 0 0 auto;
+    z-index: 25;
+    display: none;
+    width: min(20rem, calc(100vw - 2rem));
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 0.45rem;
+    margin: 0;
+    padding: max(5rem, calc(env(safe-area-inset-top) + 4rem)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) 1rem;
+    overflow-y: auto;
+    background: var(--floodlight);
+    border-left: 0.1rem solid var(--night);
+    box-shadow: -0.45rem 0 0 var(--night);
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
+
+  .route-nav[data-drawer-open="true"] .route-nav__track {
+    display: grid;
+  }
+
+  .route-nav__track::before {
+    display: none;
   }
 
   .route-nav li {
-    scroll-snap-align: start;
+    min-width: 0;
+  }
+
+  .route-nav a {
+    min-height: 3.4rem;
+    padding: 0.45rem 0.75rem;
+    background: white;
+    border: 0.08rem solid var(--line);
   }
 
   .hero {

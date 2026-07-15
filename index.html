@@ -26,9 +26,13 @@
       <div id="test-mode-badge" class="test-badge" hidden>Test mode</div>
     </header>
 
-    <nav class="route-nav" aria-label="World Cup views">
+    <nav class="route-nav" aria-label="World Cup views" data-drawer-open="false">
+      <button id="route-drawer-toggle" class="route-nav__toggle" type="button" aria-controls="route-nav-track" aria-expanded="false">
+        <span class="route-nav__toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+        Views
+      </button>
       <p class="route-nav__label" aria-hidden="true">Choose a gate</p>
-      <ol class="route-nav__track">
+      <ol id="route-nav-track" class="route-nav__track">
         <li><a data-route="tour" href="#tour"><span>01</span>Tour</a></li>
         <li><a data-route="agenda" href="#agenda"><span>02</span>Agenda</a></li>
         <li><a data-route="timeline" href="#timeline"><span>03</span>Timeline</a></li>

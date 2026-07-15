@@ -51,7 +51,9 @@ export function createShellView(document, { onLogin }) {
     loginButton: requireElement(document, 'login-button', 'shell element'),
     loginStatus: requireElement(document, 'login-status', 'shell element'),
     appStatus: requireElement(document, 'app-status', 'shell element'),
-    emailInput: requireElement(document, 'email', 'shell element')
+    emailInput: requireElement(document, 'email', 'shell element'),
+    routeNav: document.querySelector('.route-nav'),
+    routeDrawerToggle: requireElement(document, 'route-drawer-toggle', 'shell element')
   };
   const routeLinks = [...document.querySelectorAll('[data-route]')];
   const modalSiblings = [
@@ -61,6 +63,7 @@ export function createShellView(document, { onLogin }) {
     document.querySelector('.site-footer')
   ].filter(Boolean);
   let sessionModalActive = false;
+  let drawerRestoreFocus = null;
 
   function setElementInert(element, inert) {
     element.inert = inert;
@@ -85,6 +88,27 @@ export function createShellView(document, { onLogin }) {
     for (const element of modalSiblings) setElementInert(element, active);
   }
 
+  function setDrawerOpen(open, { restoreFocus = false } = {}) {
+    elements.routeNav.dataset.drawerOpen = String(open);
+    elements.routeDrawerToggle.setAttribute('aria-expanded', String(open));
+    if (!open && restoreFocus && drawerRestoreFocus) drawerRestoreFocus.focus();
+    drawerRestoreFocus = open ? elements.routeDrawerToggle : null;
+  }
+
+  elements.routeNav.addEventListener('click', (event) => {
+    const toggle = event.target.closest('#route-drawer-toggle');
+    if (toggle) {
+      setDrawerOpen(elements.routeNav.dataset.drawerOpen !== 'true');
+      return;
+    }
+    if (event.target.closest('[data-route]')) setDrawerOpen(false);
+  });
+
+  elements.routeNav.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || elements.routeNav.dataset.drawerOpen !== 'true') return;
+    event.preventDefault();
+    setDrawerOpen(false, { restoreFocus: true });
+  });
   elements.sessionPanel.addEventListener('keydown', (event) => {
     if (!sessionModalActive || event.key !== 'Tab') return;
     const focusable = getFocusableSessionElements();

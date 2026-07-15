@@ -36,7 +36,21 @@ def sign_in_with_keyboard(page, wait_for_hidden=True):
         expect(page.locator('#main-content')).to_be_focused()
 
 
+def open_mobile_drawer_if_needed(page):
+    toggle = page.locator('#route-drawer-toggle')
+    if not toggle.is_visible():
+        return
+    if toggle.get_attribute('aria-expanded') == 'true':
+        return
+    toggle.focus()
+    expect(toggle).to_be_focused()
+    page.keyboard.press('Enter')
+    expect(toggle).to_have_attribute('aria-expanded', 'true')
+    expect(page.locator('#route-nav-track')).to_be_visible()
+
+
 def activate_route(page, route):
+    open_mobile_drawer_if_needed(page)
     link = page.locator(f'[data-route="{route}"]')
     link.focus()
     expect(link).to_be_focused()
