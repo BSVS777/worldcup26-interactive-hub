@@ -21,6 +21,7 @@ No se declara conformidad WCAG 2.2 AA completa hasta terminar pruebas manuales c
 | A11Y-010 | Foco visible | Inspeccion CSS | Implementado | `:focus-visible` | IMPLEMENTADO |
 | A11Y-012 | aria-current en navegacion | Test shell | Implementado | `test/shell.test.mjs` | IMPLEMENTADO |
 | A11Y-046 | Skeleton aria-hidden | Test agenda | Implementado | `test/agenda.test.mjs` | IMPLEMENTADO |
+| A11Y-047 | Avisos de datos cacheados | Tests Matrix/Timeline sobre status live | Implementado parcial | `test/matrix.test.mjs`, `test/timeline.test.mjs` | IMPLEMENTADO |
 | A11Y-060 | Modal 401 accesible | Inspeccion estatica y flujo 401 | Implementado parcial | `js/ui.js`; `test/static-contract.test.mjs`; Playwright modal 401; pendiente prueba manual SR | EN PROGRESO |
 | A11Y-070 | No declarar AA sin evidencia | Documento vivo | Cumplido | Esta auditoria | IMPLEMENTADO |
 
@@ -64,7 +65,7 @@ Usa botones disabled y skeleton oculto; pendiente convertir fecha a `<time datet
 
 ### Timeline
 
-Implementado con lista ordenada, boton fallback "Load 10 more matches", retry persistente, countdown de retry en status `aria-live` y limpieza de intervalos en recuperacion/reset. Pendiente prueba manual de screen reader e IntersectionObserver real con datos autenticados.
+Implementado con lista ordenada, boton fallback "Load 10 more matches", retry persistente, countdown de retry en status `aria-live`, aviso de datos cacheados en el mismo status y limpieza de intervalos en recuperacion/reset. Pendiente prueba manual de screen reader e IntersectionObserver real con datos autenticados.
 
 ### Dashboard
 
@@ -72,7 +73,7 @@ Implementado con selector nativo, status `aria-live`, metricas en `<dl>` y lista
 
 ### Matrix
 
-Implementada con tablas nativas, caption, encabezados de columna, encabezados de fila con `scope="row"`, diagonal `aria-disabled`, estado `aria-live` y contenedor horizontal acotado para movil.
+Implementada con tablas nativas, caption, encabezados de columna, encabezados de fila con `scope="row"`, diagonal `aria-disabled`, estado `aria-live`, aviso de datos cacheados y contenedor horizontal acotado para movil.
 
 ## Evidencia Playwright
 

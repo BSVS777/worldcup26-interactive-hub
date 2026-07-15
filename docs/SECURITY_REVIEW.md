@@ -17,7 +17,7 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 |---|---|---|---|---|---|
 | T-01 | DOM XSS por API/cache | Render con `createElement`/`textContent`; sinks prohibidos bajo busqueda; fixture maliciosa | `rg` de sinks peligrosos; `test/matrix.test.mjs` | Sin sinks peligrosos; Matrix conserva `<img onerror>`/`<script>` como texto y no crea nodos `img`/`script` | VERIFICADO |
 | T-02 | Robo de JWT persistido | `createSessionStore` mantiene token solo en memoria y limpia legado | `npm test` session/api | `test/session.test.mjs` | IMPLEMENTADO |
-| T-03 | Cache poisoning | Cache versionada por endpoint y elimina clave corrupta | `npm test` cache | `test/cache.test.mjs` | IMPLEMENTADO |
+| T-03 | Cache poisoning | Cache versionada por endpoint, claves aisladas y avisos visibles para datos stale | `npm test` cache/matrix/timeline | `test/cache.test.mjs`, `test/matrix.test.mjs`, `test/timeline.test.mjs` | VERIFICADO |
 | T-04 | Endpoint injection | `ENDPOINTS` inmutable; API recibe endpointKey | `npm test` config/api | `js/config.js`, `test/config.test.mjs` | IMPLEMENTADO |
 | T-05 | Test mode expuesto | `testMode=1` solo en origen local | `npm test` config | `isTestMode` | IMPLEMENTADO |
 | T-07 | Clickjacking | `frame-ancestors 'none'` en servidor local | `npm test` app-server | `tools/app-server.mjs` | IMPLEMENTADO |
@@ -38,7 +38,7 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 
 ## Cache poisoning
 
-Cubierto por pruebas de cache corrupta, version incorrecta, endpoint incorrecto y fecha invalida.
+Cubierto por pruebas de cache corrupta, version incorrecta, endpoint incorrecto, fecha invalida y claves independientes para `stadiums`, `games`, `teams` y `groups`. Los metadatos `stale`, `cachedAt` y `source` se propagan desde el cliente API hacia las vistas mediante `createLoadableView`, y Matrix/Timeline tienen tests que verifican aviso visible de `cached data`.
 
 ## URLs
 
@@ -99,6 +99,14 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 - `createTimelineView` usa `generation` para descartar cargas obsoletas.
 - Load-more es local y no dispara fetch adicional.
 - Retry usa `forceRetry` y mantiene el endpoint allowlisted `games`.
+- Cuando `games` viene de cache valida, el status live muestra que los partidos se estan viendo desde cache.
+
+## Cached data notices
+
+- `createLoadableView.fetchOrFallback` conserva `stale`, `cachedAt` y `source` sin exponer payload crudo.
+- Tour, Agenda, Timeline, Fan Dashboard y Matrix muestran avisos visibles cuando algun endpoint publico responde desde cache.
+- Matrix y Timeline tienen cobertura unitaria directa de esos avisos; los demas modulos quedan cubiertos por propagacion comun y pendientes de evidencia Playwright por modulo.
+
 ## Riesgos pendientes
 
 - Completar modulos restantes.

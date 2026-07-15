@@ -8,6 +8,7 @@ export function createTourView(document, api) {
     detail: requireElement(document, 'tour-venue-detail', 'tour element')
   };
   let state = createInitialTourState();
+  let hasCachedData = false;
   const loadable = createLoadableView(api);
 
   function paragraph(className, text, attrs = {}) {
@@ -69,7 +70,7 @@ export function createTourView(document, api) {
     }
 
     const heading = document.createElement('h3');
-    heading.textContent = venue.name;
+    heading.textContent = hasCachedData ? `${venue.name} (cached data)` : venue.name;
 
     if (venue.games.length === 0) {
       elements.detail.replaceChildren(heading, paragraph('venue-detail__hint', `No matches are scheduled for ${venue.name} yet.`));
@@ -128,6 +129,7 @@ export function createTourView(document, api) {
     // this call is stale and must not overwrite fresher state.
     if (!isCurrent()) return false;
 
+    hasCachedData = stadiums.stale || games.stale;
     state = reduceTourState(state, {
       type: 'DATA_LOADED',
       stadiums: stadiums.data,
@@ -152,6 +154,7 @@ export function createTourView(document, api) {
   function reset() {
     loadable.reset();
     state = createInitialTourState();
+    hasCachedData = false;
   }
 
   return Object.freeze({ ensureLoaded, reset });

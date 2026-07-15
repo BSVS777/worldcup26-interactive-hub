@@ -12,6 +12,7 @@ export function createAgendaView(document, api) {
     columns: requireElement(document, 'agenda-columns', 'agenda element')
   };
   let state = createInitialAgendaState();
+  let hasCachedData = false;
   const loadable = createLoadableView(api);
 
   function createSkeletonColumn() {
@@ -47,7 +48,7 @@ export function createAgendaView(document, api) {
 
   function renderDateLabel() {
     if (state.dates.length > 0) {
-      elements.dateLabel.textContent = state.dates[state.currentIndex].date;
+      elements.dateLabel.textContent = hasCachedData ? `${state.dates[state.currentIndex].date} · cached data` : state.dates[state.currentIndex].date;
       return;
     }
     if (state.status === 'loading') {
@@ -98,6 +99,7 @@ export function createAgendaView(document, api) {
     // this call is stale and must not overwrite fresher state.
     if (!isCurrent()) return false;
 
+    hasCachedData = games.stale || teams.stale;
     state = reduceAgendaState(state, {
       type: 'DATA_LOADED',
       games: games.data,
@@ -117,6 +119,7 @@ export function createAgendaView(document, api) {
   function reset() {
     loadable.reset();
     state = createInitialAgendaState();
+    hasCachedData = false;
   }
 
   render();

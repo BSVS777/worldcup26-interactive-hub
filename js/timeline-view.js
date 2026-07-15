@@ -24,6 +24,7 @@ export function createTimelineView(document, api, {
   let loadPromise = null;
   let observer = null;
   let retryCountdownTimer = null;
+  let hasCachedData = false;
 
   function createSkeletonRow() {
     const row = document.createElement('li');
@@ -120,7 +121,9 @@ export function createTimelineView(document, api, {
       elements.status.textContent = 'No matches are available yet.';
       return;
     }
-    elements.status.textContent = `${visibleTimelineGames(state).length} of ${state.games.length} matches shown.`;
+    elements.status.textContent = hasCachedData
+      ? `${visibleTimelineGames(state).length} of ${state.games.length} matches shown from cached data.`
+      : `${visibleTimelineGames(state).length} of ${state.games.length} matches shown.`;
   }
 
   function renderControls() {
@@ -155,6 +158,7 @@ export function createTimelineView(document, api, {
       });
       if (myGeneration !== generation) return false;
       clearRetryCountdown();
+      hasCachedData = Boolean(result.stale);
       state = reduceTimelineState(state, { type: 'DATA_LOADED', games: result.data });
       render();
       return false;
@@ -185,6 +189,7 @@ export function createTimelineView(document, api, {
     disconnectObserver();
     clearRetryCountdown();
     loadPromise = null;
+    hasCachedData = false;
     state = reduceTimelineState(state, { type: 'RESET' });
     render();
   }

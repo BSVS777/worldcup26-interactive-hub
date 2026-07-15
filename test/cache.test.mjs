@@ -84,3 +84,21 @@ test('returns the validated entry even when cache persistence is unavailable', (
     version: CACHE_VERSION, endpoint: 'games', savedAt: now.toISOString(), data: []
   });
 });
+test('stores every public endpoint in an isolated cache key', () => {
+  const storage = new MemoryStorage();
+  const now = new Date('2026-07-13T12:00:00.000Z');
+  const endpoints = ['stadiums', 'games', 'teams', 'groups'];
+
+  for (const endpoint of endpoints) {
+    writeEndpointCache(endpoint, [{ id: endpoint }], { storage, now });
+  }
+
+  for (const endpoint of endpoints) {
+    const entry = readEndpointCache(endpoint, { storage });
+    assert.equal(entry.endpoint, endpoint);
+    assert.deepEqual(entry.data, [{ id: endpoint }]);
+    for (const other of endpoints.filter((item) => item !== endpoint)) {
+      assert.notEqual(endpointCacheKey(endpoint), endpointCacheKey(other));
+    }
+  }
+});

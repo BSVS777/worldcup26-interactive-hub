@@ -258,3 +258,15 @@ test('timeline reset clears an active retry countdown before stale recovery reso
   await loadPromise;
   assert.equal(status.textContent, 'No matches are available yet.');
 });
+test('timeline announces when matches came from endpoint cache', async () => {
+  const { document, status } = createFakeDocument();
+  const api = {
+    async apiRequest() {
+      return { data: games(2), stale: true, source: 'cache', cachedAt: '2026-07-13T12:00:00.000Z' };
+    }
+  };
+  const view = createTimelineView(document, api, { IntersectionObserverImpl: undefined });
+  await view.ensureLoaded();
+
+  assert.match(status.textContent, /cached data/i);
+});

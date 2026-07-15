@@ -14,10 +14,10 @@ export function createLoadableView(api) {
 
   async function fetchOrFallback(endpointKey) {
     try {
-      const { data } = await api.apiRequest(endpointKey);
-      return { data, failed: false };
+      const { data, stale = false, cachedAt = null, source = 'network' } = await api.apiRequest(endpointKey);
+      return { data, failed: false, stale: Boolean(stale), cachedAt, source };
     } catch {
-      return { data: [], failed: true };
+      return { data: [], failed: true, stale: false, cachedAt: null, source: 'error' };
     }
   }
 

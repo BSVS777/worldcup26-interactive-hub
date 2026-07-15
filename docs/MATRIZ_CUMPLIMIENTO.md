@@ -53,15 +53,15 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | NET-001 | Error de red se diferencia de error HTTP | `js/api.js:apiRequest` | `test/api.test.mjs` valida `Network request failed` y errores HTTP tipados | VERIFICADO | |
 | NET-002 | Error de red usa caché disponible | `js/api.js:cachedResult` | `test/api.test.mjs` valida cache inmediata en error de red | VERIFICADO | |
 | NET-003 | Sin red ni caché aplica reto específico | `js/api.js:ApiError`, vistas de modulos | `test/api.test.mjs`; tests de Tour/Agenda/Timeline cubren estados recuperables | IMPLEMENTADO | Pendiente demo Playwright offline por modulo. |
-| CAC-001 | Caché independiente de stadiums | | | NO INICIADO | |
-| CAC-002 | Caché independiente de games | | | NO INICIADO | |
-| CAC-003 | Caché independiente de teams | | | NO INICIADO | |
-| CAC-004 | Caché independiente de groups | | | NO INICIADO | |
-| CAC-005 | Caché guarda timestamp | | | NO INICIADO | |
-| CAC-006 | Caché guarda versión | | | NO INICIADO | |
-| CAC-007 | JSON corrupto se captura | | | NO INICIADO | |
-| CAC-008 | Solo se elimina la clave corrupta | | | NO INICIADO | |
-| CAC-009 | Datos cacheados muestran aviso visible | | | NO INICIADO | |
+| CAC-001 | Cache independiente de stadiums | `js/cache.js:endpointCacheKey`, `test/cache.test.mjs` | Test `stores every public endpoint in an isolated cache key` cubre `stadiums` | VERIFICADO | |
+| CAC-002 | Cache independiente de games | `js/cache.js:endpointCacheKey`, `test/cache.test.mjs` | Test `stores every public endpoint in an isolated cache key` cubre `games` | VERIFICADO | |
+| CAC-003 | Cache independiente de teams | `js/cache.js:endpointCacheKey`, `test/cache.test.mjs` | Test `stores every public endpoint in an isolated cache key` cubre `teams` | VERIFICADO | |
+| CAC-004 | Cache independiente de groups | `js/cache.js:endpointCacheKey`, `test/cache.test.mjs` | Test `stores every public endpoint in an isolated cache key` cubre `groups` | VERIFICADO | |
+| CAC-005 | Cache guarda timestamp | `js/cache.js:writeEndpointCache`, `test/cache.test.mjs` | Tests validan `savedAt` ISO y rechazan fechas invalidas | VERIFICADO | |
+| CAC-006 | Cache guarda version | `js/cache.js:CACHE_VERSION`, `test/cache.test.mjs` | Tests validan version vigente y rechazan version incorrecta | VERIFICADO | |
+| CAC-007 | JSON corrupto se captura | `js/cache.js:readEndpointCache`, `test/cache.test.mjs` | Test cubre JSON corrupto sin romper la app | VERIFICADO | |
+| CAC-008 | Solo se elimina la clave corrupta | `js/cache.js:removeEndpointCache`, `test/cache.test.mjs` | Test valida remocion acotada a la entrada invalida | VERIFICADO | |
+| CAC-009 | Datos cacheados muestran aviso visible | `js/loadable-view.js`, vistas de modulos, `test/matrix.test.mjs`, `test/timeline.test.mjs` | Metadatos stale propagados; Matrix y Timeline anuncian `cached data` en status live | VERIFICADO | Playwright por modulo pendiente para evidencia visual completa. |
 | PRO-001 | No existe alert() en código ejecutable | Codigo ejecutable `js/**`, `index.html` | `rg` de sinks peligrosos sin hallazgos; fixture maliciosa en `test/matrix.test.mjs` no crea nodos ejecutables | VERIFICADO | La palabra `alert` solo existe como payload de prueba/documentacion. |
 | PRO-002 | No existe location.reload() en código ejecutable | Codigo ejecutable `js/**`, `index.html` | `rg` de sinks peligrosos sin hallazgos en runtime | VERIFICADO | |
 | PRO-003 | Búsqueda excluye Markdown y documentación | Comando `rg` con `--glob !docs/** --glob !**/*.md` | Ejecutado en auditoria de seguridad; sin falsos positivos de docs | VERIFICADO | |
@@ -166,10 +166,10 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
 | DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
-| QA-001 | Aplicación inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 118/118 | VERIFICADO | |
+| QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 121/121 | VERIFICADO | |
 | QA-002 | Responsive verificado | | | NO INICIADO | |
 | QA-003 | Navegación por teclado verificada | Links/botones nativos; trap de Tab en modal 401 | `test/static-contract.test.mjs`; pendiente prueba manual completa | EN PROGRESO | Falta evidencia manual de teclado completo. |
-| QA-004 | aria-live en estados dinámicos | | | NO INICIADO | |
+| QA-004 | aria-live en estados dinamicos | `index.html`, `js/timeline-view.js`, `js/matrix-view.js` | Countdown y avisos de cache actualizan regiones `role=status`/`aria-live`; `test/timeline.test.mjs`, `test/matrix.test.mjs` | IMPLEMENTADO | Pendiente prueba manual con lector de pantalla. |
 | QA-005 | prefers-reduced-motion respetado | `css/styles.css`, `js/accessibility.js` | CSS contiene media query; preferencias manuales base disponibles | IMPLEMENTADO | Falta verificacion visual en browser con media emulada. |
 | QA-006 | No hay listeners duplicados | | | NO INICIADO | |
 | QA-007 | No hay observer duplicado | | | NO INICIADO | |

@@ -13,6 +13,7 @@ export function createMatrixView(document, api) {
   };
   const loadable = createLoadableView(api);
   let state = createInitialMatrixState();
+  let hasCachedData = false;
   let structureKey = '';
   const cellRefs = new Map();
 
@@ -26,7 +27,11 @@ export function createMatrixView(document, api) {
       return;
     }
     if (state.teamsFailed || state.gamesFailed) {
-      elements.status.textContent = 'Group matrix loaded with partial live data.';
+      elements.status.textContent = hasCachedData ? 'Group matrix loaded with cached and partial live data.' : 'Group matrix loaded with partial live data.';
+      return;
+    }
+    if (hasCachedData && state.matrices.length > 0) {
+      elements.status.textContent = 'Group matrix ready from cached data.';
       return;
     }
     elements.status.textContent = state.matrices.length > 0 ? 'Group matrix ready.' : 'No group data is available yet.';
@@ -161,6 +166,7 @@ export function createMatrixView(document, api) {
       loadable.fetchOrFallback('games')
     ]);
     if (!isCurrent()) return false;
+    hasCachedData = groups.stale || teams.stale || games.stale;
     state = reduceMatrixState(state, {
       type: 'DATA_LOADED',
       groups: groups.data,
@@ -186,6 +192,7 @@ export function createMatrixView(document, api) {
   function reset() {
     loadable.reset();
     state = reduceMatrixState(state, { type: 'RESET' });
+    hasCachedData = false;
     structureKey = '';
     cellRefs.clear();
     render();
@@ -194,5 +201,3 @@ export function createMatrixView(document, api) {
   render();
   return Object.freeze({ ensureLoaded, refresh, reset });
 }
-
-

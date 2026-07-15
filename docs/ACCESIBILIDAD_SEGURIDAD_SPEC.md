@@ -51,6 +51,11 @@ La pagina debe ser usable por personas con distintas capacidades, dispositivos, 
 | RES-007 | Layout nunca blanco | Cada modulo tiene skeleton, estado vacio o error accionable; ningun fallo deja una region primaria vacia. |
 | RES-008 | Tests obligatorios | Todo requisito nuevo de esta spec debe tener test unitario, test de contrato estatico o verificacion Playwright documentada. |
 
+## Evidencia actual
+
+- Los avisos de datos cacheados forman parte del requisito ACC-004 y RES-004: Matrix y Timeline tienen pruebas directas sobre estados live, y Tour, Agenda, Fan Dashboard, Timeline y Matrix consumen la misma propagacion `stale` desde `createLoadableView`.
+- La seguridad de cache queda ligada a SEC-HARD-007: cada endpoint publico usa clave aislada, version y timestamp verificables antes de llegar a las vistas.
+- La meta de resiliencia no se declara como disponibilidad absoluta; se mide por contencion de fallos, fallback de cache valido, avisos visibles y recuperacion sin recarga.
 ## Definicion de listo
 
 Un cambio queda listo solo si:

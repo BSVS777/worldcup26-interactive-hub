@@ -21,6 +21,7 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
   const loadable = createLoadableView(api);
   let lastGames = Object.freeze([]);
   let lastGroups = Object.freeze([]);
+  let hasCachedData = false;
 
   function metricTerm(label) {
     const term = document.createElement('dt');
@@ -103,6 +104,10 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
       elements.status.textContent = 'Loading teams, matches, and groups.';
       return;
     }
+    if (hasCachedData && state.dashboard) {
+      elements.status.textContent = 'Fan dashboard ready from cached data.';
+      return;
+    }
     if (state.snapshotUsed || state.dashboard?.stale) {
       elements.status.textContent = 'Showing saved favorite snapshot because live dashboard data is unavailable.';
       return;
@@ -144,6 +149,7 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
 
     lastGames = Object.freeze(games.data);
     lastGroups = Object.freeze(groups.data);
+    hasCachedData = teams.stale || games.stale || groups.stale;
 
     if (teams.failed) {
       const snapshot = readFanSnapshot(state.favoriteTeamId, storage);
@@ -176,6 +182,7 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
     state = reduceFanDashboardState(state, { type: 'RESET' });
     lastGames = Object.freeze([]);
     lastGroups = Object.freeze([]);
+    hasCachedData = false;
     render();
   }
 

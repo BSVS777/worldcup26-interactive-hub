@@ -201,3 +201,18 @@ test('matrix view treats malicious API strings as text instead of executable HTM
   assert.equal(collectTagNames(grid).includes('script'), false);
   assert.equal(collectTagNames(grid).includes('img'), false);
 });
+test('matrix view announces when endpoint data came from cache', async () => {
+  const { document, status } = createFakeDocument();
+  const api = {
+    async apiRequest(endpoint) {
+      if (endpoint === 'groups') return { data: groups, stale: true, source: 'cache', cachedAt: '2026-07-13T12:00:00.000Z' };
+      if (endpoint === 'teams') return { data: teams, stale: false, source: 'network', cachedAt: null };
+      return { data: games, stale: false, source: 'network', cachedAt: null };
+    }
+  };
+
+  const view = createMatrixView(document, api);
+  await view.ensureLoaded();
+
+  assert.match(status.textContent, /cached data/i);
+});
