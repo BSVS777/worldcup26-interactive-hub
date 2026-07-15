@@ -97,6 +97,7 @@ class FakeElement {
     this.textContent = '';
     this.className = '';
     this.scrollCalls = 0;
+    this.focusCalls = 0;
   }
 
   get classList() {
@@ -163,6 +164,7 @@ class FakeElement {
   }
 
   scrollIntoView() { this.scrollCalls++; }
+  focus() { this.focusCalls++; }
 }
 
 function createFakeDocument() {
@@ -237,6 +239,8 @@ test('when the games fetch fails, venues still render and clicking one shows a l
   assert.equal(buttons.length, 2);
 
   assert.doesNotThrow(() => clickVenue(list, 's1'));
+  assert.equal(detail.children[0].tagName, 'h3');
+  assert.equal(detail.children[0].focusCalls, 1);
   let errorParagraph = detail.children.find((child) => child.getAttribute('role') === 'alert');
   assert.ok(errorParagraph, 'expected a local per-venue error message');
   assert.match(errorParagraph.textContent, /unavailable/);
@@ -261,10 +265,12 @@ test('clicking the same venue twice does not re-fetch or duplicate rendered cont
   const callsAfterFirstClick = calls.length;
   const childrenAfterFirstClick = detail.children.length;
   const scrollsAfterFirstClick = firstButton.scrollCalls;
+  const focusCallsAfterFirstClick = detail.children[0].focusCalls;
 
   clickVenue(list, 's1');
 
   assert.equal(calls.length, callsAfterFirstClick, 'repeat click must not trigger a new network request');
   assert.equal(detail.children.length, childrenAfterFirstClick, 'repeat click must not duplicate rendered content');
   assert.equal(firstButton.scrollCalls, scrollsAfterFirstClick, 'repeat click on the active venue should skip the redundant scroll');
+  assert.equal(detail.children[0].focusCalls, focusCallsAfterFirstClick, 'repeat click on the active venue should skip redundant focus movement');
 });

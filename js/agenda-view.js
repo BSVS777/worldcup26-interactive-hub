@@ -48,7 +48,11 @@ export function createAgendaView(document, api) {
 
   function renderDateLabel() {
     if (state.dates.length > 0) {
-      elements.dateLabel.textContent = hasCachedData ? `${state.dates[state.currentIndex].date} · cached data` : state.dates[state.currentIndex].date;
+      const date = state.dates[state.currentIndex].date;
+      const time = document.createElement('time');
+      time.dateTime = date;
+      time.textContent = hasCachedData ? `${date} · cached data` : date;
+      elements.dateLabel.replaceChildren(time);
       return;
     }
     if (state.status === 'loading') {

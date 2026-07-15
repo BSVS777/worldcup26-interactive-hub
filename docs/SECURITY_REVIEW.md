@@ -82,6 +82,11 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 - CORS solo refleja origenes locales permitidos (`127.0.0.1:4173` y `localhost:4173`), no origenes arbitrarios.
 - Las respuestas agregan `no-store`, `nosniff`, metodos allowlisted y no aceptan rutas fuera del contrato.
 - `test/test-server.test.mjs` cubre auth, fixtures, bearer requerido, 429/500 recuperables, reset, metodos y rutas no permitidas.
+## Accessibility hardening
+
+- Agenda representa la fecha activa con `<time datetime>` construido mediante DOM seguro, no HTML crudo.
+- Tour crea el heading de detalle con `createElement`, `textContent` y `tabIndex=-1`; la gestion de foco no copia datos externos a atributos sensibles ni persiste estado.
+
 ## Fan Dashboard
 
 - Persiste solo `wc26:favorite-team:v1` y snapshots derivados; no persiste JWT ni Authorization.

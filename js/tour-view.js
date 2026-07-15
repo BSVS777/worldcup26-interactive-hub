@@ -54,27 +54,33 @@ export function createTourView(document, api) {
     elements.list.replaceChildren(paragraph('venue-detail__error', message, { role: 'alert' }));
   }
 
+  function createDetailHeading(venue) {
+    const heading = document.createElement('h3');
+    heading.tabIndex = -1;
+    heading.textContent = hasCachedData ? `${venue.name} (cached data)` : venue.name;
+    return heading;
+  }
+
   function renderDetail(venue) {
     if (!venue) {
       elements.detail.replaceChildren(paragraph('venue-detail__hint', 'Select a venue to see its matches.'));
-      return;
+      return null;
     }
 
+    const heading = createDetailHeading(venue);
+
     if (venue.gamesError) {
-      elements.detail.replaceChildren(paragraph(
+      elements.detail.replaceChildren(heading, paragraph(
         'venue-detail__error',
         `Match data for ${venue.name} is unavailable right now. Try another venue or refresh later.`,
         { role: 'alert' }
       ));
-      return;
+      return heading;
     }
-
-    const heading = document.createElement('h3');
-    heading.textContent = hasCachedData ? `${venue.name} (cached data)` : venue.name;
 
     if (venue.games.length === 0) {
       elements.detail.replaceChildren(heading, paragraph('venue-detail__hint', `No matches are scheduled for ${venue.name} yet.`));
-      return;
+      return heading;
     }
 
     const list = document.createElement('ul');
@@ -90,6 +96,7 @@ export function createTourView(document, api) {
       list.append(row);
     }
     elements.detail.replaceChildren(heading, list);
+    return heading;
   }
 
   function markActiveButton() {
@@ -108,7 +115,8 @@ export function createTourView(document, api) {
     if (nextState === state) return;
     state = nextState;
     const activeButton = markActiveButton();
-    renderDetail(state.venues.find((venue) => venue.id === state.selectedVenueId) ?? null);
+    const detailHeading = renderDetail(state.venues.find((venue) => venue.id === state.selectedVenueId) ?? null);
+    detailHeading?.focus?.({ preventScroll: true });
     activeButton?.scrollIntoView({ behavior: 'smooth' });
   }
 

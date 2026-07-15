@@ -109,7 +109,7 @@ Tecnica: `js/app.js:onSessionExpired`, `js/timeline-view.js:reset`, `test/timeli
 
 15 segundos: El estado es idempotente y el render reemplaza, no acumula.
 
-30 segundos: Seleccionar la misma sede o avanzar fuera de limites no cambia el estado. Las vistas usan referencias controladas y `replaceChildren`, por lo que repetir clicks no duplica tarjetas, columnas ni listeners.
+30 segundos: Seleccionar la misma sede o avanzar fuera de limites no cambia el estado. Las vistas usan referencias controladas y `replaceChildren`, por lo que repetir clicks no duplica tarjetas, columnas ni listeners. En Tour, una seleccion nueva mueve foco al heading del detalle para dar contexto; una seleccion repetida no vuelve a mover foco ni scroll.
 
 Tecnica: `test/tour.test.mjs`, `test/agenda.test.mjs`, `test/timeline.test.mjs`.
 

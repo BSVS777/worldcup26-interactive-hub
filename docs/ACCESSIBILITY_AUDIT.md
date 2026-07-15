@@ -58,11 +58,11 @@ Pendiente prueba con lector.
 
 ### Tour
 
-Usa botones y `aria-pressed`; pendiente foco contextual al heading.
+Usa botones y `aria-pressed`; al seleccionar una sede mueve foco al heading del detalle con `tabindex="-1"` para entregar contexto sin recarga.
 
 ### Agenda
 
-Usa botones disabled y skeleton oculto; pendiente convertir fecha a `<time datetime>`.
+Usa botones disabled, skeleton oculto y fecha activa en `<time datetime>`.
 
 ### Timeline
 

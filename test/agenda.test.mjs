@@ -130,9 +130,18 @@ class FakeElement {
     this._classes = new Set();
     this._attrs = new Map();
     this._listeners = new Map();
-    this.textContent = '';
+    this._textContent = '';
     this.className = '';
     this.disabled = false;
+  }
+
+  get textContent() {
+    return [this._textContent, ...this.children.map((child) => child.textContent)].join('');
+  }
+
+  set textContent(value) {
+    this._textContent = String(value);
+    this.children = [];
   }
 
   get classList() {
@@ -160,6 +169,7 @@ class FakeElement {
 
   replaceChildren(...nodes) {
     for (const child of this.children) child.parent = null;
+    this._textContent = '';
     this.children = [];
     this.append(...nodes);
   }
@@ -234,11 +244,13 @@ test('when the games fetch fails entirely, skeletons remain and both controls st
 });
 
 test('after a successful load, renders one column per simultaneous match on the first retained date', async () => {
-  const { document, columns, prevButton, nextButton } = createFakeDocument();
+  const { document, dateLabel, columns, prevButton, nextButton } = createFakeDocument();
   const api = { apiRequest: (endpoint) => Promise.resolve({ data: endpoint === 'games' ? games : teams }) };
   const view = createAgendaView(document, api);
   await view.ensureLoaded();
 
+  assert.equal(dateLabel.children[0].tagName, 'time');
+  assert.equal(dateLabel.children[0].dateTime, '2026-06-11');
   assert.equal(columns.children.length, 2);
   assert.ok(columns.children.every((child) => !child.className.includes('agenda-skeleton')));
   assert.equal(prevButton.disabled, true, 'previous must be disabled on the first retained date');
@@ -253,6 +265,8 @@ test('next/prev move across retained dates and disable at each boundary, includi
 
   nextButton.trigger('click');
   assert.equal(dateLabel.textContent, '2026-06-13');
+  assert.equal(dateLabel.children[0].tagName, 'time');
+  assert.equal(dateLabel.children[0].dateTime, '2026-06-13');
   assert.equal(columns.children.length, 2);
   assert.equal(nextButton.disabled, true, 'next must be disabled on the last retained date');
   assert.equal(prevButton.disabled, false);
@@ -345,5 +359,7 @@ test('a stale in-flight load never overwrites a fresher load (race condition gua
   await firstLoad;
 
   assert.equal(dateLabel.textContent, '2026-07-01', 'must show the fresh load\'s date, not the stale one');
+  assert.equal(dateLabel.children[0].tagName, 'time');
+  assert.equal(dateLabel.children[0].dateTime, '2026-07-01');
   assert.equal(columns.children.length, 2);
 });
