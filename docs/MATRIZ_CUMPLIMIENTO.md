@@ -176,3 +176,12 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | QA-008 | No hay intervalos huérfanos | | | NO INICIADO | |
 | QA-009 | No hay archivos o dependencias innecesarias | | | NO INICIADO | |
 | QA-010 | README contiene comandos exactos | | | NO INICIADO | |
+
+## Especificaciones transversales agregadas
+
+| ID | Requisito | Archivo y funcion | Evidencia | Estado | Gap |
+|---|---|---|---|---|---|
+| SPEC-ACC-001 | Accesibilidad e inclusion son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define ACC-001..ACC-012 y Definition of Done | IMPLEMENTADO | Pendiente auditar cada modulo contra la spec. |
+| SPEC-SEC-001 | Seguridad y privacidad son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define SEC-HARD-001..SEC-HARD-010 | IMPLEMENTADO | Pendiente ejecutar auditoria final de headers, storage y rutas. |
+| SPEC-RES-001 | Resiliencia tipo "intumbable" se define como degradacion segura, contencion de fallos y recuperacion sin recarga | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define RES-001..RES-008 | IMPLEMENTADO | Pendiente Playwright por modulo para validar comportamiento real. |
+| QA-011 | Elementos con `hidden` no ocupan layout ni foco | `css/styles.css` (`[hidden]`) | `test/static-contract.test.mjs` verifica `display: none !important` | IMPLEMENTADO | |
