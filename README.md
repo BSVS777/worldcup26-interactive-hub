@@ -11,8 +11,9 @@ Aplicacion vanilla JavaScript para explorar el Mundial 2026 con una base de resi
 | Levantar el servidor determinista | `npm run test:server` | Inicia `node tools/test-server.mjs` en `http://127.0.0.1:4174`. |
 | Auditar responsive autenticado | `npm run test:responsive` | Ejecuta `python tools/responsive-audit.py`; requiere app local y servidor determinista activos. |
 | Auditar teclado autenticado | `npm run test:keyboard` | Ejecuta `python tools/keyboard-audit.py`; requiere app local y servidor determinista activos. |
+| Auditar movimiento reducido | `npm run test:motion` | Ejecuta `python tools/motion-audit.py`; requiere app local y servidor determinista activos. |
 
-La app local y el servidor determinista son procesos separados. Para pruebas manuales con datos sinteticos, inicia ambos y abre `http://127.0.0.1:4173/?testMode=1`. La auditoria responsive se puede ejecutar con ambos servidores activos o con `python C:\Users\uyv31\.agents\skills\webapp-testing\scripts\with_server.py --server "npm start" --port 4173 --server "npm run test:server" --port 4174 -- python tools/responsive-audit.py`. La auditoria de teclado usa los mismos servidores con `python C:\Users\uyv31\.agents\skills\webapp-testing\scripts\with_server.py --server "npm start" --port 4173 --server "npm run test:server" --port 4174 -- python tools/keyboard-audit.py`.
+La app local y el servidor determinista son procesos separados. Para pruebas manuales con datos sinteticos, inicia ambos y abre `http://127.0.0.1:4173/?testMode=1`. La auditoria responsive se puede ejecutar con ambos servidores activos o con `python C:\Users\uyv31\.agents\skills\webapp-testing\scripts\with_server.py --server "npm start" --port 4173 --server "npm run test:server" --port 4174 -- python tools/responsive-audit.py`. La auditoria de teclado usa los mismos servidores con `python C:\Users\uyv31\.agents\skills\webapp-testing\scripts\with_server.py --server "npm start" --port 4173 --server "npm run test:server" --port 4174 -- python tools/keyboard-audit.py`. La auditoria de movimiento reducido usa `python C:\Users\uyv31\.agents\skills\webapp-testing\scripts\with_server.py --server "npm start" --port 4173 --server "npm run test:server" --port 4174 -- python tools/motion-audit.py`.
 
 ## Alcance actual
 
@@ -34,6 +35,6 @@ La app local y el servidor determinista son procesos separados. Para pruebas man
 
 - El DOCX original `ProyectoFinal_ISW521_Categoria_B.docx` no esta presente en este repo.
 - Falta validar Matriz contra API viva; el testMode ya cubre 12 grupos sinteticos deterministas.
-- Falta auditoria manual completa WCAG 2.2 AA, screen reader, zoom y contrastes; teclado ya tiene auditoria Playwright automatizada.
+- Falta auditoria manual completa WCAG 2.2 AA, screen reader, zoom y contrastes; teclado y movimiento reducido ya tienen auditorias Playwright automatizadas.
 - Falta verificacion real de esquemas contra API viva con credenciales validas.
 
