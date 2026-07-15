@@ -2,12 +2,14 @@ import { createApiClient } from './api.js';
 import { resolveApiBaseUrl } from './config.js';
 import { describeLoginError } from './login-feedback.js';
 import { createInitialViewState, normalizeRoute, reduceViewState } from './router.js';
-import { createSessionStore } from './session.js';
+import { applyAccessibilityPreferences, readAccessibilityPreferences } from './accessibility.js';
+import { createAuthStore } from './auth.js';
 import { createTourView } from './tour-view.js';
 import { createAgendaView } from './agenda-view.js';
 import { createShellView } from './ui.js';
 
-const session = createSessionStore(window.sessionStorage);
+applyAccessibilityPreferences(document.documentElement, readAccessibilityPreferences(window.localStorage));
+const session = createAuthStore();
 let state = createInitialViewState({
   hash: window.location.hash,
   search: window.location.search,

@@ -40,3 +40,8 @@ test('hidden modules cannot be re-displayed by component display rules', async (
   const css = await readFile(new URL('../css/styles.css', import.meta.url), 'utf8');
   assert.match(css, /\[hidden\]\s*\{\s*display:\s*none\s*!important;\s*\}/s);
 });
+
+test('document language is Spanish for the WC26 command center', async () => {
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+  assert.match(html, /<html lang="es">/);
+});

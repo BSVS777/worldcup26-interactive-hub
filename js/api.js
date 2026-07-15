@@ -1,13 +1,8 @@
+import { ENDPOINTS, AUTH_ENDPOINT } from './config.js';
 import { readEndpointCache, writeEndpointCache } from './cache.js';
 import { normalizePayload } from './normalizers.js';
 import { createSessionStore } from './session.js';
 
-const DATA_PATHS = Object.freeze({
-  stadiums: '/get/stadiums',
-  games: '/get/games',
-  teams: '/get/teams',
-  groups: '/get/groups'
-});
 const BACKOFF_MS = Object.freeze([1000, 2000, 4000]);
 
 export class ApiError extends Error {
@@ -56,6 +51,12 @@ function defaultSleep(milliseconds, signal) {
 
 function joinUrl(baseUrl, path) {
   return `${baseUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+}
+
+function hasJsonContentType(response) {
+  if (typeof response?.headers?.get !== 'function') return true;
+  const contentType = response.headers.get('content-type');
+  return typeof contentType === 'string' && contentType.toLowerCase().includes('application/json');
 }
 
 function retryAfterMilliseconds(value, now) {
@@ -113,15 +114,15 @@ export function createApiClient({
   }
 
   async function apiRequest(endpointKey, {
-    path = DATA_PATHS[endpointKey],
-    method = 'GET',
+    path = ENDPOINTS[endpointKey]?.path,
+    method = ENDPOINTS[endpointKey]?.method,
     body,
-    cache = true,
+    cache = ENDPOINTS[endpointKey]?.cache !== false,
     signal,
     onRetry = () => {},
     forceRetry = false
   } = {}) {
-    if (!Object.hasOwn(DATA_PATHS, endpointKey) || typeof path !== 'string') {
+    if (!Object.hasOwn(ENDPOINTS, endpointKey) || typeof path !== 'string' || typeof method !== 'string') {
       throw new TypeError(`Unknown data endpoint: ${endpointKey}`);
     }
 
@@ -133,7 +134,7 @@ export function createApiClient({
     }
 
     const headers = new Headers({ Accept: 'application/json', Authorization: `Bearer ${token}` });
-    const request = { method, headers, signal };
+    const request = { method, headers, signal, credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer' };
     if (body !== undefined) {
       headers.set('Content-Type', 'application/json');
       request.body = JSON.stringify(body);
@@ -168,6 +169,9 @@ export function createApiClient({
       if (response.ok) {
         let data;
         try {
+          if (!hasJsonContentType(response)) {
+            throw new ApiError('The API returned a non-JSON response', { status: response.status, endpoint: endpointKey });
+          }
           const payload = await readJson(response, endpointKey, signal);
           data = normalizePayload(endpointKey, payload);
         } catch (cause) {
@@ -224,11 +228,14 @@ export function createApiClient({
     if (signal?.aborted) throw abortReason(signal);
     let response;
     try {
-      response = await fetchImpl(joinUrl(baseUrl, '/auth/authenticate'), {
-        method: 'POST',
+      response = await fetchImpl(joinUrl(baseUrl, AUTH_ENDPOINT.path), {
+        method: AUTH_ENDPOINT.method,
         headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), password }),
-        signal
+        signal,
+        credentials: 'omit',
+        cache: 'no-store',
+        referrerPolicy: 'no-referrer'
       });
     } catch (cause) {
       if (signal?.aborted) throw abortReason(signal);
@@ -247,6 +254,9 @@ export function createApiClient({
         endpoint: 'authenticate',
         recoverable: response.status === 429 || response.status >= 500
       });
+    }
+    if (!hasJsonContentType(response)) {
+      throw new AuthenticationError('Authentication response was not JSON', { status: response.status });
     }
     const payload = await readJson(response, 'authenticate', signal);
     if (typeof payload?.token !== 'string' || payload.token.trim() === '') {

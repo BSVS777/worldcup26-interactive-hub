@@ -385,7 +385,7 @@ test('does not cache data when cancellation occurs while reading the response bo
   const { client, cacheStorage } = setup(async () => ({
     ok: true,
     status: 200,
-    headers: new Headers(),
+    headers: new Headers({ 'content-type': 'application/json' }),
     json: async () => {
       controller.abort(reason);
       return { games: [] };
@@ -405,7 +405,7 @@ test('does not store a token when cancellation occurs while reading the authenti
   const { client, session } = setup(async () => ({
     ok: true,
     status: 200,
-    headers: new Headers(),
+    headers: new Headers({ 'content-type': 'application/json' }),
     json: async () => {
       controller.abort(reason);
       return { user: { id: 1 }, token: 'jwt-must-not-be-stored' };
@@ -426,7 +426,7 @@ test('falls back to endpoint cache when a successful response contains invalid J
   const { client, cacheStorage } = setup(async () => ({
     ok: true,
     status: 200,
-    headers: new Headers(),
+    headers: new Headers({ 'content-type': 'application/json' }),
     json: async () => { throw new SyntaxError('invalid JSON'); }
   }));
   cacheStorage.setItem('wc26:cache:v1:games', JSON.stringify({
@@ -451,7 +451,7 @@ test('preserves typed 2xx validation errors when no cache exists', async () => {
   const invalidJson = setup(async () => ({
     ok: true,
     status: 200,
-    headers: new Headers(),
+    headers: new Headers({ 'content-type': 'application/json' }),
     json: async () => { throw new SyntaxError('invalid JSON'); }
   })).client;
   await assert.rejects(invalidJson.apiRequest('games'), (error) => (

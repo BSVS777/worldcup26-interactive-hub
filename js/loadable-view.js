@@ -1,5 +1,5 @@
 // Shared fetch-fallback + load-memoization + generation-guard plumbing for
-// views that load two endpoints in parallel and must survive rapid
+// views that load endpoints in parallel and must survive rapid
 // reset()/ensureLoaded() cycles without a stale load clobbering fresher state.
 
 export function formatScore(game) {
@@ -21,6 +21,12 @@ export function createLoadableView(api) {
     }
   }
 
+  async function runLoad(loadFn, isCurrent) {
+    const shouldRetry = await loadFn(isCurrent);
+    if (shouldRetry) loadPromise = null;
+    return shouldRetry;
+  }
+
   // loadFn receives isCurrent(), a check for "am I still the latest load"
   // to run after awaiting the fetches. loadFn should return true if this
   // was a fatal failure that should allow a future ensureLoaded() to retry.
@@ -28,9 +34,7 @@ export function createLoadableView(api) {
     if (loadPromise) return loadPromise;
     const myGeneration = ++generation;
     const isCurrent = () => myGeneration === generation;
-    loadPromise = loadFn(isCurrent).then((shouldRetry) => {
-      if (shouldRetry) loadPromise = null;
-    });
+    loadPromise = runLoad(loadFn, isCurrent);
     return loadPromise;
   }
 

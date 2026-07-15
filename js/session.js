@@ -1,11 +1,5 @@
 export const SESSION_TOKEN_KEY = 'wc26:session-token:v1';
 
-function resolveStorage(storage) {
-  const target = storage ?? globalThis.sessionStorage;
-  if (!target) throw new Error('Session storage is not available');
-  return target;
-}
-
 function decodePayload(token) {
   const parts = token.split('.');
   if (parts.length !== 3 || parts.some((part) => part === '')) return null;
@@ -25,49 +19,36 @@ function isUsableJwt(token, now) {
   return Number.isFinite(payload?.exp) && payload.exp > Math.floor(now() / 1000);
 }
 
+function clearLegacyToken(storage) {
+  try {
+    storage?.removeItem?.(SESSION_TOKEN_KEY);
+  } catch {
+    // Token removal from blocked storage is best-effort; runtime auth remains memory-only.
+  }
+}
+
 export function createSessionStore(storage, { now = () => Date.now() } = {}) {
-  const target = resolveStorage(storage);
-  let memoryToken;
-  let invalidated = false;
+  let memoryToken = null;
   let locallyInvalidatedToken = null;
+  clearLegacyToken(storage ?? globalThis.sessionStorage);
 
-  function clearSession() {
-    invalidated = true;
-    locallyInvalidatedToken = null;
-    memoryToken = undefined;
-    try {
-      target.removeItem(SESSION_TOKEN_KEY);
-    } catch {
-      // In-memory invalidation remains authoritative for this page lifetime.
-    }
-  }
-
-  function invalidateSession(token) {
-    clearSession();
+  function invalidateSession(token = memoryToken) {
     locallyInvalidatedToken = typeof token === 'string' && token.trim() !== '' ? token.trim() : null;
+    memoryToken = null;
+    clearLegacyToken(storage ?? globalThis.sessionStorage);
   }
 
-  function validateStoredToken(token) {
-    if (!isUsableJwt(token, now)) {
-      if (token !== null && token !== undefined) invalidateSession(token);
+  function getToken() {
+    if (!memoryToken) return null;
+    if (!isUsableJwt(memoryToken, now)) {
+      invalidateSession(memoryToken);
       return null;
     }
-    return token.trim();
+    return memoryToken;
   }
 
   return Object.freeze({
-    getToken() {
-      if (invalidated) return null;
-      if (memoryToken !== undefined) return validateStoredToken(memoryToken);
-      let token;
-      try {
-        token = target.getItem(SESSION_TOKEN_KEY);
-      } catch {
-        invalidated = true;
-        return null;
-      }
-      return validateStoredToken(token);
-    },
+    getToken,
 
     setToken(token) {
       if (typeof token !== 'string' || token.trim() === '') {
@@ -77,27 +58,24 @@ export function createSessionStore(storage, { now = () => Date.now() } = {}) {
       if (!isUsableJwt(normalized, now)) {
         throw new TypeError('Token must be a valid unexpired JWT');
       }
-      invalidated = false;
+      memoryToken = normalized;
       locallyInvalidatedToken = null;
-      memoryToken = undefined;
-      try {
-        target.setItem(SESSION_TOKEN_KEY, normalized);
-      } catch {
-        // Keep the authenticated session usable in memory for this page lifetime.
-        memoryToken = normalized;
-      }
+      clearLegacyToken(storage ?? globalThis.sessionStorage);
       return normalized;
     },
 
-    clear: clearSession,
+    clear() {
+      invalidateSession(null);
+      locallyInvalidatedToken = null;
+    },
 
     getLocallyInvalidatedToken() {
       return locallyInvalidatedToken;
     },
 
     clearIfToken(expectedToken) {
-      if (this.getToken() !== expectedToken) return false;
-      clearSession();
+      if (getToken() !== expectedToken) return false;
+      invalidateSession(expectedToken);
       return true;
     }
   });
