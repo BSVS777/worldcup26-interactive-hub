@@ -30,6 +30,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 21. El JWT en memoria se demuestra con Playwright: tras login no aparece en storage y recargar vuelve a pedir sesion.
 22. La defensa contra endpoint injection se demuestra con Playwright: `apiBase` malicioso no recibe trafico y el proxy rechaza queries target.
 23. La defensa anti-clickjacking local se demuestra con Playwright: CSP incluye `frame-ancestors 'none'` y `X-Frame-Options: DENY`.
+24. La resiliencia de API se demuestra con Playwright: 429 y 500 recuperan con retry, y una caida de red usa cache valida en Agenda.
 
 ## Endpoints por modulo
 
@@ -120,7 +121,7 @@ Tecnica: `js/api.js`, `js/session.js`, `js/router.js`, `js/ui.js`, `test/api.tes
 
 30 segundos: `apiRequest` reintenta 429 con 1 s, 2 s y 4 s, respeta un `Retry-After` mayor y corta en cuatro intentos totales. Timeline expone el countdown en una region live.
 
-Tecnica: `test/api.test.mjs`, `test/timeline.test.mjs`, `docs/SECURITY_REVIEW.md`.
+Tecnica: `test/api.test.mjs`, `test/timeline.test.mjs`, `tools/api-resilience-audit.py`, `docs/SECURITY_REVIEW.md`.
 
 ### Como defiendo 500
 
@@ -128,7 +129,7 @@ Tecnica: `test/api.test.mjs`, `test/timeline.test.mjs`, `docs/SECURITY_REVIEW.md
 
 30 segundos: Los 500 pasan por la misma politica de cuatro intentos. Si no hay recuperacion, se conserva el error tipado o se entrega cache por endpoint marcada como stale, sin mezclar endpoints ni payloads corruptos.
 
-Tecnica: `js/api.js`, `js/cache.js`, `test/api.test.mjs`, `test/cache.test.mjs`.
+Tecnica: `js/api.js`, `js/cache.js`, `test/api.test.mjs`, `test/cache.test.mjs`, `tools/api-resilience-audit.py`.
 
 ### Como defiendo JWT expirado con observer activo
 

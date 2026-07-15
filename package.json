@@ -21,6 +21,7 @@
     "test:agenda-layout": "python tools/agenda-layout-audit.py",
     "test:session-storage": "python tools/session-storage-audit.py",
     "test:endpoint-injection": "python tools/endpoint-injection-audit.py",
-    "test:security-headers": "python tools/security-headers-audit.py"
+    "test:security-headers": "python tools/security-headers-audit.py",
+    "test:api-resilience": "python tools/api-resilience-audit.py"
   }
 }

@@ -21,7 +21,7 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 | T-04 | Endpoint injection | `ENDPOINTS` inmutable; API recibe endpointKey y proxy rechaza queries target | Unit + Playwright endpoint audit | `js/config.js`, `test/config.test.mjs`, `tools/endpoint-injection-audit.py` | VERIFICADO |
 | T-05 | Test mode expuesto | `testMode=1` solo en origen local y usa base fija | Unit + Playwright endpoint audit | `isTestMode`, `tools/endpoint-injection-audit.py` | VERIFICADO |
 | T-07 | Clickjacking | `frame-ancestors 'none'` y `X-Frame-Options: DENY` en servidor local | Playwright security headers audit | `tools/app-server.mjs`, `tools/security-headers-audit.py` | VERIFICADO |
-| T-09 | API lenta/caida | Retry 429/500, cache fallback, abort | `npm test` api | `test/api.test.mjs` | IMPLEMENTADO |
+| T-09 | API lenta/caida | Retry 429/500, cache fallback y errores recuperables | Unit + Playwright API resilience audit | `test/api.test.mjs`, `tools/api-resilience-audit.py`, `tools/offline-audit.py` | VERIFICADO |
 | T-10 | Navegacion movil rompe foco o agrega HTML dinamico | Drawer con boton nativo, `aria-expanded`, dataset controlado y listeners centralizados; sin HTML crudo | Playwright drawer y busquedas de sinks | `tools/mobile-drawer-audit.py`, `test/static-contract.test.mjs`, `js/ui.js` | VERIFICADO |
 
 ## Endpoint authorization
@@ -144,7 +144,7 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 
 ## Evidencia DevTools HTTP
 
-`tools/failure-audit.py` fuerza 401, 429 y 500 sobre `/get/games` en Chromium. La auditoria observa responses 401/429/500 en Network, confirma que 401 abre el modal accesible, que 429 muestra countdown de retry y que 429/500 recuperan con un 200 posterior sin recarga. `tools/console-401-audit.py` complementa DevTools Console: captura el `Failed to load resource` 401 esperado y falla si aparece otro error de consola.
+`tools/failure-audit.py` fuerza 401, 429 y 500 sobre `/get/games` en Chromium. La auditoria observa responses 401/429/500 en Network, confirma que 401 abre el modal accesible, que 429 muestra countdown de retry y que 429/500 recuperan con un 200 posterior sin recarga. `tools/api-resilience-audit.py` consolida 429, 500 y cache fallback en Agenda con red bloqueada (`API_RESILIENCE_AUDIT_PASS`). `tools/console-401-audit.py` complementa DevTools Console: captura el `Failed to load resource` 401 esperado y falla si aparece otro error de consola.
 
 ## Riesgos pendientes
 
