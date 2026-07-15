@@ -27,6 +27,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 18. La tematizacion del fanatico se demuestra con Playwright: el favorito escribe variables CSS locales y al seleccionar otro equipo cambian sin consumir colores externos de API.
 19. El fallo parcial de Tour se demuestra con Playwright: si `/get/games` falla, las sedes siguen clicables y cada seleccion muestra su error local.
 20. El layout de Agenda se demuestra con Playwright: cada partido simultaneo se renderiza como columna visible y la navegacion conserva el patron.
+21. El JWT en memoria se demuestra con Playwright: tras login no aparece en storage y recargar vuelve a pedir sesion.
 
 ## Endpoints por modulo
 
@@ -79,7 +80,7 @@ Si un campo no existe o no pasa normalizacion, el modulo usa estado recuperable 
 
 30 segundos: El token entra por autenticacion, se guarda en `createSessionStore` solo como variable de cierre y se borra con 401 o expiracion local. Tambien limpio cualquier clave legada.
 
-Tecnica: `js/session.js:createSessionStore`, `test/session.test.mjs`, `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md:SEC-HARD-010`.
+Tecnica: `js/session.js:createSessionStore`, `test/session.test.mjs`, `tools/session-storage-audit.py`, `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md:SEC-HARD-010`.
 
 ### Como evito XSS
 

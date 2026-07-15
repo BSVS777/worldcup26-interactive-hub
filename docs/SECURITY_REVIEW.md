@@ -16,7 +16,7 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 | ID | Amenaza | Control | Prueba | Evidencia | Estado |
 |---|---|---|---|---|---|
 | T-01 | DOM XSS por API/cache | Render con `createElement`/`textContent`; sinks prohibidos bajo busqueda; fixture maliciosa | `rg` de sinks peligrosos; `test/matrix.test.mjs` | Sin sinks peligrosos; Matrix conserva `<img onerror>`/`<script>` como texto y no crea nodos `img`/`script` | VERIFICADO |
-| T-02 | Robo de JWT persistido | `createSessionStore` mantiene token solo en memoria y limpia legado | `npm test` session/api | `test/session.test.mjs` | IMPLEMENTADO |
+| T-02 | Robo de JWT persistido | `createSessionStore` mantiene token solo en memoria y limpia legado | Unit + Playwright storage audit | `test/session.test.mjs`, `tools/session-storage-audit.py` | VERIFICADO |
 | T-03 | Cache poisoning | Cache versionada por endpoint, claves aisladas y avisos visibles para datos stale | `npm test` cache/matrix/timeline | `test/cache.test.mjs`, `test/matrix.test.mjs`, `test/timeline.test.mjs` | VERIFICADO |
 | T-04 | Endpoint injection | `ENDPOINTS` inmutable; API recibe endpointKey | `npm test` config/api | `js/config.js`, `test/config.test.mjs` | IMPLEMENTADO |
 | T-05 | Test mode expuesto | `testMode=1` solo en origen local | `npm test` config | `isTestMode` | IMPLEMENTADO |
@@ -31,7 +31,8 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 
 ## Token
 
-- almacenamiento: memoria solamente.
+- almacenamiento: memoria solamente; `tools/session-storage-audit.py` verifica en Chromium que `localStorage` y `sessionStorage` no contienen token/JWT/Authorization tras login.
+- recarga: al perder memoria, vuelve a mostrarse el panel de login.
 - logging: sin logger de secretos; `security.js` redaction disponible.
 - expiracion: JWT `exp` validado localmente.
 - 401: limpia token vigente y notifica sesion expirada.
