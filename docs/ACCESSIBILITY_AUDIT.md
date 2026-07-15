@@ -91,6 +91,7 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 - Movimiento reducido verificado en Playwright: `MOTION_AUDIT_PASS reduced_motion=emulated scroll=auto transitions<=0.01ms`; `test/static-contract.test.mjs` valida `animation-duration` e `animation-iteration-count`.
 - Offline sin cache conserva estado operable: `tools/offline-audit.py` verifica mensaje recuperable y boton Retry visible en Timeline.
 - Recuperacion 401 verificada bajo response HTTP real interceptada: `tools/failure-audit.py` confirma modal con `aria-modal` y foco inicial.
+- Consola 401 verificada en Playwright: `CONSOLE_401_AUDIT_PASS console=failed-resource-401 network=401 modal=recovery`, sin errores JS inesperados durante el foco de recuperacion.
 - Timeline IntersectionObserver verificado en Playwright: `TIMELINE_OBSERVER_AUDIT_PASS before=10 after=20 games_requests=1`, con fallback visible antes del trigger.
 - Avisos de cache verificados en Playwright para Tour, Agenda, Timeline, Dashboard y Matrix: `CACHED_NOTICE_AUDIT_PASS routes=5 cache_keys=4 blocked_network=get-endpoints`.
 - Drawer movil verificado en Playwright: `MOBILE_DRAWER_AUDIT_PASS mobile=390 desktop=1366 escape=restores-focus route=group-matrix`.

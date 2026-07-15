@@ -159,7 +159,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEF-010 | Guia explica clics repetidos | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida la respuesta; Tour/Agenda/Timeline cubren idempotencia | VERIFICADO | |
 | DEF-011 | Guia explica cache corrupta | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida la respuesta; `test/cache.test.mjs` cubre entradas invalidas | VERIFICADO | |
 | DEF-012 | Guia explica actualizacion parcial de matriz | `docs/GUIA_DEFENSA_INFJ_T.md` | `test/static-contract.test.mjs` valida la respuesta; `test/matrix.test.mjs` cubre refresh parcial | VERIFICADO | |
-| DEV-001 | 401 se reproduce en Console | | | NO INICIADO | |
+| DEV-001 | 401 se reproduce en Console | `tools/console-401-audit.py`, `js/api.js`, `js/ui.js` | Playwright fuerza `/get/games` 401 y captura el mensaje de Chromium `Failed to load resource` en consola, sin errores JS inesperados, mientras verifica modal de recuperacion (`CONSOLE_401_AUDIT_PASS`) | VERIFICADO | |
 | DEV-002 | 401 se reproduce en Network | `tools/failure-audit.py`, `js/api.js`, `js/ui.js` | Playwright intercepta `/get/games`, observa response 401 y verifica modal de sesion expirada sin errores de consola (`FAILURE_AUDIT_PASS`) | VERIFICADO | |
 | DEV-003 | 429 y reintentos se observan en Network | `tools/failure-audit.py`, `js/api.js`, `js/timeline-view.js` | Playwright fuerza primer `/get/games` 429, observa 429 seguido de 200 y recuperacion del Timeline (`FAILURE_AUDIT_PASS`) | VERIFICADO | |
 | DEV-004 | Countdown 429 se observa en UI | `tools/failure-audit.py`, `js/timeline-view.js` | Playwright verifica `Retrying in` en `#timeline-status` durante backoff 429 (`FAILURE_AUDIT_PASS`) | VERIFICADO | |

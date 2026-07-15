@@ -15,6 +15,7 @@
     "test:timeline-observer": "python tools/timeline-observer-audit.py",
     "test:cached-notices": "python tools/cached-notice-audit.py",
     "test:mobile-drawer": "python tools/mobile-drawer-audit.py",
-    "test:fan-theme": "python tools/fan-theme-audit.py"
+    "test:fan-theme": "python tools/fan-theme-audit.py",
+    "test:console-401": "python tools/console-401-audit.py"
   }
 }

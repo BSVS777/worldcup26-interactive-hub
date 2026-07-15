@@ -20,7 +20,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 11. La navegacion por teclado se demuestra con Playwright: Tab/Shift+Tab/Enter cubren skip link, login, rutas, controles y modal 401 sin recarga.
 12. Movimiento reducido se demuestra emulando `prefers-reduced-motion: reduce`: scroll auto y transiciones minimas en browser; animaciones minimas e iteracion unica por contrato CSS estatico.
 13. Offline se demuestra en browser: con cache muestra datos stale, sin cache conserva estado recuperable con Retry sin recarga.
-14. DevTools HTTP se demuestra con Playwright: 401 abre modal, 429 muestra countdown y 429/500 se recuperan con response 200 posterior.
+14. DevTools HTTP se demuestra con Playwright: 401 aparece en Console y Network, abre modal, 429 muestra countdown y 429/500 se recuperan con response 200 posterior.
 15. Timeline Infinito se demuestra con Playwright: el `IntersectionObserver` observa el sentinel, agrega el segundo bloque local y no repite `/get/games`.
 16. Los avisos de cache se demuestran con Playwright en los cinco modulos bloqueando `/get/*` despues de calentar cache real.
 17. La navegacion movil se demuestra con Playwright: drawer por boton nativo, Escape restaura foco, seleccionar ruta cierra el panel y desktop conserva el track visible.
@@ -107,7 +107,7 @@ Tecnica: `index.html`, `css/styles.css`, `js/ui.js`, `tools/mobile-drawer-audit.
 
 30 segundos: El cliente central limpia solo el token afectado. El shell cambia a estado `expired`, aplica `role=dialog`, `aria-modal`, fondo inerte y trap de Tab; al login exitoso conserva la ruta y recarga el modulo activo.
 
-Tecnica: `js/api.js`, `js/session.js`, `js/router.js`, `js/ui.js`, `test/api.test.mjs`, `test/static-contract.test.mjs`.
+Tecnica: `js/api.js`, `js/session.js`, `js/router.js`, `js/ui.js`, `test/api.test.mjs`, `test/static-contract.test.mjs`, `tools/console-401-audit.py`.
 
 ### Como defiendo 429
 
@@ -168,6 +168,6 @@ Tecnica: `tools/test-server.mjs`, `test/test-server.test.mjs`, `npm start`, `npm
 ## Preguntas que siguen pendientes de evidencia manual
 
 - Lector de pantalla y contraste manual completo fuera del Dashboard.
-- Reproducciones DevTools de Network/Console para 401, 429, 500 y offline.
+- Reproducciones DevTools manuales para 429, 500 y offline.
 - Validacion contra API viva con credenciales validas.
 

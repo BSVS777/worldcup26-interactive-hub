@@ -109,6 +109,7 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 - `onSessionExpired` resetea las vistas antes de enfocar el panel de recuperacion, para cortar observers/timers activos y descartar cargas obsoletas.
 - El fondo queda inerte y `aria-hidden` mientras se reautentica.
 - El trap de Tab se registra una vez al construir `createShellView`.
+- `tools/console-401-audit.py` confirma que Chromium reporta el 401 en Console como recurso fallido y que no hay errores JS inesperados durante la recuperacion.
 
 ## Retry countdown
 
@@ -132,7 +133,7 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 
 ## Evidencia DevTools HTTP
 
-`tools/failure-audit.py` fuerza 401, 429 y 500 sobre `/get/games` en Chromium. La auditoria observa responses 401/429/500 en Network, confirma que 401 abre el modal accesible, que 429 muestra countdown de retry y que 429/500 recuperan con un 200 posterior sin recarga.
+`tools/failure-audit.py` fuerza 401, 429 y 500 sobre `/get/games` en Chromium. La auditoria observa responses 401/429/500 en Network, confirma que 401 abre el modal accesible, que 429 muestra countdown de retry y que 429/500 recuperan con un 200 posterior sin recarga. `tools/console-401-audit.py` complementa DevTools Console: captura el `Failed to load resource` 401 esperado y falla si aparece otro error de consola.
 
 ## Riesgos pendientes
 
