@@ -19,6 +19,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 10. El proyecto se mantiene sin dependencias runtime, sin CDN y sin lockfiles porque usa JavaScript/CSS vanilla y Node nativo.
 11. La navegacion por teclado se demuestra con Playwright: Tab/Shift+Tab/Enter cubren skip link, login, rutas, controles y modal 401 sin recarga.
 12. Movimiento reducido se demuestra emulando `prefers-reduced-motion: reduce`: scroll auto y transiciones minimas en browser; animaciones minimas e iteracion unica por contrato CSS estatico.
+13. Offline se demuestra en browser: con cache muestra datos stale, sin cache conserva estado recuperable con Retry sin recarga.
 
 ## Endpoints por modulo
 

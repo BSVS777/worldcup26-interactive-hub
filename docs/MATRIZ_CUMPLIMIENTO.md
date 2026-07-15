@@ -52,7 +52,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | ERR-500-005 | Sin caché muestra error recuperable | `js/api.js:ApiError` | `test/api.test.mjs` valida error 500 recoverable sin cache | VERIFICADO | |
 | NET-001 | Error de red se diferencia de error HTTP | `js/api.js:apiRequest` | `test/api.test.mjs` valida `Network request failed` y errores HTTP tipados | VERIFICADO | |
 | NET-002 | Error de red usa caché disponible | `js/api.js:cachedResult` | `test/api.test.mjs` valida cache inmediata en error de red | VERIFICADO | |
-| NET-003 | Sin red ni caché aplica reto específico | `js/api.js:ApiError`, vistas de modulos | `test/api.test.mjs`; tests de Tour/Agenda/Timeline cubren estados recuperables | IMPLEMENTADO | Pendiente demo Playwright offline por modulo. |
+| NET-003 | Sin red ni caché aplica reto específico | `js/api.js:ApiError`, `js/timeline-view.js`, `tools/offline-audit.py` | Playwright autentica, limpia cache, corta red y verifica Timeline con mensaje recuperable y boton Retry (`OFFLINE_AUDIT_PASS`) | VERIFICADO | |
 | CAC-001 | Cache independiente de stadiums | `js/cache.js:endpointCacheKey`, `test/cache.test.mjs` | Test `stores every public endpoint in an isolated cache key` cubre `stadiums` | VERIFICADO | |
 | CAC-002 | Cache independiente de games | `js/cache.js:endpointCacheKey`, `test/cache.test.mjs` | Test `stores every public endpoint in an isolated cache key` cubre `games` | VERIFICADO | |
 | CAC-003 | Cache independiente de teams | `js/cache.js:endpointCacheKey`, `test/cache.test.mjs` | Test `stores every public endpoint in an isolated cache key` cubre `teams` | VERIFICADO | |
@@ -164,8 +164,8 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | DEV-003 | 429 y reintentos se observan en Network | | | NO INICIADO | |
 | DEV-004 | Countdown 429 se observa en UI | | | NO INICIADO | |
 | DEV-005 | 500 y reintentos se observan en Network | | | NO INICIADO | |
-| DEV-006 | Offline con caché se demuestra | | | NO INICIADO | |
-| DEV-007 | Offline sin caché se demuestra | | | NO INICIADO | |
+| DEV-006 | Offline con caché se demuestra | `tools/offline-audit.py`, `js/cache.js`, `js/agenda-view.js` | Playwright precarga cache de games, corta red y verifica Agenda con `cached data` y columnas renderizadas (`OFFLINE_AUDIT_PASS`) | VERIFICADO | |
+| DEV-007 | Offline sin caché se demuestra | `tools/offline-audit.py`, `js/timeline-view.js` | Playwright limpia cache, corta red y verifica estado recuperable sin filas de datos y Retry visible (`OFFLINE_AUDIT_PASS`) | VERIFICADO | |
 | QA-001 | Aplicacion inicia sin errores de sintaxis | App local `npm start` | Playwright cargo app sin errores de consola; `npm test` 128/128 | VERIFICADO | |
 | QA-002 | Responsive verificado | `tools/responsive-audit.py`, `css/styles.css` | `with_server.py` + `python tools/responsive-audit.py`: 320x720, 390x844, 768x1024, 1366x768, 1920x1080 en cinco rutas; 25/25 sin overflow global | VERIFICADO | |
 | QA-003 | Navegación por teclado verificada | `tools/keyboard-audit.py`, links/botones nativos, trap de Tab en modal 401, foco contextual en Tour | Playwright usa Tab/Shift+Tab/Enter reales: skip link, login, cinco rutas, controles de modulo y modal 401 (`KEYBOARD_AUDIT_PASS routes=5 login=keyboard modal_trap=verified`) | VERIFICADO | Lector de pantalla sigue pendiente en Accessibility Audit. |

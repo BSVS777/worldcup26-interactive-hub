@@ -87,6 +87,7 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 - Modal 401 verificado en Playwright: role=dialog, aria-modal=true, foco inicial en email, fondo inerte, Tab cicla dentro del modal y sin errores de consola.
 - Navegacion por teclado verificada en Playwright: `KEYBOARD_AUDIT_PASS routes=5 login=keyboard modal_trap=verified`.
 - Movimiento reducido verificado en Playwright: `MOTION_AUDIT_PASS reduced_motion=emulated scroll=auto transitions<=0.01ms`; `test/static-contract.test.mjs` valida `animation-duration` e `animation-iteration-count`.
+- Offline sin cache conserva estado operable: `tools/offline-audit.py` verifica mensaje recuperable y boton Retry visible en Timeline.
 
 ## Gaps pendientes
 
