@@ -32,6 +32,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 23. La defensa anti-clickjacking local se demuestra con Playwright: CSP incluye `frame-ancestors 'none'` y `X-Frame-Options: DENY`.
 24. La resiliencia de API se demuestra con Playwright: 429 y 500 recuperan con retry, y una caida de red usa cache valida en Agenda.
 25. La API viva se valida con `tools/live-api-probe.mjs` usando credenciales por entorno; sin credenciales se salta sin imprimir secretos.
+26. El reflow 200%/400% se demuestra con Playwright: cinco rutas sin overflow global ni controles con texto cortado.
 
 ## Endpoints por modulo
 
@@ -182,7 +183,7 @@ Tecnica: `tools/app-server.mjs`, `tools/security-headers-audit.py`, `docs/SECURI
 
 ## Preguntas que siguen pendientes de evidencia manual
 
-- Lector de pantalla y contraste manual completo fuera del Dashboard.
+- Lector de pantalla y contraste manual completo fuera del Dashboard; zoom con lector sigue pendiente.
 - Reproducciones DevTools manuales para 429, 500 y offline.
 - Validacion contra API viva con credenciales validas: ejecutar `npm run test:live-api` y exigir `LIVE_API_PROBE_PASS`.
 

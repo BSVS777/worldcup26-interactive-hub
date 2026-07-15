@@ -9,7 +9,7 @@ No se declara conformidad WCAG 2.2 AA completa hasta terminar pruebas manuales c
 - navegador: Chromium via Playwright para checks parciales.
 - SO: Windows.
 - lector: pendiente NVDA/Chrome o NVDA/Firefox.
-- zoom: pendiente 200% y 400%.
+- zoom/reflow: Playwright verifica equivalentes 200% y 400%; zoom con lector sigue pendiente.
 - viewport: verificado con Playwright en testMode autenticado para 320x720, 390x844, 768x1024, 1366x768 y 1920x1080 sobre las cinco rutas; zoom con navegador/lector sigue pendiente.
 
 ## Pruebas
@@ -23,6 +23,7 @@ No se declara conformidad WCAG 2.2 AA completa hasta terminar pruebas manuales c
 | A11Y-012 | aria-current en navegacion | Test shell y Playwright | Verificado | `test/shell.test.mjs`; `tools/keyboard-audit.py`; `tools/mobile-drawer-audit.py` | VERIFICADO |
 | A11Y-013 | Drawer movil operable por teclado | Playwright movil 390x844 | Verificado | `tools/mobile-drawer-audit.py` abre con Enter, cierra con Escape y navega a `group-matrix` | VERIFICADO |
 | A11Y-014 | Drawer restaura foco al cerrar | Playwright movil 390x844 | Verificado | `tools/mobile-drawer-audit.py` confirma foco de vuelta en `#route-drawer-toggle` tras Escape | VERIFICADO |
+| A11Y-020 | Zoom/reflow 200% y 400% | Playwright reflow | Verificado | `tools/zoom-reflow-audit.py` recorre cinco rutas en 640px y 320px CSS sin overflow global ni texto interactivo cortado | VERIFICADO |
 | A11Y-046 | Skeleton aria-hidden | Test agenda | Implementado | `test/agenda.test.mjs` | IMPLEMENTADO |
 | A11Y-047 | Avisos de datos cacheados | Playwright y tests sobre status live | Verificado en cinco modulos | `tools/cached-notice-audit.py`, `test/matrix.test.mjs`, `test/timeline.test.mjs` | VERIFICADO |
 | A11Y-060 | Modal 401 accesible | Inspeccion estatica y flujo 401 | Verificado por teclado; pendiente lector | `js/ui.js`; `test/static-contract.test.mjs`; `tools/keyboard-audit.py` valida role dialog, aria-modal, foco inicial y trap Tab | EN PROGRESO |
@@ -43,7 +44,7 @@ Implementado modal dinamico de sesion expirada con `role="dialog"`, `aria-modal`
 
 ## Zoom y reflow
 
-`tools/responsive-audit.py` verifico 25 combinaciones: 320x720, 390x844, 768x1024, 1366x768 y 1920x1080 sobre `tour`, `agenda`, `timeline`, `fan-dashboard` y `group-matrix`, autenticado contra testMode. Cada ruta reporto `scrollWidth == clientWidth` y sin elementos visibles fuera del viewport salvo contenedores con scroll horizontal intencional. Zoom de navegador/lector sigue pendiente.
+`tools/responsive-audit.py` verifico 25 combinaciones: 320x720, 390x844, 768x1024, 1366x768 y 1920x1080 sobre `tour`, `agenda`, `timeline`, `fan-dashboard` y `group-matrix`, autenticado contra testMode. `tools/zoom-reflow-audit.py` agrega equivalentes 200%/400% en 640px y 320px CSS sobre las cinco rutas, sin overflow global ni texto interactivo cortado. Zoom con lector sigue pendiente.
 
 ## Contraste
 
@@ -85,6 +86,7 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 - Rutas navegables: `tour`, `agenda`, `timeline`, `fan-dashboard`, `group-matrix`. Timeline fue verificado en Playwright como vista activa con placeholder oculto y retry visible en estado anonimo. Matrix fue verificada en movil 390x844 con 16 celdas, diagonal `aria-disabled`, resultado/pending y overflow contenido en el shell de tabla.
 - `aria-current="page"` cambia en cada ruta.
 - Sin overflow horizontal global en 320x720, 390x844, 768x1024, 1366x768 y 1920x1080 para las cinco rutas autenticadas (`RESPONSIVE_AUDIT_PASS viewports=5 routes=5 checks=25`).
+- Zoom/reflow verificado en Playwright: `ZOOM_REFLOW_AUDIT_PASS zoom_levels=2 routes=5 checks=10`, con equivalentes 200%/400% y controles visibles sin texto cortado.
 - La superficie de dependencias se mantiene reducida: `test/static-contract.test.mjs` valida cero dependencias npm, sin lockfiles/node_modules y sin scripts/styles remotos.
 - Modal 401 verificado en Playwright: role=dialog, aria-modal=true, foco inicial en email, fondo inerte, Tab cicla dentro del modal y sin errores de consola.
 - Navegacion por teclado verificada en Playwright: `KEYBOARD_AUDIT_PASS routes=5 login=keyboard modal_trap=verified`.
@@ -105,6 +107,6 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 
 ## Gaps pendientes
 
-- Zoom de navegador/lector de pantalla.
+- Zoom con lector de pantalla.
 - Contraste AA manual completo en todos los modulos.
 
