@@ -42,9 +42,25 @@ Tecnica: `js/tour-view.js:load`, `js/tour.js:crossReferenceVenues`, `test/tour.t
 
 Tecnica: `js/agenda-view.js:renderColumns`, `test/agenda.test.mjs`.
 
+### Como evita duplicados Timeline
+
+15 segundos: Cargo games una vez, normalizo por ID y muestro bloques locales.
+
+30 segundos: El reducer ordena cronologicamente, descarta IDs repetidos y aumenta `visibleCount` de 10 en 10. El boton fallback no vuelve a pedir red.
+
+Tecnica: `js/timeline.js:uniqueSortedGames`, `reduceTimelineState`, `test/timeline.test.mjs`.
+
+### Que pasa si falla Timeline
+
+15 segundos: No deja el observer esperando; muestra error persistente y boton de retry.
+
+30 segundos: El fallo inicial pasa a estado `error`, oculta centinela y boton de cargar mas, y el retry usa `forceRetry` con la politica central de backoff.
+
+Tecnica: `js/timeline-view.js:load`, `retry`, `test/timeline.test.mjs`.
 ## Preguntas que faltan dominar
 
 - Timeline con retry manual y observer.
 - Dashboard con snapshot stale.
 - Matriz con actualizacion parcial de celdas.
 - Modal 401 con trap de foco.
+

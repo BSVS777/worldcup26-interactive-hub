@@ -63,10 +63,16 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests.
 - Handlers inline: sin resultados en HTML.
 - Secretos: la busqueda marco nombres de variables/tests y filas de docs; no encontro valores tipo `Bearer <token real>` ni credenciales de produccion.
 
+## Timeline
+
+- `createTimelineView` usa `generation` para descartar cargas obsoletas.
+- Load-more es local y no dispara fetch adicional.
+- Retry usa `forceRetry` y mantiene el endpoint allowlisted `games`.
 ## Riesgos pendientes
 
 - Completar modulos restantes.
 - Validar API viva y Content-Type real.
 - Agregar prueba DOM XSS dedicada.
 - Auditar secretos antes de entrega final.
+
 

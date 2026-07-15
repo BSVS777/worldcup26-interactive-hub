@@ -63,7 +63,7 @@ Usa botones disabled y skeleton oculto; pendiente convertir fecha a `<time datet
 
 ### Timeline
 
-Placeholder actual; pendiente modulo completo con lista y boton fallback.
+Implementado con lista ordenada, boton fallback "Load 10 more matches", retry persistente y status `aria-live`. Pendiente prueba manual de screen reader e IntersectionObserver real con datos autenticados.
 
 ### Dashboard
 
@@ -76,14 +76,15 @@ Placeholder con tabla/caption; pendiente matriz 4x4 real y celdas con scope comp
 ## Evidencia Playwright
 
 - App arranca en `http://127.0.0.1:4173` sin errores de consola.
-- Rutas navegables: `tour`, `agenda`, `timeline`, `fan-dashboard`, `group-matrix`.
+- Rutas navegables: `tour`, `agenda`, `timeline`, `fan-dashboard`, `group-matrix`. Timeline fue verificado en Playwright como vista activa con placeholder oculto y retry visible en estado anonimo.
 - `aria-current="page"` cambia en cada ruta.
 - Sin overflow horizontal global en 1366x768.
 
 ## Gaps pendientes
 
 - Modal 401 accesible.
-- Timeline, Dashboard y Matrix completos.
+- Dashboard y Matrix completos.
 - Tests responsive y lector de pantalla.
 - Contraste AA medido.
+
 

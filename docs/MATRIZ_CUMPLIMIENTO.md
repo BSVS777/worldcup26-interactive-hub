@@ -11,7 +11,7 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 
 | ID | Requisito | Archivo y función | Evidencia | Estado | Gap |
 |---|---|---|---|---|---|
-| ARC-001 | Aplicación única con cinco módulos | `index.html`, `js/router.js`, `js/ui.js`, `js/modules/*` | Playwright navego las cinco rutas sin errores de consola | IMPLEMENTADO | Timeline, Fan Dashboard y Matrix aun son placeholders. |
+| ARC-001 | Aplicación única con cinco módulos | `index.html`, `js/router.js`, `js/ui.js`, `js/modules/*` | Playwright navego las cinco rutas sin errores de consola | IMPLEMENTADO | Fan Dashboard y Matrix aun son placeholders. |
 | ARC-002 | HTML semántico y reducido | | | NO INICIADO | |
 | ARC-003 | CSS minimalista y responsive | | | NO INICIADO | |
 | ARC-004 | Navegación entre módulos | `js/router.js`, `js/ui.js` | Playwright: aria-current cambia en las cinco rutas | IMPLEMENTADO | Falta navegacion movil avanzada/drawer. |
@@ -88,20 +88,20 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | AGE-010 | Navegación rápida no desordena el estado | `js/agenda.js:reduceAgendaState` (transiciones síncronas puras, no-op idempotente en los límites), `js/agenda-view.js:goToDate` | `test/agenda.test.mjs` → "next/prev move across retained dates and disable at each boundary, including under rapid repeated clicks"; además `js/agenda-view.js:load` usa el mismo guard de `generation` que `tour-view.js` para la carga inicial async, cubierto por "a stale in-flight load never overwrites a fresher load" | IMPLEMENTADO | |
 | AGE-011 | Sin red ni caché muestra skeletons | `js/agenda-view.js:renderColumns` (rama `state.dates.length === 0` → `createSkeletonColumn`), clase `.agenda-skeleton` en `css/styles.css` | `test/agenda.test.mjs` → "when the games fetch fails entirely, skeletons remain and both controls stay disabled" | IMPLEMENTADO | |
 | AGE-012 | Nunca deja el layout en blanco | `js/agenda-view.js` (llamada a `render()` en la construcción de la vista, antes de cualquier carga) y `renderControls` (controles siempre presentes, deshabilitados sin datos) | `test/agenda.test.mjs` → "before any data arrives, the columns area shows skeletons and controls are disabled, never blank" | IMPLEMENTADO | Decisión de diseño: sin fechas, los controles se renderizan siempre visibles pero deshabilitados (no se ocultan). |
-| TIME-001 | Pide todos los partidos una sola vez | | | NO INICIADO | |
-| TIME-002 | Ordena cronológicamente | | | NO INICIADO | |
-| TIME-003 | Inserta bloques de 10 | | | NO INICIADO | |
-| TIME-004 | Usa IntersectionObserver | | | NO INICIADO | |
-| TIME-005 | Usa centinela al final | | | NO INICIADO | |
-| TIME-006 | No pagina la petición HTTP | | | NO INICIADO | |
-| TIME-007 | Evita duplicados con ID estable | | | NO INICIADO | |
-| TIME-008 | Desconecta observer al terminar | | | NO INICIADO | |
-| TIME-009 | Fallo inicial no deja observer esperando | | | NO INICIADO | |
-| TIME-010 | Fallo inicial muestra estado de error | | | NO INICIADO | |
-| TIME-011 | Existe botón de reintento manual | | | NO INICIADO | |
-| TIME-012 | Reintento manual dispara backoff | | | NO INICIADO | |
-| TIME-013 | Recuperación reinicia desde el principio | | | NO INICIADO | |
-| TIME-014 | Recuperación no duplica partidos | | | NO INICIADO | |
+| TIME-001 | Pide todos los partidos una sola vez | `js/timeline-view.js:load` (`api.apiRequest('games')`) | `test/timeline.test.mjs` confirma una sola llamada y load-more local | IMPLEMENTADO | Pendiente validar con API autenticada real. |
+| TIME-002 | Ordena cronológicamente | `js/timeline.js:uniqueSortedGames` | `test/timeline.test.mjs` | IMPLEMENTADO | |
+| TIME-003 | Inserta bloques de 10 | `js/timeline.js:reduceTimelineState` (`SHOW_NEXT`) | `test/timeline.test.mjs` | IMPLEMENTADO | |
+| TIME-004 | Usa IntersectionObserver | `js/timeline-view.js:syncObserver` | Codigo implementado; tests usan fallback sin observer | IMPLEMENTADO | Pendiente verificacion browser con datos suficientes e IntersectionObserver activo. |
+| TIME-005 | Usa centinela al final | `index.html#timeline-sentinel`, `js/timeline-view.js` | Playwright confirma vista Timeline activa; centinela se oculta sin mas datos | IMPLEMENTADO | |
+| TIME-006 | No pagina la petición HTTP | `js/timeline-view.js:showNextBatch` | `test/timeline.test.mjs` confirma que load-more no refetch | IMPLEMENTADO | |
+| TIME-007 | Evita duplicados con ID estable | `js/timeline.js:uniqueSortedGames` | `test/timeline.test.mjs` | IMPLEMENTADO | |
+| TIME-008 | Desconecta observer al terminar | `js/timeline-view.js:disconnectObserver`, `syncObserver` | Codigo desconecta antes de resincronizar y al reset | IMPLEMENTADO | Falta test especifico con observer falso. |
+| TIME-009 | Fallo inicial no deja observer esperando | `js/timeline-view.js:renderControls` | `test/timeline.test.mjs` confirma centinela oculto tras fallo | IMPLEMENTADO | |
+| TIME-010 | Fallo inicial muestra estado de error | `js/timeline-view.js:renderStatus` | `test/timeline.test.mjs`; Playwright muestra retry visible en anonimo | IMPLEMENTADO | |
+| TIME-011 | Existe botón de reintento manual | `index.html#timeline-retry`, `js/timeline-view.js:retry` | `test/timeline.test.mjs`; Playwright `RETRY_VISIBLE True` | IMPLEMENTADO | |
+| TIME-012 | Reintento manual dispara backoff | `js/timeline-view.js:retry` (`forceRetry: true`) | `test/timeline.test.mjs` confirma `forceRetry`; backoff central cubierto por `test/api.test.mjs` | IMPLEMENTADO | |
+| TIME-013 | Recuperación reinicia desde el principio | `js/timeline-view.js:retry`, `js/timeline.js:DATA_LOADED` | `test/timeline.test.mjs` recupera 3 partidos luego de fallo | IMPLEMENTADO | |
+| TIME-014 | Recuperación no duplica partidos | `js/timeline.js:uniqueSortedGames` | `test/timeline.test.mjs` cubre dedupe por ID | IMPLEMENTADO | |
 | FAN-001 | Obtiene teams | | | NO INICIADO | |
 | FAN-002 | Obtiene games | | | NO INICIADO | |
 | FAN-003 | Obtiene groups | | | NO INICIADO | |
@@ -185,5 +185,6 @@ Copia esta matriz a `docs/MATRIZ_CUMPLIMIENTO.md` y actualízala durante el desa
 | SPEC-SEC-001 | Seguridad y privacidad son objetivo transversal obligatorio | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define SEC-HARD-001..SEC-HARD-010 | IMPLEMENTADO | Pendiente ejecutar auditoria final de headers, storage y rutas. |
 | SPEC-RES-001 | Resiliencia tipo "intumbable" se define como degradacion segura, contencion de fallos y recuperacion sin recarga | `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md` | Spec define RES-001..RES-008 | IMPLEMENTADO | Pendiente Playwright por modulo para validar comportamiento real. |
 | QA-011 | Elementos con `hidden` no ocupan layout ni foco | `css/styles.css` (`[hidden]`) | `test/static-contract.test.mjs` verifica `display: none !important` | IMPLEMENTADO | |
+
 
 
