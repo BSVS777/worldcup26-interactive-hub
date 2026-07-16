@@ -31,7 +31,7 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 22. La defensa contra endpoint injection se demuestra con Playwright: `apiBase` malicioso no recibe trafico y el proxy rechaza queries target.
 23. La defensa anti-clickjacking local se demuestra con Playwright: CSP incluye `frame-ancestors 'none'` y `X-Frame-Options: DENY`.
 24. La resiliencia de API se demuestra con Playwright: 429 y 500 recuperan con retry, y una caida de red usa cache valida en Agenda.
-25. La API viva se valida con `tools/live-api-probe.mjs` usando credenciales por entorno; sin credenciales se salta sin imprimir secretos.
+25. La API viva se valida con `tools/live-api-probe.mjs` contra los cuatro `GET` publicos sin credenciales; `tools/live-api-auth-probe.mjs` conserva el flujo autenticado como compatibilidad opcional y se salta sin credenciales sin imprimir secretos.
 26. El reflow 200%/400% se demuestra con Playwright: cinco rutas sin overflow global ni controles con texto cortado.
 
 ## Endpoints por modulo
@@ -157,6 +157,14 @@ Tecnica: `test/tour.test.mjs`, `test/agenda.test.mjs`, `test/timeline.test.mjs`.
 
 Tecnica: `js/cache.js`, `test/cache.test.mjs`.
 
+### Como defiendo el acceso publico sin login
+
+15 segundos: La API desplegada permite lectura publica; por eso no fabrico ni exijo un JWT falso para leer datos.
+
+30 segundos: La API desplegada permite actualmente lectura publica. Por eso el flujo real no fabrica ni persiste credenciales. Conservamos el manejo de 401 y los escenarios deterministas de seguridad, pero documentamos la contradiccion con el requisito academico de JWT para validarla con el profesor. `apiRequest` agrega `Authorization: Bearer` solo si existe una sesion; su ausencia ya no produce un 401 local, y un 401 real del servidor sigue limpiando el token y abriendo el panel de recuperacion.
+
+Tecnica: `js/api.js:apiRequest`, `js/ui.js` (panel de sesion solo visible en `expired`), `tools/live-api-probe.mjs` (`LIVE_API_PUBLIC_PROBE_PASSED teams=48 games=104 groups=12 stadiums=16`), `docs/MATRIZ_CUMPLIMIENTO.md:API-001..API-003`.
+
 ### Como defiendo actualizacion parcial de matriz
 
 15 segundos: Si solo cambian resultados, actualizo celdas; no reconstruyo tablas.
@@ -185,5 +193,6 @@ Tecnica: `tools/app-server.mjs`, `tools/security-headers-audit.py`, `docs/SECURI
 
 - Lector de pantalla y contraste manual completo fuera del Dashboard; zoom con lector sigue pendiente.
 - Reproducciones DevTools manuales para 429, 500 y offline.
-- Validacion contra API viva con credenciales validas: ejecutar `npm run test:live-api` y exigir `LIVE_API_PROBE_PASS`.
+- Validacion del flujo autenticado `/auth/authenticate` contra la API viva: ejecutar `npm run test:live-api:auth` con credenciales validas y exigir `LIVE_API_AUTH_PROBE_PASS`. Es opcional; la lectura publica ya esta verificada con `npm run test:live-api` (`LIVE_API_PUBLIC_PROBE_PASSED teams=48 games=104 groups=12 stadiums=16`).
+- El profesor debe decidir si el requisito de Bearer en cada request sigue aplicando ahora que el proveedor externo permite lectura publica sin token.
 

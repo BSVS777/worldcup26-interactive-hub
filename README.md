@@ -21,7 +21,8 @@ Aplicacion vanilla JavaScript para explorar el Mundial 2026 con una base de resi
 | Auditar endpoint injection | `npm run test:endpoint-injection` | Ejecuta `python tools/endpoint-injection-audit.py`; requiere app local y servidor determinista activos. |
 | Auditar headers de seguridad | `npm run test:security-headers` | Ejecuta `python tools/security-headers-audit.py`; requiere app local activa. |
 | Auditar resiliencia de API | `npm run test:api-resilience` | Ejecuta `python tools/api-resilience-audit.py`; requiere app local y servidor determinista activos. |
-| Validar API viva | `npm run test:live-api` | Ejecuta `node tools/live-api-probe.mjs`; requiere `WC26_API_EMAIL` y `WC26_API_PASSWORD`. |
+| Validar API viva (lectura publica) | `npm run test:live-api` | Ejecuta `node tools/live-api-probe.mjs`; sin credenciales, consulta directamente los cuatro `GET` publicos. |
+| Validar API viva (compatibilidad autenticada, opcional) | `npm run test:live-api:auth` | Ejecuta `node tools/live-api-auth-probe.mjs`; requiere `WC26_API_EMAIL` y `WC26_API_PASSWORD`; sin ellas imprime `LIVE_API_AUTH_PROBE_SKIPPED`. |
 | Auditar zoom y reflow | `npm run test:zoom-reflow` | Ejecuta `python tools/zoom-reflow-audit.py`; requiere app local y servidor determinista activos. |
 | Auditar observer del Timeline | `npm run test:timeline-observer` | Ejecuta `python tools/timeline-observer-audit.py`; requiere app local y servidor determinista activos. |
 | Auditar avisos de cache | `npm run test:cached-notices` | Ejecuta `python tools/cached-notice-audit.py`; requiere app local y servidor determinista activos. |
@@ -35,7 +36,7 @@ La app local y el servidor determinista son procesos separados. Para pruebas man
 - App shell con navegacion entre cinco modulos.
 - Tour Virtual y Agenda Simultanea implementados con datos de API normalizados.
 - Timeline Infinito esta implementado con carga unica de games, bloques locales de 10, fallback manual y retry. Dashboard del Fanatico esta implementado con favorito persistido, metricas desde API y snapshot local. Matriz de Enfrentamientos esta implementada con tablas 4x4 por grupo, resultados, pendientes y actualizacion parcial de celdas.
-- Cliente HTTP central con JWT en memoria, endpoint allowlist, retry 429/500 y cache publica por endpoint.
+- Cliente HTTP central con endpoint allowlist, retry 429/500 y cache publica por endpoint. La API desplegada permite lectura publica en `stadiums`, `games`, `teams` y `groups` sin credenciales; el cliente agrega `Authorization: Bearer` solo si existe una sesion (login opcional de compatibilidad), y sigue tratando cualquier 401 real del servidor como sesion expirada.
 - Accesibilidad, inclusion, seguridad y resiliencia quedan como criterio de listo en `docs/ACCESIBILIDAD_SEGURIDAD_SPEC.md`; la meta "intumbable" se mide como degradacion con gracia, fallos contenidos y recuperacion sin recarga.
 - Test mode local con servidor determinista para autenticacion, fixtures de stadiums/games/teams/groups, 401, 429, 500 y reset.
 
@@ -49,7 +50,7 @@ La app local y el servidor determinista son procesos separados. Para pruebas man
 ## Gaps conocidos
 
 - El DOCX original `ProyectoFinal_ISW521_Categoria_B.docx` no esta presente en este repo.
-- Falta validar Matriz contra API viva; el testMode ya cubre 12 grupos sinteticos deterministas.
 - Falta auditoria manual completa WCAG 2.2 AA, screen reader, zoom y contrastes; teclado y movimiento reducido ya tienen auditorias Playwright automatizadas.
-- Falta verificacion real de esquemas contra API viva con credenciales validas.
+- Contradiccion academica pendiente de aclaracion del profesor: el enunciado exige JWT/Bearer en cada request de datos, pero la API desplegada en `https://worldcup26.ir` permite lectura publica de `stadiums`, `games`, `teams` y `groups` sin token (verificado con `npm run test:live-api`: `teams=48 games=104 groups=12 stadiums=16`). El cliente conserva el flujo de login y el manejo de 401 como compatibilidad, pero no fabrica ni exige un Bearer falso para leer datos publicos. Ver `docs/MATRIZ_CUMPLIMIENTO.md` (filas API-001..API-003) y `docs/GUIA_DEFENSA_INFJ_T.md`.
+- La verificacion del flujo `/auth/authenticate` contra la API viva (`npm run test:live-api:auth`) sigue pendiente de credenciales validas; es opcional y no bloquea la lectura publica.
 

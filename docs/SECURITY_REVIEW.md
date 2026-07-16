@@ -26,12 +26,14 @@ Revision viva para WC26 Interactive Hub. No declara seguridad absoluta; registra
 
 ## Live API probe
 
-- `tools/live-api-probe.mjs` valida el contrato live cuando existen `WC26_API_EMAIL` y `WC26_API_PASSWORD`: autentica, exige `token` presente sin imprimirlo, llama `stadiums`, `games`, `teams` y `groups` con Bearer, revisa JSON y normaliza con el codigo real de la app. Sin credenciales imprime `LIVE_API_PROBE_SKIPPED` y no marca verificacion live.
+- `tools/live-api-probe.mjs` valida el contrato live sin credenciales: llama `teams`, `games`, `groups` y `stadiums` directamente contra los endpoints publicos, exige `response.ok`, `application/json`, un arreglo raiz por endpoint y normaliza con el codigo real de la app. Evidencia registrada: `LIVE_API_PUBLIC_PROBE_PASSED teams=48 games=104 groups=12 stadiums=16`.
+- `tools/live-api-auth-probe.mjs` conserva el flujo autenticado como compatibilidad opcional cuando existen `WC26_API_EMAIL` y `WC26_API_PASSWORD`: autentica, exige `token` presente sin imprimirlo, llama los mismos cuatro endpoints con Bearer y normaliza. Sin credenciales imprime `LIVE_API_AUTH_PROBE_SKIPPED` y no marca verificacion live de `/auth/authenticate`.
 
 ## Endpoint authorization
 
-- `apiRequest` obtiene el JWT vigente desde `sessionStore` y rechaza peticiones de datos sin token antes de llamar a `fetchImpl`.
-- `test/api.test.mjs` valida que `stadiums`, `games`, `teams` y `groups` usen `Authorization: Bearer ...` y sus paths allowlisted de `ENDPOINTS`.
+- La API desplegada permite lectura publica en `stadiums`, `games`, `teams` y `groups`; `apiRequest` ya no rechaza localmente una peticion de datos por falta de token. Agrega `Authorization: Bearer ...` solo cuando `sessionStore` tiene un token vigente; un 401 real del servidor sigue limpiando la sesion y notificando expiracion, sin fabricar ni exigir un Bearer falso.
+- `test/api.test.mjs` valida que, con sesion activa, `stadiums`, `games`, `teams` y `groups` usen `Authorization: Bearer ...` y sus paths allowlisted de `ENDPOINTS`; y que, sin sesion, la peticion se complete igual sin cabecera `Authorization`.
+- Contradiccion academica: el enunciado ISW-521 exige Bearer en cada request de datos; la API real ya no lo exige para lectura. Clasificado como BLOQUEO POR CONTRADICCION EXTERNA en `docs/MATRIZ_CUMPLIMIENTO.md` (API-001..API-003), pendiente de aclaracion del profesor.
 
 ## Token
 
@@ -152,8 +154,7 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 
 ## Riesgos pendientes
 
-- Completar modulos restantes.
-- Validar API viva y Content-Type real con `tools/live-api-probe.mjs` y credenciales validas.
+- Validar el flujo autenticado `/auth/authenticate` contra la API viva con `tools/live-api-auth-probe.mjs` y credenciales validas; opcional, no bloquea la lectura publica ya verificada.
 - Agregar prueba DOM XSS dedicada.
 - Auditar secretos antes de entrega final.
 
