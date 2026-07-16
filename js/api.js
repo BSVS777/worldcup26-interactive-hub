@@ -126,14 +126,12 @@ export function createApiClient({
       throw new TypeError(`Unknown data endpoint: ${endpointKey}`);
     }
 
+    // The deployed API allows public GET access to these endpoints, so a
+    // missing token is not treated as a local 401 — the request still goes
+    // out, with Authorization attached only when a session happens to exist.
     const token = session.getToken();
-    if (!token) {
-      const invalidatedToken = session.getLocallyInvalidatedToken?.();
-      if (invalidatedToken) await notifySessionExpired(invalidatedToken, endpointKey);
-      throw new AuthenticationError('A valid session is required', { endpoint: endpointKey });
-    }
-
-    const headers = new Headers({ Accept: 'application/json', Authorization: `Bearer ${token}` });
+    const headers = new Headers({ Accept: 'application/json' });
+    if (token) headers.set('Authorization', `Bearer ${token}`);
     const request = { method, headers, signal, credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer' };
     if (body !== undefined) {
       headers.set('Content-Type', 'application/json');

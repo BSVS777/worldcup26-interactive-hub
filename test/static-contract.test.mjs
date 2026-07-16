@@ -121,7 +121,8 @@ test('runtime code keeps async and fetch responsibilities centralized', async ()
   const api = runtimeFiles.find(({ file }) => file === 'js/api.js')?.text ?? '';
   assert.match(api, /if \(response\.ok\)/);
   assert.match(api, /normalizePayload\(endpointKey, payload\)/);
-  assert.match(api, /new Headers\(\{ Accept: 'application\/json', Authorization: `Bearer \$\{token\}` \}\)/);
+  assert.match(api, /new Headers\(\{ Accept: 'application\/json' \}\)/);
+  assert.match(api, /headers\.set\('Authorization', `Bearer \$\{token\}`\)/);
 });
 
 test('document declares the explicitly served favicon', async () => {

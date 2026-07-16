@@ -164,9 +164,12 @@ export function createShellView(document, { onLogin }) {
       else link.removeAttribute('aria-current');
     }
 
-    const needsLogin = state.session !== 'authenticated';
-    elements.sessionPanel.hidden = !needsLogin;
-    setSessionModal(state.session === 'expired');
+    // Live match data now loads from public read endpoints, so sign-in is an
+    // optional compatibility path shown only when a real session actually
+    // expires — not a gate for the ordinary anonymous state.
+    const showSessionPanel = state.session === 'expired';
+    elements.sessionPanel.hidden = !showSessionPanel;
+    setSessionModal(showSessionPanel);
     elements.sessionTitle.textContent = state.session === 'expired'
       ? 'Your session expired'
       : 'Sign in to load live match data';

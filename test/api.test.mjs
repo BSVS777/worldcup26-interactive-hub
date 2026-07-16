@@ -77,15 +77,20 @@ test('adds Bearer JWT to every public data endpoint request', async () => {
   })));
 });
 
-test('rejects a data request without a token before calling fetch', async () => {
-  let calls = 0;
-  const { client, session } = setup(async () => { calls += 1; });
+test('sends a data request without Authorization when no token exists and still completes it', async () => {
+  const calls = [];
+  const { client, session } = setup(async (url, options) => {
+    calls.push({ url, options });
+    return jsonResponse(200, { games: [] });
+  });
   session.clear();
-  await assert.rejects(client.apiRequest('games'), AuthenticationError);
-  assert.equal(calls, 0);
+  const result = await client.apiRequest('games');
+  assert.equal(result.source, 'network');
+  assert.equal(calls.length, 1);
+  assert.equal(new Headers(calls[0].options.headers).has('authorization'), false);
 });
 
-test('reports a persisted session that expires locally through the shared recovery callback', async () => {
+test('omits Authorization once a stored token expires locally, without blocking the request', async () => {
   let currentTime = 2_000_000_000_000;
   let calls = 0;
   const expirations = [];
@@ -94,31 +99,39 @@ test('reports a persisted session that expires locally through the shared recove
   assert.ok(session.getToken(), 'the session is valid at initial render');
   currentTime = 2_000_000_002_000;
   const client = createApiClient({
-    fetchImpl: async () => { calls += 1; },
+    fetchImpl: async (url, options) => {
+      calls += 1;
+      assert.equal(new Headers(options.headers).has('authorization'), false);
+      return jsonResponse(200, { games: [] });
+    },
     session,
     cacheStorage: new MemoryStorage(),
     onSessionExpired: (event) => { expirations.push(event); }
   });
 
-  await assert.rejects(client.apiRequest('games'), (error) => (
-    error instanceof AuthenticationError && error.status === null
-  ));
-  await assert.rejects(client.apiRequest('teams'), AuthenticationError);
-
-  assert.equal(calls, 0);
-  assert.deepEqual(expirations, [{ endpoint: 'games' }]);
+  const result = await client.apiRequest('games');
+  assert.equal(result.source, 'network');
+  assert.equal(calls, 1);
+  assert.deepEqual(expirations, []);
 });
 
-test('does not report expiration for a client that has never had a session', async () => {
+test('fetches public data for a client that has never had a session', async () => {
+  let calls = 0;
   let expirations = 0;
   const client = createApiClient({
-    fetchImpl: async () => { throw new Error('fetch must not run'); },
+    fetchImpl: async (url, options) => {
+      calls += 1;
+      assert.equal(new Headers(options.headers).has('authorization'), false);
+      return jsonResponse(200, { games: [] });
+    },
     session: createSessionStore(new MemoryStorage()),
     cacheStorage: new MemoryStorage(),
     onSessionExpired: () => { expirations += 1; }
   });
 
-  await assert.rejects(client.apiRequest('games'), AuthenticationError);
+  const result = await client.apiRequest('games');
+  assert.equal(result.source, 'network');
+  assert.equal(calls, 1);
   assert.equal(expirations, 0);
 });
 
