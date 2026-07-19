@@ -286,7 +286,6 @@ select {
   font: 0.63rem/1 var(--utility);
 }
 
-.route-nav a:hover,
 .route-nav a[aria-current="page"] {
   color: var(--chalk);
   border-color: rgb(242 199 92 / 62%);
@@ -294,9 +293,26 @@ select {
   transform: translateY(-0.1rem);
 }
 
-.route-nav a:hover::after,
 .route-nav a[aria-current="page"]::after {
   transform: scaleX(1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .route-nav a:hover {
+    color: var(--chalk);
+    border-color: rgb(242 199 92 / 62%);
+    background: linear-gradient(135deg, rgb(242 199 92 / 22%), rgb(54 211 126 / 12%));
+    transform: translateY(-0.1rem);
+  }
+
+  .route-nav a:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+.route-nav a:active {
+  transform: scale(0.97) translateY(-0.1rem);
+  transition-duration: 100ms;
 }
 
 main {
@@ -487,15 +503,22 @@ main {
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
-.ui-card:hover,
-.venue-card:hover,
-.agenda-column:hover,
-.timeline-item:hover,
-.fan-match:hover,
-.matrix-card:hover {
-  border-color: rgb(15 107 63 / 44%);
-  box-shadow: 0 1rem 2.4rem rgb(7 17 15 / 24%);
-  transform: translateY(-0.14rem);
+@media (hover: hover) and (pointer: fine) {
+  .ui-card:hover,
+  .venue-card:hover,
+  .agenda-column:hover,
+  .timeline-item:hover,
+  .fan-match:hover,
+  .matrix-card:hover {
+    border-color: rgb(15 107 63 / 44%);
+    box-shadow: 0 1rem 2.4rem rgb(7 17 15 / 24%);
+    transform: translateY(-0.14rem);
+  }
+}
+
+.venue-card:active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
 }
 
 .venue-grid {
@@ -631,13 +654,24 @@ main {
   transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease, opacity 160ms ease;
 }
 
-.ui-control:hover:not(:disabled),
-.agenda-nav__button:hover:not(:disabled),
-.timeline-button:hover:not(:disabled),
-.login-form button:hover:not(:disabled),
-.route-nav__toggle:hover {
-  filter: brightness(1.06);
-  transform: translateY(-0.1rem);
+@media (hover: hover) and (pointer: fine) {
+  .ui-control:hover:not(:disabled),
+  .agenda-nav__button:hover:not(:disabled),
+  .timeline-button:hover:not(:disabled),
+  .login-form button:hover:not(:disabled),
+  .route-nav__toggle:hover {
+    filter: brightness(1.06);
+    transform: translateY(-0.1rem);
+  }
+}
+
+.ui-control:active:not(:disabled),
+.agenda-nav__button:active:not(:disabled),
+.timeline-button:active:not(:disabled),
+.login-form button:active:not(:disabled),
+.route-nav__toggle:active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
 }
 
 .ui-control:disabled,
@@ -992,6 +1026,12 @@ main {
   overflow-y: auto;
   background: rgb(5 8 6 / 88%);
   border-radius: 0;
+  opacity: 1;
+  transition: opacity 200ms ease-out;
+
+  @starting-style {
+    opacity: 0;
+  }
 }
 
 .session-panel[role="dialog"]::before {
@@ -1004,6 +1044,14 @@ main {
   border: 1px solid var(--line);
   border-radius: 0.8rem;
   content: "";
+  transform: scale(1);
+  transform-origin: center;
+  transition: opacity 220ms ease-out, transform 220ms cubic-bezier(0.23, 1, 0.32, 1);
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
 
 .session-panel .eyebrow {
@@ -1076,6 +1124,13 @@ main {
   display: block;
   opacity: 1;
   visibility: visible;
+  transform: scale(1);
+  transition: opacity 90ms ease-out, transform 90ms ease-out;
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.96);
+  }
 }
 
 .pitch-transition::after {

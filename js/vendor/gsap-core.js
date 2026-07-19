@@ -45,9 +45,9 @@ function animateElement(element, vars) {
   delete finalVars.stagger;
   delete finalVars.onComplete;
   const transition = [
-    `transform ${duration}ms cubic-bezier(.2,.8,.2,1) ${delay}ms`,
-    `opacity ${duration}ms ease ${delay}ms`,
-    `filter ${duration}ms ease ${delay}ms`
+    `transform ${duration}ms cubic-bezier(.23,1,.32,1) ${delay}ms`,
+    `opacity ${duration}ms cubic-bezier(.23,1,.32,1) ${delay}ms`,
+    `filter ${duration}ms cubic-bezier(.23,1,.32,1) ${delay}ms`
   ].join(', ');
   element.style.transition = transition;
   requestAnimationFrame(() => applyVars(element, finalVars));
