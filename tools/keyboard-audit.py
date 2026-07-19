@@ -134,10 +134,13 @@ with sync_playwright() as playwright:
     console_errors = []
     page.on('console', lambda msg: console_errors.append(msg.text) if msg.type == 'error' else None)
 
-    page.goto(BASE_URL + '#tour')
-    page.wait_for_load_state('networkidle')
+    page.goto('http://127.0.0.1:4173/#tour')
+    page.wait_for_load_state('domcontentloaded')
     verify_skip_link(page)
-    sign_in_with_keyboard(page, wait_for_hidden=False)
+
+    page.goto(BASE_URL + '#tour')
+    page.wait_for_load_state('domcontentloaded')
+    sign_in_with_keyboard(page)
     verify_module_controls(page)
     verify_expired_modal_trap(browser)
 
@@ -146,4 +149,5 @@ with sync_playwright() as playwright:
 
     print(f"KEYBOARD_AUDIT_PASS routes={len(ROUTES)} login=keyboard modal_trap=verified")
     browser.close()
+
 

@@ -1,4 +1,5 @@
 import { requireElement } from './dom.js';
+import { announceViewRendered, markInteractiveCard } from './components.js';
 import { createInitialTourState, reduceTourState } from './tour.js';
 import { createLoadableView, formatScore } from './loadable-view.js';
 
@@ -24,6 +25,7 @@ export function createTourView(document, api) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'venue-card';
+    markInteractiveCard(button, 'venue');
     button.dataset.venueId = venue.id;
     button.setAttribute('aria-pressed', 'false');
 
@@ -152,6 +154,7 @@ export function createTourView(document, api) {
       renderList();
     }
     renderDetail(null);
+    announceViewRendered(document, { route: 'tour' });
     return state.stadiumsFailed; // fatal failure: allow a future ensureLoaded() to retry
   }
 

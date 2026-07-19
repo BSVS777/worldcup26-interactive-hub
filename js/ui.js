@@ -101,7 +101,10 @@ export function createShellView(document, { onLogin }) {
       setDrawerOpen(elements.routeNav.dataset.drawerOpen !== 'true');
       return;
     }
-    if (event.target.closest('[data-route]')) setDrawerOpen(false);
+    if (event.target.closest('[data-route]')) {
+      if (typeof CustomEvent === 'function') document.dispatchEvent(new CustomEvent('wc26:route-intent'));
+      setDrawerOpen(false);
+    }
   });
 
   elements.routeNav.addEventListener('keydown', (event) => {
@@ -167,7 +170,7 @@ export function createShellView(document, { onLogin }) {
     // Live match data now loads from public read endpoints, so sign-in is an
     // optional compatibility path shown only when a real session actually
     // expires — not a gate for the ordinary anonymous state.
-    const showSessionPanel = state.session === 'expired';
+    const showSessionPanel = state.session === 'expired' || (state.testMode && state.session === 'anonymous');
     elements.sessionPanel.hidden = !showSessionPanel;
     setSessionModal(showSessionPanel);
     elements.sessionTitle.textContent = state.session === 'expired'

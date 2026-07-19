@@ -1,4 +1,5 @@
 import { requireElement } from './dom.js';
+import { announceViewRendered, markInteractiveCard } from './components.js';
 import { createLoadableView, formatScore } from './loadable-view.js';
 import {
   createFanTheme,
@@ -89,6 +90,7 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
     elements.matches.replaceChildren(...state.dashboard.games.map((game) => {
       const item = document.createElement('li');
       item.className = 'fan-match';
+      markInteractiveCard(item, 'fan-match');
       const date = document.createElement('time');
       date.className = 'fan-match__date';
       if (game.localDate) date.dateTime = game.localDate;
@@ -151,6 +153,7 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
     state = reduceFanDashboardState(state, { type: 'FAVORITE_SELECTED', teamId, games: lastGames, groups: lastGroups });
     writeFanSnapshot(state.dashboard, storage);
     render();
+  announceViewRendered(document, { route: 'fan-dashboard', reason: 'favorite-team' });
   });
 
   async function load(isCurrent) {
@@ -187,6 +190,7 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
     if (state.favoriteTeamId) writeFavoriteTeamId(state.favoriteTeamId, storage);
     writeFanSnapshot(state.dashboard, storage);
     render();
+    announceViewRendered(document, { route: 'fan-dashboard' });
     return false;
   }
 

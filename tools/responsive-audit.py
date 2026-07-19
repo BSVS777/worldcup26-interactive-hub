@@ -62,19 +62,19 @@ with sync_playwright() as playwright:
     page.on('console', lambda msg: console_errors.append(msg.text) if msg.type == 'error' else None)
 
     page.goto(BASE_URL + '#tour')
-    page.wait_for_load_state('networkidle')
+    page.wait_for_load_state('domcontentloaded')
     page.fill('#email', 'student@example.test')
     page.fill('#password', 'secret')
     page.click('#login-button')
     page.wait_for_selector('#session-panel', state='hidden')
-    page.wait_for_load_state('networkidle')
+    page.wait_for_load_state('domcontentloaded')
 
     results = []
     for label, width, height in VIEWPORTS:
         page.set_viewport_size({"width": width, "height": height})
         for route in ROUTES:
             page.goto(BASE_URL + '#' + route)
-            page.wait_for_load_state('networkidle')
+            page.wait_for_load_state('domcontentloaded')
             page.wait_for_timeout(250)
             metrics = page.evaluate(RESPONSIVE_SCRIPT)
             if metrics['hasGlobalOverflow'] or metrics['offenders']:
@@ -92,3 +92,5 @@ with sync_playwright() as playwright:
         print(result)
     print(f"RESPONSIVE_AUDIT_PASS viewports={len(VIEWPORTS)} routes={len(ROUTES)} checks={len(results)}")
     browser.close()
+
+

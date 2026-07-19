@@ -1,4 +1,5 @@
 import { requireElement } from './dom.js';
+import { announceViewRendered, markInteractiveCard, markPrimaryControl } from './components.js';
 import { createInitialAgendaState, reduceAgendaState } from './agenda.js';
 import { createLoadableView, formatScore } from './loadable-view.js';
 
@@ -25,6 +26,7 @@ export function createAgendaView(document, api) {
   function createGameColumn(game) {
     const column = document.createElement('div');
     column.className = 'agenda-column';
+    markInteractiveCard(column, 'match');
 
     const teams = document.createElement('p');
     teams.className = 'agenda-column__teams';
@@ -89,6 +91,8 @@ export function createAgendaView(document, api) {
 
   elements.prevButton.addEventListener('click', () => goToDate({ type: 'DATE_PREV' }));
   elements.nextButton.addEventListener('click', () => goToDate({ type: 'DATE_NEXT' }));
+  markPrimaryControl(elements.prevButton);
+  markPrimaryControl(elements.nextButton);
 
   async function load(isCurrent) {
     state = reduceAgendaState(state, { type: 'LOAD_STARTED' });
@@ -113,6 +117,7 @@ export function createAgendaView(document, api) {
     });
 
     render();
+    announceViewRendered(document, { route: 'agenda' });
     return state.gamesFailed; // fatal failure: allow a future ensureLoaded() to retry
   }
 

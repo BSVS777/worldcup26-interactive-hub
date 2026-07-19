@@ -25,6 +25,7 @@
     "test:api-resilience": "python tools/api-resilience-audit.py",
     "test:live-api": "node tools/live-api-probe.mjs",
     "test:live-api:auth": "node tools/live-api-auth-probe.mjs",
-    "test:zoom-reflow": "python tools/zoom-reflow-audit.py"
+    "test:zoom-reflow": "python tools/zoom-reflow-audit.py",
+    "test:final-local": "node tools/final-audit-runner.mjs"
   }
 }

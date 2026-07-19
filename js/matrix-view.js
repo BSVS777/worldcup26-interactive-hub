@@ -1,4 +1,5 @@
 import { requireElement } from './dom.js';
+import { announceViewRendered, markInteractiveCard } from './components.js';
 import { createLoadableView } from './loadable-view.js';
 import { createInitialMatrixState, reduceMatrixState } from './matrix.js';
 
@@ -74,6 +75,7 @@ export function createMatrixView(document, api) {
     const cards = state.matrices.map((matrix) => {
       const section = document.createElement('section');
       section.className = 'matrix-card';
+      markInteractiveCard(section, 'matrix');
       section.setAttribute('aria-labelledby', `matrix-title-${matrix.id}`);
 
       const title = document.createElement('h3');
@@ -129,6 +131,7 @@ export function createMatrixView(document, api) {
       return section;
     });
     elements.grid.replaceChildren(...cards);
+  announceViewRendered(document, { route: 'group-matrix' });
   }
 
   function updateCells() {

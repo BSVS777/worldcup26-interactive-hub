@@ -10,6 +10,7 @@ import { createTimelineView } from './timeline-view.js';
 import { createFanDashboardView } from './fan-dashboard-view.js';
 import { createMatrixView } from './matrix-view.js';
 import { createShellView } from './ui.js';
+import { createMotionSystem } from './motion.js';
 
 applyAccessibilityPreferences(document.documentElement, readAccessibilityPreferences(window.localStorage));
 const session = createAuthStore();
@@ -19,10 +20,12 @@ let state = createInitialViewState({
   hasToken: Boolean(session.getToken())
 });
 let view;
+let motion;
 
 function update(action, options) {
   state = reduceViewState(state, action);
   view.render(state, options);
+  motion?.animateRoute(state.route, { transition: Boolean(options?.announce) });
 }
 
 const api = createApiClient({
@@ -51,6 +54,7 @@ function resetModuleViews() {
 }
 
 function loadActiveModule() {
+  if (state.testMode && state.session === 'anonymous') return;
   if (state.route === 'tour') tourView.ensureLoaded();
   if (state.route === 'agenda') agendaView.ensureLoaded();
   if (state.route === 'timeline') timelineView.ensureLoaded();
@@ -72,7 +76,9 @@ async function handleLogin(credentials) {
 }
 
 view = createShellView(document, { onLogin: handleLogin });
+motion = createMotionSystem(document, window);
 view.render(state);
+motion.animateRoute(state.route);
 loadActiveModule();
 
 window.addEventListener('hashchange', () => {

@@ -1,4 +1,5 @@
 import { requireElement } from './dom.js';
+import { announceViewRendered, markInteractiveCard, markPrimaryControl } from './components.js';
 import {
   createInitialTimelineState,
   hasMoreTimelineGames,
@@ -36,6 +37,7 @@ export function createTimelineView(document, api, {
   function createGameRow(game) {
     const row = document.createElement('li');
     row.className = 'timeline-item';
+    markInteractiveCard(row, 'timeline');
 
     const time = document.createElement('time');
     time.className = 'timeline-item__date';
@@ -161,6 +163,7 @@ export function createTimelineView(document, api, {
       hasCachedData = Boolean(result.stale);
       state = reduceTimelineState(state, { type: 'DATA_LOADED', games: result.data });
       render();
+      announceViewRendered(document, { route: 'timeline' });
       return false;
     } catch {
       if (myGeneration !== generation) return false;
@@ -196,6 +199,8 @@ export function createTimelineView(document, api, {
 
   elements.loadMoreButton.addEventListener('click', showNextBatch);
   elements.retryButton.addEventListener('click', retry);
+  markPrimaryControl(elements.loadMoreButton);
+  markPrimaryControl(elements.retryButton);
 
   render();
 

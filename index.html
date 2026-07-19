@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0b2740">
+    <meta name="theme-color" content="#07110f">
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://worldcup26.ir http://127.0.0.1:4174; base-uri 'self'; form-action 'self'"
     >
-    <meta name="description" content="Explore World Cup 2026 venues, fixtures, teams, and groups through five focused views.">
-    <title>World Cup 2026 Matchday Atlas</title>
+    <meta name="description" content="Explora sedes, partidos, equipos y grupos de una competicion mundial de futbol con una experiencia cinematografica interactiva.">
+    <title>Global Match Theatre</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/styles.css">
     <script type="module" src="js/app.js"></script>
@@ -18,11 +18,11 @@
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
     <header class="site-header">
-      <a class="brand" href="#tour" aria-label="World Cup 2026 Matchday Atlas home">
+      <a class="brand" href="#tour" aria-label="Global Match Theatre home">
         <span class="brand__year" aria-hidden="true">26</span>
-        <span class="brand__name">Matchday<br>Atlas</span>
+        <span class="brand__name">Global<br>Match Theatre</span>
       </a>
-      <p class="site-header__edition">North America · 16 host cities</p>
+      <p class="site-header__edition">Continental football command room</p>
       <div id="test-mode-badge" class="test-badge" hidden>Test mode</div>
     </header>
 
@@ -49,7 +49,7 @@
           <p id="view-description" class="hero__description">Cross the continent through every host stadium and the matches played there.</p>
         </div>
         <div class="hero__scoreboard" aria-hidden="true">
-          <span>CAN</span><strong>·</strong><span>MEX</span><strong>·</strong><span>USA</span>
+          <span>North</span><strong>vs</strong><span>Central</span><strong>vs</strong><span>South</span>
         </div>
       </section>
 
@@ -124,8 +124,15 @@
     <div id="app-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <footer class="site-footer">
-      <p>World Cup 2026 · Five views, one matchday.</p>
-      <p>Live data loads from the public World Cup 2026 API. Sign-in is an optional compatibility path.</p>
+      <p>Global Match Theatre · Five live views, one tournament pulse.</p>
+      <p>Live data loads from the public tournament API. Sign-in is an optional compatibility path.</p>
     </footer>
+
+    <div id="pitch-transition" class="pitch-transition" aria-hidden="true">
+      <div class="pitch-transition__curtain pitch-transition__curtain--top"></div>
+      <div class="pitch-transition__line"></div>
+      <div class="pitch-transition__ball"></div>
+      <div class="pitch-transition__curtain pitch-transition__curtain--bottom"></div>
+    </div>
   </body>
 </html>

@@ -3,10 +3,18 @@ from playwright.sync_api import sync_playwright, expect
 BASE_URL = 'http://127.0.0.1:4173/?testMode=1#tour'
 
 
+def sign_in(page):
+    page.fill('#email', 'student@example.test')
+    page.fill('#password', 'secret')
+    page.click('#login-button')
+    page.wait_for_selector('#session-panel', state='hidden')
+
+
 def verify_mobile_drawer(browser):
     page = browser.new_page(viewport={"width": 390, "height": 844})
     page.goto(BASE_URL)
-    page.wait_for_load_state('networkidle')
+    page.wait_for_load_state('domcontentloaded')
+    sign_in(page)
 
     toggle = page.locator('#route-drawer-toggle')
     track = page.locator('#route-nav-track')
@@ -42,7 +50,8 @@ def verify_mobile_drawer(browser):
 def verify_desktop_navigation(browser):
     page = browser.new_page(viewport={"width": 1366, "height": 768})
     page.goto(BASE_URL)
-    page.wait_for_load_state('networkidle')
+    page.wait_for_load_state('domcontentloaded')
+    sign_in(page)
 
     expect(page.locator('#route-drawer-toggle')).to_be_hidden()
     expect(page.locator('#route-nav-track')).to_be_visible()
@@ -58,3 +67,4 @@ with sync_playwright() as playwright:
     verify_desktop_navigation(browser)
     print('MOBILE_DRAWER_AUDIT_PASS mobile=390 desktop=1366 escape=restores-focus route=group-matrix')
     browser.close()
+

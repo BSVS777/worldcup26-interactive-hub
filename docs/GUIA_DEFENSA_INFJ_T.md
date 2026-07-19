@@ -196,3 +196,4 @@ Tecnica: `tools/app-server.mjs`, `tools/security-headers-audit.py`, `docs/SECURI
 - Validacion del flujo autenticado `/auth/authenticate` contra la API viva: ejecutar `npm run test:live-api:auth` con credenciales validas y exigir `LIVE_API_AUTH_PROBE_PASS`. Es opcional; la lectura publica ya esta verificada con `npm run test:live-api` (`LIVE_API_PUBLIC_PROBE_PASSED teams=48 games=104 groups=12 stadiums=16`).
 - El profesor debe decidir si el requisito de Bearer en cada request sigue aplicando ahora que el proveedor externo permite lectura publica sin token.
 
+

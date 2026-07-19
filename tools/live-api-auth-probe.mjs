@@ -30,6 +30,14 @@ async function readJson(response, label) {
   }
 }
 
+function sanitizeErrorPayload(payload) {
+  const text = JSON.stringify(payload ?? null);
+  return text
+    .replaceAll(EMAIL || '___NO_EMAIL___', '<email>')
+    .replaceAll(PASSWORD || '___NO_PASSWORD___', '<password>')
+    .slice(0, 240);
+}
+
 async function requestJson(fetchImpl, url, options, label) {
   const response = await fetchImpl(url, {
     ...options,
@@ -37,7 +45,13 @@ async function requestJson(fetchImpl, url, options, label) {
     signal: AbortSignal.timeout(10000)
   });
   if (!response.ok) {
-    throw new Error(`${label} failed with HTTP ${response.status}`);
+    let detail = '';
+    try {
+      detail = ` body=${sanitizeErrorPayload(await response.clone().json())}`;
+    } catch {
+      detail = '';
+    }
+    throw new Error(`${label} failed with HTTP ${response.status}${detail}`);
   }
   return readJson(response, label);
 }
@@ -81,3 +95,4 @@ async function main() {
 }
 
 await main();
+

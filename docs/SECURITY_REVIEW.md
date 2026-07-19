@@ -158,3 +158,4 @@ Sin dependencias runtime. Usa Node nativo para servidor y tests. `test/static-co
 - Agregar prueba DOM XSS dedicada.
 - Auditar secretos antes de entrega final.
 
+
