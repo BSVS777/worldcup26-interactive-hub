@@ -61,7 +61,7 @@ function scheduleUpdate() {
   ticking = true;
   requestAnimationFrame(() => {
     ticking = false;
-    for (const trigger of triggers) trigger.update();
+    for (const trigger of triggers.slice()) trigger.update();
   });
 }
 
@@ -122,6 +122,7 @@ export const ScrollTrigger = Object.freeze({
         if (visible && !entered) {
           entered = true;
           config.onEnter?.(this);
+          if (config.once) item.kill();
         }
         if (!visible && entered && rect.top > threshold) {
           entered = false;

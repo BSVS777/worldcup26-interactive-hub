@@ -8,21 +8,31 @@ const ROUTE_SELECTORS = Object.freeze({
   'group-matrix': '.matrix-card, .matrix-table tr'
 });
 
+const BAR_PALETTE = Object.freeze([
+  'var(--pitch)', 'var(--pitch)', 'var(--canopy)', 'var(--pitch)',
+  'var(--gold)', 'var(--pitch)', 'var(--pitch)', 'var(--canopy)',
+  'var(--ember)', 'var(--pitch)', 'var(--pitch)', 'var(--aqua)'
+]);
+const SWEEP_MS = 620;
+const OPEN_MS = 260;
+
 function elementsFor(document, selector) {
   if (!selector || selector.includes('::')) return [];
   return Array.from(document.querySelectorAll(selector));
 }
 
+function easeOutCubicInverse(p) {
+  return 1 - (1 - p) ** (1 / 3);
+}
+
 export function createMotionSystem(document, window) {
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
   const transition = document.getElementById('pitch-transition');
-  const ball = transition?.querySelector('.pitch-transition__ball');
-  const topCurtain = transition?.querySelector('.pitch-transition__curtain--top');
-  const bottomCurtain = transition?.querySelector('.pitch-transition__curtain--bottom');
-  const line = transition?.querySelector('.pitch-transition__line');
+  const bars = transition?.querySelector('.pitch-transition__bars');
   const hero = document.querySelector('.hero');
   const stage = document.querySelector('.module-stage');
   let lastRoute = '';
+  let closeTimer = null;
 
   document.documentElement.classList.add('has-motion-system');
   gsap.registerPlugin(ScrollTrigger);
@@ -43,18 +53,33 @@ export function createMotionSystem(document, window) {
   }
 
   function playPartingPitch() {
-    if (reduceMotion || !transition || !ball || !topCurtain || !bottomCurtain || !line) return;
+    if (reduceMotion || !transition || !bars) return;
+    window.clearTimeout(closeTimer);
     transition.classList.add('is-active');
-    gsap.set([topCurtain, bottomCurtain], { scaleY: 0 });
-    gsap.set(line, { scaleX: 0, opacity: 1 });
-    gsap.set(ball, { x: 0, rotate: 0, opacity: 1 });
-    const timeline = gsap.timeline();
-    timeline
-      .to([topCurtain, bottomCurtain], { scaleY: 1, duration: 0.16 })
-      .to(line, { scaleX: 1, duration: 0.16 })
-      .to(ball, { x: Math.max(0, window.innerWidth - 48), rotate: 760, duration: 0.62 })
-      .to([topCurtain, bottomCurtain], { scaleY: 0, duration: 0.18 })
-      .to(line, { opacity: 0, duration: 0.08, onComplete: () => transition.classList.remove('is-active') });
+
+    const width = window.innerWidth || document.documentElement.clientWidth;
+    const count = Math.max(12, Math.round(width / 56));
+    const barWidth = width / count;
+    bars.innerHTML = '';
+    const built = [];
+    for (let i = 0; i < count; i += 1) {
+      const bar = document.createElement('div');
+      bar.className = 'pitch-transition__bar';
+      bar.style.setProperty('--bar-color', BAR_PALETTE[i % BAR_PALETTE.length]);
+      bar.innerHTML =
+        '<div class="pitch-transition__bar-half pitch-transition__bar-half--top"></div>' +
+        '<div class="pitch-transition__bar-half pitch-transition__bar-half--bottom"></div>';
+      const delay = Math.round(easeOutCubicInverse(((i + 0.5) * barWidth) / width) * SWEEP_MS);
+      bar.querySelectorAll('.pitch-transition__bar-half').forEach((half) => {
+        half.style.transitionDelay = `${delay}ms`;
+      });
+      bars.appendChild(bar);
+      built.push(bar);
+    }
+
+    bars.offsetHeight;
+    requestAnimationFrame(() => built.forEach((bar) => bar.classList.add('is-open')));
+    closeTimer = window.setTimeout(() => transition.classList.remove('is-active'), SWEEP_MS + OPEN_MS + 80);
   }
 
   function animateRoute(route, { transition: shouldTransition = false } = {}) {
@@ -78,7 +103,7 @@ export function createMotionSystem(document, window) {
   if (!reduceMotion) {
     reveal(Array.from(document.querySelectorAll('.brand, .site-header__edition, .route-nav a')), { y: -10, stagger: 0.04 });
     ScrollTrigger.create({ trigger: hero, onEnter: () => reveal(Array.from(document.querySelectorAll('.hero__marker, .hero h1, .hero__description, .hero__scoreboard')), { y: 24, stagger: 0.08 }) });
-    ScrollTrigger.create({ trigger: stage, onEnter: () => playPartingPitch() });
+    ScrollTrigger.create({ trigger: stage, once: true, onEnter: () => playPartingPitch() });
     ScrollTrigger.create({ trigger: stage, onEnter: () => reveal(Array.from(stage.querySelectorAll('.module-stage__header > *, .module-placeholder')), { y: 18, stagger: 0.04 }) });
   }
 
