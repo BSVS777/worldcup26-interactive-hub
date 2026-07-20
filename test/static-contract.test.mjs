@@ -44,6 +44,7 @@ test('embedded sign-in uses section semantics and exposes accessibility hooks', 
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   const app = await readFile(new URL('../js/app.js', import.meta.url), 'utf8');
   const ui = await readFile(new URL('../js/ui.js', import.meta.url), 'utf8');
+  const accessibility = await readFile(new URL('../js/accessibility.js', import.meta.url), 'utf8');
   assert.match(html, /<section id="session-panel"[^>]*aria-labelledby="session-title"/);
   assert.doesNotMatch(html, /id="session-panel"[^>]*role="dialog"/);
   assert.match(html, /id="app-status"[^>]*role="status"[^>]*aria-live="polite"/);
@@ -52,9 +53,10 @@ test('embedded sign-in uses section semantics and exposes accessibility hooks', 
   assert.match(ui, /getElementById\('main-content'\)|requireElement\(document, 'main-content'/);
   assert.match(ui, /setAttribute\('role', 'dialog'\)/);
   assert.match(ui, /setAttribute\('aria-modal', 'true'\)/);
-  assert.match(ui, /element\.inert = inert/);
+  assert.match(ui, /setInert\(element, active\)/);
+  assert.match(accessibility, /element\.inert = inert/);
   assert.match(ui, /addEventListener\('keydown'/);
-  assert.match(ui, /event\.key !== 'Tab'/);
+  assert.match(accessibility, /event\.key !== 'Tab'/);
 });
 
 test('session expiration resets module views before focusing the recovery panel', async () => {

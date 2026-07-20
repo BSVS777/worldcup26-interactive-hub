@@ -1,5 +1,6 @@
 import { requireElement } from './dom.js';
 import { MODULE_ROUTES } from './router.js';
+import { setInert, trapTabKey } from './accessibility.js';
 
 const MODULE_COPY = Object.freeze({
   tour: Object.freeze({
@@ -60,21 +61,11 @@ export function createShellView(document, { onLogin }) {
     document.querySelector('.site-header'),
     document.querySelector('.route-nav'),
     requireElement(document, 'main-content', 'shell element'),
-    document.querySelector('.site-footer')
+    document.querySelector('.site-footer'),
+    document.getElementById('a11y-widget')
   ].filter(Boolean);
   let sessionModalActive = false;
   let drawerRestoreFocus = null;
-
-  function setElementInert(element, inert) {
-    element.inert = inert;
-    if (inert) element.setAttribute('aria-hidden', 'true');
-    else element.removeAttribute('aria-hidden');
-  }
-
-  function getFocusableSessionElements() {
-    return [...elements.sessionPanel.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
-      .filter((element) => !element.hidden && element.getAttribute('aria-hidden') !== 'true');
-  }
 
   function setSessionModal(active) {
     sessionModalActive = active;
@@ -85,7 +76,7 @@ export function createShellView(document, { onLogin }) {
       elements.sessionPanel.removeAttribute('role');
       elements.sessionPanel.removeAttribute('aria-modal');
     }
-    for (const element of modalSiblings) setElementInert(element, active);
+    for (const element of modalSiblings) setInert(element, active);
   }
 
   function setDrawerOpen(open, { restoreFocus = false } = {}) {
@@ -113,21 +104,8 @@ export function createShellView(document, { onLogin }) {
     setDrawerOpen(false, { restoreFocus: true });
   });
   elements.sessionPanel.addEventListener('keydown', (event) => {
-    if (!sessionModalActive || event.key !== 'Tab') return;
-    const focusable = getFocusableSessionElements();
-    if (focusable.length === 0) {
-      event.preventDefault();
-      return;
-    }
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
+    if (!sessionModalActive) return;
+    trapTabKey(elements.sessionPanel, event);
   });
 
   elements.loginForm.addEventListener('submit', async (event) => {

@@ -26,7 +26,11 @@ function easeOutCubicInverse(p) {
 }
 
 export function createMotionSystem(document, window) {
-  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+  function isReduceMotion() {
+    return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+      || document.documentElement.dataset.reduceMotion === 'true';
+  }
+  const reduceMotion = isReduceMotion();
   const transition = document.getElementById('pitch-transition');
   const bars = transition?.querySelector('.pitch-transition__bars');
   const hero = document.querySelector('.hero');
@@ -38,7 +42,7 @@ export function createMotionSystem(document, window) {
   gsap.registerPlugin(ScrollTrigger);
 
   function reveal(elements, options = {}) {
-    if (reduceMotion || elements.length === 0) return;
+    if (isReduceMotion() || elements.length === 0) return;
     gsap.fromTo(elements, {
       opacity: 0,
       y: options.y ?? 18,
@@ -53,7 +57,7 @@ export function createMotionSystem(document, window) {
   }
 
   function playPartingPitch() {
-    if (reduceMotion || !transition || !bars) return;
+    if (isReduceMotion() || !transition || !bars) return;
     window.clearTimeout(closeTimer);
     transition.classList.add('is-active');
 
@@ -103,7 +107,6 @@ export function createMotionSystem(document, window) {
   if (!reduceMotion) {
     reveal(Array.from(document.querySelectorAll('.brand, .site-header__edition, .route-nav a')), { y: -10, stagger: 0.04 });
     ScrollTrigger.create({ trigger: hero, onEnter: () => reveal(Array.from(document.querySelectorAll('.hero__marker, .hero h1, .hero__description, .hero__scoreboard')), { y: 24, stagger: 0.08 }) });
-    ScrollTrigger.create({ trigger: stage, once: true, onEnter: () => playPartingPitch() });
     ScrollTrigger.create({ trigger: stage, onEnter: () => reveal(Array.from(stage.querySelectorAll('.module-stage__header > *, .module-placeholder')), { y: 18, stagger: 0.04 }) });
   }
 

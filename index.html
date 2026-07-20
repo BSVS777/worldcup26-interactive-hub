@@ -59,7 +59,7 @@
             <p class="eyebrow">Current view</p>
             <h2 id="module-heading">Venue map and match list</h2>
           </div>
-          <span id="module-status" class="stage-status">Shell ready</span>
+          <span id="module-status" class="stage-status" role="status">Shell ready</span>
         </header>
         <div id="module-placeholder" class="module-placeholder">
           <p class="module-placeholder__label">This gate is being prepared</p>
@@ -130,6 +130,65 @@
 
     <div id="pitch-transition" class="pitch-transition" aria-hidden="true">
       <div class="pitch-transition__bars"></div>
+    </div>
+
+    <div id="a11y-widget" class="a11y-widget">
+      <button id="a11y-toggle" type="button" class="a11y-toggle" aria-haspopup="dialog" aria-expanded="false" aria-controls="a11y-panel">
+        <svg class="a11y-toggle__icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="5" r="2.3" fill="currentColor" />
+          <rect x="5" y="9" width="14" height="2.4" rx="1.2" fill="currentColor" />
+          <rect x="10.8" y="9" width="2.4" height="12" rx="1.2" fill="currentColor" />
+          <rect x="7.5" y="16.3" width="2.4" height="6.6" rx="1.2" fill="currentColor" transform="rotate(-18 8.7 16.3)" />
+          <rect x="14.1" y="16.3" width="2.4" height="6.6" rx="1.2" fill="currentColor" transform="rotate(18 15.3 16.3)" />
+        </svg>
+        <span class="sr-only">Accessibility settings</span>
+      </button>
+
+      <div id="a11y-panel" class="a11y-panel" role="dialog" aria-modal="true" aria-labelledby="a11y-panel-title" hidden>
+        <div class="a11y-panel__header">
+          <p id="a11y-panel-title" class="a11y-panel__title">Accessibility</p>
+          <button id="a11y-panel-close" type="button" class="a11y-panel__close" aria-label="Close accessibility settings">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+              <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+              <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <p class="a11y-panel__hint">Adjust how Global Match Theatre looks and moves. Changes save to this device.</p>
+        <ul class="a11y-panel__list">
+          <li class="a11y-panel__row">
+            <span id="a11y-label-large-text" class="a11y-panel__label">Large text</span>
+            <button type="button" id="a11y-toggle-large-text" class="a11y-switch" role="switch" aria-checked="false" aria-labelledby="a11y-label-large-text">
+              <span class="a11y-switch__track"><span class="a11y-switch__thumb"></span></span>
+            </button>
+          </li>
+          <li class="a11y-panel__row">
+            <span id="a11y-label-high-contrast" class="a11y-panel__label">High contrast</span>
+            <button type="button" id="a11y-toggle-high-contrast" class="a11y-switch" role="switch" aria-checked="false" aria-labelledby="a11y-label-high-contrast">
+              <span class="a11y-switch__track"><span class="a11y-switch__thumb"></span></span>
+            </button>
+          </li>
+          <li class="a11y-panel__row">
+            <span id="a11y-label-reduce-transparency" class="a11y-panel__label">Reduce transparency</span>
+            <button type="button" id="a11y-toggle-reduce-transparency" class="a11y-switch" role="switch" aria-checked="false" aria-labelledby="a11y-label-reduce-transparency">
+              <span class="a11y-switch__track"><span class="a11y-switch__thumb"></span></span>
+            </button>
+          </li>
+          <li class="a11y-panel__row">
+            <span id="a11y-label-reduce-motion" class="a11y-panel__label">Reduce motion</span>
+            <button type="button" id="a11y-toggle-reduce-motion" class="a11y-switch" role="switch" aria-checked="false" aria-labelledby="a11y-label-reduce-motion">
+              <span class="a11y-switch__track"><span class="a11y-switch__thumb"></span></span>
+            </button>
+          </li>
+          <li class="a11y-panel__row">
+            <span id="a11y-label-underline-links" class="a11y-panel__label">Underline links</span>
+            <button type="button" id="a11y-toggle-underline-links" class="a11y-switch" role="switch" aria-checked="false" aria-labelledby="a11y-label-underline-links">
+              <span class="a11y-switch__track"><span class="a11y-switch__thumb"></span></span>
+            </button>
+          </li>
+        </ul>
+        <button id="a11y-reset" type="button" class="a11y-panel__reset">Reset to defaults</button>
+      </div>
     </div>
   </body>
 </html>

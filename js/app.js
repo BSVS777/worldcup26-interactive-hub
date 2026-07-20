@@ -3,6 +3,7 @@ import { resolveApiBaseUrl } from './config.js';
 import { describeLoginError } from './login-feedback.js';
 import { createInitialViewState, normalizeRoute, reduceViewState } from './router.js';
 import { applyAccessibilityPreferences, readAccessibilityPreferences } from './accessibility.js';
+import { createAccessibilityPanel } from './accessibility-panel.js';
 import { createAuthStore } from './auth.js';
 import { createTourView } from './tour-view.js';
 import { createAgendaView } from './agenda-view.js';
@@ -77,6 +78,7 @@ async function handleLogin(credentials) {
 
 view = createShellView(document, { onLogin: handleLogin });
 motion = createMotionSystem(document, window);
+createAccessibilityPanel(document, window, { storage: window.localStorage });
 view.render(state);
 motion.animateRoute(state.route);
 loadActiveModule();
