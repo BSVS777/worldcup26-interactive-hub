@@ -14,7 +14,8 @@ const MIME_TYPES = Object.freeze({
   '.css': 'text/css; charset=utf-8',
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
-  '.svg': 'image/svg+xml'
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png'
 });
 const SECURITY_HEADERS = Object.freeze({
   'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' http://127.0.0.1:4174; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
@@ -47,17 +48,20 @@ export function resolveRequestPath(requestUrl = '/') {
   const isPublicAsset = relativePath === 'index.html'
     || relativePath === 'favicon.svg'
     || relativePath.startsWith('css/')
-    || relativePath.startsWith('js/');
+    || relativePath.startsWith('js/')
+    || relativePath.startsWith('frames/');
   if (!isPublicAsset) return null;
   const filePath = resolve(ROOT, relativePath);
   const indexPath = resolve(ROOT, 'index.html');
   const faviconPath = resolve(ROOT, 'favicon.svg');
   const cssRoot = resolve(ROOT, 'css');
   const jsRoot = resolve(ROOT, 'js');
+  const framesRoot = resolve(ROOT, 'frames');
   const isCanonicalPublicAsset = filePath === indexPath
     || filePath === faviconPath
     || filePath.startsWith(`${cssRoot}${sep}`)
-    || filePath.startsWith(`${jsRoot}${sep}`);
+    || filePath.startsWith(`${jsRoot}${sep}`)
+    || filePath.startsWith(`${framesRoot}${sep}`);
   if (!isCanonicalPublicAsset) return null;
   return filePath;
 }

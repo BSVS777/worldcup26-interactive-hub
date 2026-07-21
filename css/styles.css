@@ -1188,6 +1188,24 @@ main {
   opacity: 0;
 }
 
+.pitch-transition__logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: clamp(96px, 16vw, 200px);
+  height: clamp(96px, 16vw, 200px);
+  transform: translate(-50%, -50%) scale(0.82);
+  opacity: 0;
+  filter: drop-shadow(0 0 24px color-mix(in srgb, var(--gold) 45%, transparent));
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.pitch-transition__logo.is-active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

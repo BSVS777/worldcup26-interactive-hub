@@ -13,8 +13,19 @@ const BAR_PALETTE = Object.freeze([
   'var(--gold)', 'var(--pitch)', 'var(--pitch)', 'var(--canopy)',
   'var(--ember)', 'var(--pitch)', 'var(--pitch)', 'var(--aqua)'
 ]);
-const SWEEP_MS = 620;
-const OPEN_MS = 260;
+const SWEEP_MS = 1500;
+const OPEN_MS = 630;
+const LOGO_FRAME_MS = 45;
+const LOGO_FRAME_COUNT = 18;
+const LOGO_SOURCE_FRAME_TOTAL = 30;
+// logo intentionally finishes and fades before the slower curtain does — fade-out is driven by
+// the CSS transition on .pitch-transition__logo (280ms)
+const LOGO_FRAMES = Object.freeze(
+  Array.from({ length: LOGO_FRAME_COUNT }, (_, i) => {
+    const frame = Math.round(1 + (i * (LOGO_SOURCE_FRAME_TOTAL - 1)) / (LOGO_FRAME_COUNT - 1));
+    return `frames/${String(frame).padStart(2, '0')}.png`;
+  })
+);
 
 function elementsFor(document, selector) {
   if (!selector || selector.includes('::')) return [];
@@ -33,10 +44,13 @@ export function createMotionSystem(document, window) {
   const reduceMotion = isReduceMotion();
   const transition = document.getElementById('pitch-transition');
   const bars = transition?.querySelector('.pitch-transition__bars');
+  const logo = document.getElementById('pitch-transition-logo');
   const hero = document.querySelector('.hero');
   const stage = document.querySelector('.module-stage');
   let lastRoute = '';
   let closeTimer = null;
+  let logoTimer = null;
+  let logoFadeTimer = null;
 
   document.documentElement.classList.add('has-motion-system');
   gsap.registerPlugin(ScrollTrigger);
@@ -56,10 +70,30 @@ export function createMotionSystem(document, window) {
     });
   }
 
+  function playLogoSpin() {
+    if (!logo) return;
+    window.clearInterval(logoTimer);
+    window.clearTimeout(logoFadeTimer);
+    let frame = 0;
+    logo.src = LOGO_FRAMES[0];
+    logo.classList.add('is-active');
+    logoTimer = window.setInterval(() => {
+      frame += 1;
+      if (frame >= LOGO_FRAMES.length) {
+        window.clearInterval(logoTimer);
+        return;
+      }
+      logo.src = LOGO_FRAMES[frame];
+    }, LOGO_FRAME_MS);
+    const spinDuration = LOGO_FRAMES.length * LOGO_FRAME_MS;
+    logoFadeTimer = window.setTimeout(() => logo.classList.remove('is-active'), spinDuration);
+  }
+
   function playPartingPitch() {
     if (isReduceMotion() || !transition || !bars) return;
     window.clearTimeout(closeTimer);
     transition.classList.add('is-active');
+    playLogoSpin();
 
     const width = window.innerWidth || document.documentElement.clientWidth;
     const count = Math.max(12, Math.round(width / 56));
@@ -83,7 +117,10 @@ export function createMotionSystem(document, window) {
 
     bars.offsetHeight;
     requestAnimationFrame(() => built.forEach((bar) => bar.classList.add('is-open')));
-    closeTimer = window.setTimeout(() => transition.classList.remove('is-active'), SWEEP_MS + OPEN_MS + 80);
+    closeTimer = window.setTimeout(() => {
+      transition.classList.remove('is-active');
+      window.clearInterval(logoTimer);
+    }, SWEEP_MS + OPEN_MS + 80);
   }
 
   function animateRoute(route, { transition: shouldTransition = false } = {}) {
