@@ -48,7 +48,11 @@ Implementado modal dinamico de sesion expirada con `role="dialog"`, `aria-modal`
 
 ## Contraste
 
-Medicion numerica parcial implementada para Dashboard del Fanatico y foco: `test/accessibility-contrast.test.mjs` verifica texto principal, labels, status banner y foco contra umbrales WCAG AA. La tematizacion del favorito usa paleta local con variables `--fan-primary`, `--fan-accent` y `--fan-contrast`, no colores remotos de API. Queda pendiente auditoria manual completa de todos los modulos.
+Medicion numerica implementada para Dashboard del Fanatico y foco: `test/accessibility-contrast.test.mjs` verifica texto principal, labels, status banner y foco contra umbrales WCAG AA, incluyendo ahora las 6 paletas reales de `FAN_THEME_PALETTES` (no solo los valores por defecto de `:root`) contra los fondos donde efectivamente se renderizan.
+
+Bug encontrado y corregido en esta pasada: `.fan-summary` (nombre del equipo, texto grande) heredaba el fondo oscuro de `body` sin ningun contenedor claro debajo, y `--fan-primary` esta disenado para leerse sobre fondos claros. Las 6 paletas fallaban WCAG AA (ratios 1.88-2.41, bajo el 3:1 minimo para texto grande). Se agrego `.fan-summary` al mismo fondo tipo tarjeta que ya usan `.status-banner`/`.fan-metrics` (`css/styles.css`); las 6 paletas ahora dan 7.08-9.10:1. Verificado con el nuevo test y con `tools/fan-theme-audit.py`, `tools/responsive-audit.py` y `tools/zoom-reflow-audit.py` en verde.
+
+Queda pendiente auditoria manual completa (lector de pantalla real) de todos los modulos; la medicion numerica cubre el resto del contraste de texto.
 
 ## Motion
 
@@ -108,5 +112,5 @@ Implementada con tablas nativas, caption, encabezados de columna, encabezados de
 ## Gaps pendientes
 
 - Zoom con lector de pantalla.
-- Contraste AA manual completo en todos los modulos.
+- Sesion real con NVDA/VoiceOver (unico gap sin cobertura automatizada; ver nota abajo).
 

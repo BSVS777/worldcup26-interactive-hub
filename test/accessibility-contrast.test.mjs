@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { createFanTheme } from '../js/fan-dashboard.js';
 
 function hexToRgb(hex) {
   const value = hex.replace('#', '');
@@ -50,5 +51,28 @@ test('fan dashboard color pairs meet WCAG AA contrast thresholds', async () => {
     assert.ok(foreground, name + ' foreground token exists');
     assert.ok(background, name + ' background token exists');
     assert.ok(contrastRatio(foreground, background) >= threshold, name + ' contrast is below WCAG threshold');
+  }
+});
+
+test('every fan team theme palette meets WCAG AA contrast on its real card backgrounds', () => {
+  const cardBackground = '#f7f2df'; // darker stop of the .ui-card/.fan-summary gradient background
+  const sampleNames = [
+    'Argentina', 'Brazil', 'Canada', 'Mexico', 'USA', 'France', 'Germany', 'Spain',
+    'Portugal', 'Japan', 'Korea', 'Morocco', 'Senegal', 'Nigeria', 'Ghana', 'Egypt',
+    'Croatia', 'Belgium', 'Netherlands', 'England', 'Italy', 'Uruguay', 'Chile', 'Colombia'
+  ];
+  const seen = new Map();
+  sampleNames.forEach((name, id) => {
+    const theme = createFanTheme({ id: String(id), name });
+    seen.set(theme.primary, theme);
+  });
+  assert.equal(seen.size, 6, 'expected to discover all 6 fan theme palettes across this team name sample');
+
+  for (const theme of seen.values()) {
+    const summaryRatio = contrastRatio(theme.primary, cardBackground);
+    assert.ok(summaryRatio >= 4.5, `fan-summary/fan-metrics dt text ${theme.primary} on card background is below WCAG AA (${summaryRatio.toFixed(2)})`);
+
+    const bannerRatio = contrastRatio(theme.contrast, theme.accent);
+    assert.ok(bannerRatio >= 4.5, `status banner text ${theme.contrast} on accent ${theme.accent} is below WCAG AA (${bannerRatio.toFixed(2)})`);
   }
 });
