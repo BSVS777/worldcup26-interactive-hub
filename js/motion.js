@@ -15,17 +15,27 @@ const BAR_PALETTE = Object.freeze([
 ]);
 const SWEEP_MS = 1500;
 const OPEN_MS = 630;
-const LOGO_FRAME_MS = 45;
-const LOGO_FRAME_COUNT = 18;
-const LOGO_SOURCE_FRAME_TOTAL = 30;
-// logo intentionally finishes and fades before the slower curtain does — fade-out is driven by
-// the CSS transition on .pitch-transition__logo (280ms)
+// must match the .pitch-transition__bar-half transition duration in styles.css
+const BAR_TRANSITION_MS = 260;
+// must match the .pitch-transition__logo transition duration in styles.css
+const LOGO_FADE_MS = 280;
+const LOGO_SOURCE_FRAME_TOTAL = 31;
+// use every source frame — spreads them across the full sweep instead of subsampling
+const LOGO_FRAME_COUNT = LOGO_SOURCE_FRAME_TOTAL;
+// last bar finishes opening at SWEEP_MS + BAR_TRANSITION_MS; size the spin so the logo's
+// fade-out lands on that same moment instead of finishing early or lingering after
+const CURTAIN_OPEN_MS = SWEEP_MS + BAR_TRANSITION_MS;
+const LOGO_FRAME_MS = Math.round((CURTAIN_OPEN_MS - LOGO_FADE_MS) / (LOGO_FRAME_COUNT - 1));
 const LOGO_FRAMES = Object.freeze(
   Array.from({ length: LOGO_FRAME_COUNT }, (_, i) => {
     const frame = Math.round(1 + (i * (LOGO_SOURCE_FRAME_TOTAL - 1)) / (LOGO_FRAME_COUNT - 1));
     return `frames/${String(frame).padStart(2, '0')}.png`;
   })
 );
+// decode frames once up front so mid-spin src swaps are instant paints, not decode stalls
+if (typeof Image !== 'undefined') {
+  LOGO_FRAMES.forEach((src) => { const img = new Image(); img.src = src; });
+}
 
 function elementsFor(document, selector) {
   if (!selector || selector.includes('::')) return [];
@@ -107,7 +117,10 @@ export function createMotionSystem(document, window) {
       bar.innerHTML =
         '<div class="pitch-transition__bar-half pitch-transition__bar-half--top"></div>' +
         '<div class="pitch-transition__bar-half pitch-transition__bar-half--bottom"></div>';
-      const delay = Math.round(easeOutCubicInverse(((i + 0.5) * barWidth) / width) * SWEEP_MS);
+      // opens from both edges inward — center (where the logo sits) opens last,
+      // buying the logo the full SWEEP_MS to finish before its cover lifts
+      const closeness = 1 - Math.abs((i + 0.5) * barWidth / width - 0.5) * 2;
+      const delay = Math.round(easeOutCubicInverse(closeness) * SWEEP_MS);
       bar.querySelectorAll('.pitch-transition__bar-half').forEach((half) => {
         half.style.transitionDelay = `${delay}ms`;
       });
