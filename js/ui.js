@@ -1,5 +1,6 @@
 import { requireElement } from './dom.js';
 import { MODULE_ROUTES } from './router.js';
+import { ENDPOINTS } from './config.js';
 import { setInert, trapTabKey } from './accessibility.js';
 
 const MODULE_COPY = Object.freeze({
@@ -52,6 +53,7 @@ export function createShellView(document, { onLogin }) {
     loginButton: requireElement(document, 'login-button', 'shell element'),
     loginStatus: requireElement(document, 'login-status', 'shell element'),
     appStatus: requireElement(document, 'app-status', 'shell element'),
+    retryStatus: requireElement(document, 'retry-status', 'shell element'),
     emailInput: requireElement(document, 'email', 'shell element'),
     routeNav: document.querySelector('.route-nav'),
     routeDrawerToggle: requireElement(document, 'route-drawer-toggle', 'shell element')
@@ -174,5 +176,17 @@ export function createShellView(document, { onLogin }) {
     requireElement(document, 'main-content').focus();
   }
 
-  return Object.freeze({ render, focusSession, focusCurrentView });
+  function renderRetryStatus(snapshot) {
+    if (!snapshot || snapshot.silent || snapshot.secondsRemaining <= 0) {
+      elements.retryStatus.hidden = true;
+      elements.retryStatus.textContent = '';
+      return;
+    }
+    const path = ENDPOINTS[snapshot.endpoint]?.path ?? snapshot.endpoint;
+    const cause = snapshot.status ? `responded ${snapshot.status}` : 'could not be reached';
+    elements.retryStatus.hidden = false;
+    elements.retryStatus.textContent = `GET ${path} ${cause}. Retrying in ${snapshot.secondsRemaining}s.`;
+  }
+
+  return Object.freeze({ render, focusSession, focusCurrentView, renderRetryStatus });
 }

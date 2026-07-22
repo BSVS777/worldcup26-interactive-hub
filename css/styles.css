@@ -1096,6 +1096,12 @@ main {
   font-size: 0.88rem;
 }
 
+.retry-status {
+  max-width: var(--max-width);
+  margin: 0.75rem auto 0;
+  padding: 0.6rem 0.85rem;
+}
+
 .site-footer {
   display: flex;
   justify-content: space-between;

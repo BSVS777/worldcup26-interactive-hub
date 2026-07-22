@@ -4,6 +4,7 @@ import { normalizePayload } from './normalizers.js';
 import { createSessionStore } from './session.js';
 
 const BACKOFF_MS = Object.freeze([1000, 2000, 4000]);
+const NOOP_RETRY = () => {};
 
 export class ApiError extends Error {
   constructor(message, { status = null, endpoint = null, recoverable = true, cause } = {}) {
@@ -92,6 +93,7 @@ export function createApiClient({
   session = createSessionStore(),
   cacheStorage = globalThis.localStorage,
   onSessionExpired = () => {},
+  onRetryEvent = () => {},
   sleep = defaultSleep,
   now = () => new Date()
 } = {}) {
@@ -119,11 +121,19 @@ export function createApiClient({
     body,
     cache = ENDPOINTS[endpointKey]?.cache !== false,
     signal,
-    onRetry = () => {},
+    onRetry = NOOP_RETRY,
     forceRetry = false
   } = {}) {
     if (!Object.hasOwn(ENDPOINTS, endpointKey) || typeof path !== 'string' || typeof method !== 'string') {
       throw new TypeError(`Unknown data endpoint: ${endpointKey}`);
+    }
+
+    // Views that pass their own onRetry (Timeline) already render a
+    // dedicated countdown, so the shell's global banner stays silent for
+    // their events instead of showing a contradictory duplicate.
+    async function emitRetry(event) {
+      await onRetry(event);
+      await onRetryEvent({ ...event, silent: onRetry !== NOOP_RETRY });
     }
 
     // The deployed API allows public GET access to these endpoints, so a
@@ -148,7 +158,7 @@ export function createApiClient({
         if (cause?.name === 'AbortError') throw cause;
         if (forceRetry && attempt < 4) {
           const delayMs = BACKOFF_MS[attempt - 1];
-          await onRetry({
+          await emitRetry({
             endpoint: endpointKey,
             status: null,
             attempt,
@@ -212,7 +222,7 @@ export function createApiClient({
         ? retryAfterMilliseconds(response.headers.get('retry-after'), now)
         : 0;
       const delayMs = Math.max(backoffMs, retryAfterMs);
-      await onRetry({ endpoint: endpointKey, status: response.status, attempt, nextAttempt: attempt + 1, delayMs });
+      await emitRetry({ endpoint: endpointKey, status: response.status, attempt, nextAttempt: attempt + 1, delayMs });
       await sleep(delayMs, signal);
     }
 

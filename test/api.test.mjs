@@ -544,3 +544,49 @@ test('forceRetry preserves a typed network error after exhaustion without cache'
   ));
   assert.equal(calls, 4);
 });
+
+test('emits a non-silent global retry event for a module that never passes its own onRetry (Tour/Agenda/Dashboard/Matrix)', async () => {
+  const statuses = [429, 200];
+  const globalEvents = [];
+  const { client } = setup(async () => {
+    const status = statuses.shift();
+    return status === 200 ? jsonResponse(200, { stadiums: [] }) : jsonResponse(429, {}, { 'retry-after': '1' });
+  }, { onRetryEvent: (event) => globalEvents.push(event) });
+
+  await client.apiRequest('stadiums');
+  assert.equal(globalEvents.length, 1);
+  assert.deepEqual(
+    { endpoint: globalEvents[0].endpoint, status: globalEvents[0].status, silent: globalEvents[0].silent },
+    { endpoint: 'stadiums', status: 429, silent: false }
+  );
+});
+
+test('emits a silent global retry event when the caller already renders its own countdown (Timeline)', async () => {
+  const statuses = [500, 200];
+  const globalEvents = [];
+  const { client } = setup(async () => {
+    const status = statuses.shift();
+    return status === 200 ? jsonResponse(200, { games: [] }) : jsonResponse(500, {});
+  }, { onRetryEvent: (event) => globalEvents.push(event) });
+
+  await client.apiRequest('games', { onRetry: () => {} });
+  assert.equal(globalEvents.length, 1);
+  assert.equal(globalEvents[0].silent, true, 'a caller-supplied onRetry means the shell must not duplicate the countdown');
+});
+
+test('emits a global retry event for forceRetry network-failure backoff too, not only HTTP 429/500', async () => {
+  let calls = 0;
+  const globalEvents = [];
+  const { client } = setup(async () => {
+    calls += 1;
+    if (calls < 2) throw new TypeError('offline');
+    return jsonResponse(200, { games: [] });
+  }, { onRetryEvent: (event) => globalEvents.push(event) });
+
+  await client.apiRequest('games', { forceRetry: true });
+  assert.equal(globalEvents.length, 1);
+  assert.deepEqual(
+    { endpoint: globalEvents[0].endpoint, status: globalEvents[0].status, silent: globalEvents[0].silent },
+    { endpoint: 'games', status: null, silent: false }
+  );
+});

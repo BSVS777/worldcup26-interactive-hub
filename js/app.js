@@ -1,4 +1,5 @@
 import { createApiClient } from './api.js';
+import { createRetryStatusController } from './retry-status.js';
 import { resolveApiBaseUrl } from './config.js';
 import { describeLoginError } from './login-feedback.js';
 import { createInitialViewState, normalizeRoute, reduceViewState } from './router.js';
@@ -29,10 +30,15 @@ function update(action, options) {
   motion?.animateRoute(state.route, { transition: Boolean(options?.announce) });
 }
 
+const retryStatus = createRetryStatusController({
+  onChange: (snapshot) => view.renderRetryStatus(snapshot)
+});
+
 const api = createApiClient({
   baseUrl: resolveApiBaseUrl(window.location),
   session,
   cacheStorage: window.localStorage,
+  onRetryEvent: retryStatus.notify,
   async onSessionExpired() {
     resetModuleViews();
     update({ type: 'SESSION_EXPIRED' });
@@ -47,6 +53,7 @@ const fanDashboardView = createFanDashboardView(document, api);
 const matrixView = createMatrixView(document, api);
 
 function resetModuleViews() {
+  retryStatus.clear();
   tourView.reset();
   agendaView.reset();
   timelineView.reset();

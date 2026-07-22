@@ -72,6 +72,33 @@ def verify_retry_status(browser, status_code, label):
     context.close()
 
 
+def verify_global_retry_banner(browser):
+    context = browser.new_context(viewport={"width": 390, "height": 844})
+    page = context.new_page()
+    console_errors = []
+    page.on('console', lambda msg: console_errors.append(msg.text) if msg.type == 'error' and not msg.text.startswith('Failed to load resource:') else None)
+    attempts = {'count': 0}
+
+    def handle_stadiums(route):
+        attempts['count'] += 1
+        if attempts['count'] == 1:
+            route.fulfill(status=429, content_type='application/json', headers={'Retry-After': '1'}, body='{"message":"forced 429"}')
+            return
+        route.continue_()
+
+    page.route('**/get/stadiums', handle_stadiums)
+    page.goto(BASE_URL + '#tour')
+    page.wait_for_load_state('networkidle')
+    sign_in(page)
+    expect(page.locator('#retry-status')).to_contain_text('GET /get/stadiums responded 429')
+    expect(page.locator('#retry-status')).to_be_visible()
+    page.wait_for_selector('#retry-status', state='hidden')
+    if attempts['count'] < 2:
+        raise AssertionError(f'Expected Tour stadiums retry, got {attempts["count"]} attempts')
+    assert_no_console_errors(console_errors, 'global retry banner for a non-Timeline module')
+    context.close()
+
+
 def verify_cache_fallback(browser):
     context = browser.new_context(viewport={"width": 390, "height": 844})
     page = context.new_page()
@@ -105,6 +132,7 @@ with sync_playwright() as playwright:
     browser = playwright.chromium.launch(headless=True)
     verify_retry_status(browser, 429, '429 retry')
     verify_retry_status(browser, 500, '500 retry')
+    verify_global_retry_banner(browser)
     verify_cache_fallback(browser)
-    print('API_RESILIENCE_AUDIT_PASS retry=429,500 cache_fallback=agenda-cached-data')
+    print('API_RESILIENCE_AUDIT_PASS retry=429,500 cache_fallback=agenda-cached-data global_retry_banner=tour-stadiums')
     browser.close()
