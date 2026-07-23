@@ -62,7 +62,7 @@ export function createAgendaView(document, api) {
     } else {
       elements.dateLabel.textContent = state.gamesFailed
         ? 'Match schedule unavailable right now.'
-        : 'No simultaneous matchdays yet.';
+        : 'No matches scheduled yet.';
     }
   }
 

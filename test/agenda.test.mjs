@@ -19,10 +19,10 @@ const games = [
   { id: 'g5', localDate: '2026-06-13T15:00:00', homeTeamId: 't1', awayTeamId: 't4', homeScore: 2, awayScore: 0, played: true }
 ];
 
-test('groups games by normalized local date and drops dates with fewer than two matches', () => {
+test('groups games by normalized local date and keeps single-match dates (e.g. semifinals/final)', () => {
   const state = reduceAgendaState(createInitialAgendaState(), { type: 'DATA_LOADED', games, teams });
-  assert.deepEqual(state.dates.map((entry) => entry.date), ['2026-06-11', '2026-06-13']);
-  assert.equal(state.dates.find((entry) => entry.date === '2026-06-12'), undefined);
+  assert.deepEqual(state.dates.map((entry) => entry.date), ['2026-06-11', '2026-06-12', '2026-06-13']);
+  assert.equal(state.dates.find((entry) => entry.date === '2026-06-12').games.length, 1);
 });
 
 test('strips a time-of-day suffix so same-day games with different timestamps still group together', () => {
@@ -43,15 +43,19 @@ test('cross-references home and away team ids with real team names', () => {
 test('retained dates are sorted chronologically', () => {
   const reversedGames = [...games].reverse();
   const state = reduceAgendaState(createInitialAgendaState(), { type: 'DATA_LOADED', games: reversedGames, teams });
-  assert.deepEqual(state.dates.map((entry) => entry.date), ['2026-06-11', '2026-06-13']);
+  assert.deepEqual(state.dates.map((entry) => entry.date), ['2026-06-11', '2026-06-12', '2026-06-13']);
 });
 
 test('DATE_NEXT advances the cursor and is a no-op once the last retained date is reached', () => {
   const loaded = reduceAgendaState(createInitialAgendaState(), { type: 'DATA_LOADED', games, teams });
   const next = reduceAgendaState(loaded, { type: 'DATE_NEXT' });
   assert.equal(next.currentIndex, 1);
-  const pastEnd = reduceAgendaState(next, { type: 'DATE_NEXT' });
-  assert.equal(pastEnd, next);
+  const lastIndex = loaded.dates.length - 1;
+  let atEnd = loaded;
+  for (let i = 0; i < lastIndex; i += 1) atEnd = reduceAgendaState(atEnd, { type: 'DATE_NEXT' });
+  assert.equal(atEnd.currentIndex, lastIndex);
+  const pastEnd = reduceAgendaState(atEnd, { type: 'DATE_NEXT' });
+  assert.equal(pastEnd, atEnd);
 });
 
 test('DATE_PREV retreats the cursor and is a no-op at the first retained date', () => {
@@ -76,7 +80,7 @@ test('a failed teams fetch keeps games grouped but marks team names unavailable'
     type: 'DATA_LOADED', games, teams: [], teamsFailed: true
   });
   assert.equal(state.teamsFailed, true);
-  assert.equal(state.dates.length, 2);
+  assert.equal(state.dates.length, 3);
   for (const entry of state.dates) {
     for (const game of entry.games) {
       assert.equal(game.homeTeamName, null);
@@ -85,14 +89,15 @@ test('a failed teams fetch keeps games grouped but marks team names unavailable'
   }
 });
 
-test('a successful fetch that legitimately has no simultaneous matchdays yields an empty, non-failed result', () => {
+test('single-match dates (e.g. a semifinal or the final) are kept, not dropped as "not simultaneous"', () => {
   const lonelyGames = [
     { id: 'g1', localDate: '2026-06-11', homeTeamId: 't1', awayTeamId: 't2', homeScore: null, awayScore: null, played: false },
     { id: 'g2', localDate: '2026-06-12', homeTeamId: 't3', awayTeamId: 't4', homeScore: null, awayScore: null, played: false }
   ];
   const state = reduceAgendaState(createInitialAgendaState(), { type: 'DATA_LOADED', games: lonelyGames, teams });
   assert.equal(state.gamesFailed, false);
-  assert.deepEqual(state.dates, []);
+  assert.deepEqual(state.dates.map((entry) => entry.date), ['2026-06-11', '2026-06-12']);
+  for (const entry of state.dates) assert.equal(entry.games.length, 1);
 });
 
 test('a game referencing a team id absent from a successful teams fetch falls back to "Unknown team"', () => {
@@ -264,6 +269,12 @@ test('next/prev move across retained dates and disable at each boundary, includi
   await view.ensureLoaded();
 
   nextButton.trigger('click');
+  assert.equal(dateLabel.textContent, '2026-06-12');
+  assert.equal(columns.children.length, 1, 'a single-match date (e.g. a semifinal) still renders');
+  assert.equal(nextButton.disabled, false);
+  assert.equal(prevButton.disabled, false);
+
+  nextButton.trigger('click');
   assert.equal(dateLabel.textContent, '2026-06-13');
   assert.equal(dateLabel.children[0].tagName, 'time');
   assert.equal(dateLabel.children[0].dateTime, '2026-06-13');
@@ -277,6 +288,10 @@ test('next/prev move across retained dates and disable at each boundary, includi
   nextButton.trigger('click');
   assert.equal(dateLabel.textContent, '2026-06-13');
   assert.equal(nextButton.disabled, true);
+
+  prevButton.trigger('click');
+  assert.equal(dateLabel.textContent, '2026-06-12');
+  assert.equal(prevButton.disabled, false);
 
   prevButton.trigger('click');
   assert.equal(dateLabel.textContent, '2026-06-11');
@@ -322,14 +337,11 @@ test('the loading label is distinct from the confirmed-empty label', async () =>
   const loaded = view.ensureLoaded();
   assert.equal(dateLabel.textContent, 'Loading matches…');
 
-  const lonelyGames = [
-    { id: 'g1', localDate: '2026-06-11', homeTeamId: 't1', awayTeamId: 't2', homeScore: null, awayScore: null, played: false }
-  ];
-  calls.find((c) => c.endpoint === 'games').resolve({ data: lonelyGames });
+  calls.find((c) => c.endpoint === 'games').resolve({ data: [] });
   calls.find((c) => c.endpoint === 'teams').resolve({ data: teams });
   await loaded;
 
-  assert.equal(dateLabel.textContent, 'No simultaneous matchdays yet.');
+  assert.equal(dateLabel.textContent, 'No matches scheduled yet.');
 });
 
 test('a stale in-flight load never overwrites a fresher load (race condition guard)', async () => {

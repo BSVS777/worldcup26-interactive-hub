@@ -34,15 +34,12 @@ function groupByDate(games) {
   return grouped;
 }
 
-const MIN_SIMULTANEOUS_GAMES = 2;
-
 function buildDates(games, teams, gamesFailed, teamsFailed) {
   if (gamesFailed) return Object.freeze([]);
   const teamNames = buildTeamNameLookup(teams);
   const grouped = groupByDate(games);
   return Object.freeze(
     [...grouped.entries()]
-      .filter(([, list]) => list.length >= MIN_SIMULTANEOUS_GAMES)
       .sort(([dateA], [dateB]) => (dateA < dateB ? -1 : dateA > dateB ? 1 : 0))
       .map(([date, list]) => Object.freeze({
         date,

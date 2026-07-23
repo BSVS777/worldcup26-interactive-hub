@@ -123,6 +123,16 @@ select {
   transform: translateY(0);
 }
 
+.skip-link--end {
+  top: auto;
+  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  transform: translateY(160%);
+}
+
+.skip-link--end:focus {
+  transform: translateY(0);
+}
+
 .site-header {
   position: sticky;
   top: 0;

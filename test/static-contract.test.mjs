@@ -231,7 +231,7 @@ test('document shell uses semantic landmarks and reduced inline surface', async 
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.equal((html.match(/<main\b/g) ?? []).length, 1);
   assert.match(html, /<header class="site-header">/);
-  assert.match(html, /<nav class="route-nav" aria-label="World Cup views" data-drawer-open="false">/);
+  assert.match(html, /<nav class="route-nav" id="route-nav" tabindex="-1" aria-label="World Cup views" data-drawer-open="false">/);
   assert.match(html, /id="route-drawer-toggle"[^>]*aria-controls="route-nav-track"[^>]*aria-expanded="false"/);
   assert.match(html, /<ol id="route-nav-track" class="route-nav__track">/);
   assert.match(html, /<footer class="site-footer">/);
