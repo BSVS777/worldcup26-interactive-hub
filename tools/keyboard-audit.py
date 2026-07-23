@@ -20,6 +20,27 @@ def tab_until(page, selector, limit=30):
     raise AssertionError(f'Could not reach {selector} with Tab')
 
 
+def assert_pointer_target(page, link):
+    result = link.evaluate("""
+element => {
+  const rect = element.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+  const target = document.elementFromPoint(x, y);
+  return {
+    x: Math.round(x),
+    y: Math.round(y),
+    target: target ? `${target.tagName.toLowerCase()}#${target.id}.${target.className}` : 'null',
+    matches: target === element || element.contains(target)
+  };
+}
+""")
+    if not result['matches']:
+        raise AssertionError(
+            f"Focused route link is visually covered at {result['x']},{result['y']}: {result['target']}"
+        )
+
+
 def sign_in_with_keyboard(page, wait_for_hidden=True):
     tab_until(page, '#email')
     page.keyboard.type('student@example.test')
@@ -58,6 +79,29 @@ def activate_route(page, route):
     page.wait_for_function("route => location.hash === '#' + route", arg=route)
     expect(link).to_have_attribute('aria-current', 'page')
     page.wait_for_load_state('networkidle')
+
+
+def verify_route_tab_order(page):
+    page.goto('http://127.0.0.1:4173/#tour')
+    page.wait_for_load_state('domcontentloaded')
+    tab_until(page, '#language-toggle')
+    page.keyboard.press('Tab')
+    if page.locator('#route-drawer-toggle').is_visible():
+        expect(page.locator('#route-drawer-toggle')).to_be_focused()
+        page.keyboard.press('Enter')
+        expect(page.locator('#route-nav-track')).to_be_visible()
+        page.keyboard.press('Tab')
+
+    for index, route in enumerate(ROUTES):
+        link = page.locator(f'[data-route="{route}"]')
+        expect(link).to_be_focused()
+        assert_pointer_target(page, link)
+        if index < len(ROUTES) - 1:
+            page.keyboard.press('Tab')
+
+    page.keyboard.press('Enter')
+    page.wait_for_function("() => location.hash === '#group-matrix'")
+    expect(page.locator('[data-route="group-matrix"]')).to_have_attribute('aria-current', 'page')
 
 
 def verify_module_controls(page):
@@ -137,6 +181,7 @@ with sync_playwright() as playwright:
     page.goto('http://127.0.0.1:4173/#tour')
     page.wait_for_load_state('domcontentloaded')
     verify_skip_link(page)
+    verify_route_tab_order(page)
 
     page.goto(BASE_URL + '#tour')
     page.wait_for_load_state('domcontentloaded')
@@ -147,7 +192,5 @@ with sync_playwright() as playwright:
     if console_errors:
         raise AssertionError('Console errors: ' + ' | '.join(console_errors[:5]))
 
-    print(f"KEYBOARD_AUDIT_PASS routes={len(ROUTES)} login=keyboard modal_trap=verified")
+    print(f"KEYBOARD_AUDIT_PASS routes={len(ROUTES)} route_tab_order=verified login=keyboard modal_trap=verified")
     browser.close()
-
-

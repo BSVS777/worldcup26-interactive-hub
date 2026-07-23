@@ -1,11 +1,13 @@
 import { requireElement } from './dom.js';
 import { announceViewRendered, markInteractiveCard, markPrimaryControl } from './components.js';
 import { createInitialAgendaState, reduceAgendaState } from './agenda.js';
+import { createI18n } from './i18n.js';
 import { createLoadableView, formatScore } from './loadable-view.js';
 
 const SKELETON_COLUMN_COUNT = 2;
+const DEFAULT_I18N = createI18n({ document: null, storage: null, locale: 'en' });
 
-export function createAgendaView(document, api) {
+export function createAgendaView(document, api, { i18n = DEFAULT_I18N } = {}) {
   const elements = {
     dateLabel: requireElement(document, 'agenda-date-label', 'agenda element'),
     prevButton: requireElement(document, 'agenda-prev', 'agenda element'),
@@ -30,11 +32,11 @@ export function createAgendaView(document, api) {
 
     const teams = document.createElement('p');
     teams.className = 'agenda-column__teams';
-    teams.textContent = `${game.homeTeamName ?? 'Team data unavailable'} vs ${game.awayTeamName ?? 'Team data unavailable'}`;
+    teams.textContent = `${game.homeTeamName == null ? i18n.t('common.teamUnavailable') : i18n.formatTeamName(game.homeTeamName)} ${i18n.t('common.vs')} ${game.awayTeamName == null ? i18n.t('common.teamUnavailable') : i18n.formatTeamName(game.awayTeamName)}`;
 
     const score = document.createElement('p');
     score.className = 'agenda-column__score';
-    score.textContent = formatScore(game);
+    score.textContent = formatScore(game, i18n.t('common.notPlayed'), i18n.formatNumber);
 
     column.append(teams, score);
     return column;
@@ -53,16 +55,17 @@ export function createAgendaView(document, api) {
       const date = state.dates[state.currentIndex].date;
       const time = document.createElement('time');
       time.dateTime = date;
-      time.textContent = hasCachedData ? `${date} · cached data` : date;
+      const formattedDate = i18n.formatDate(date);
+      time.textContent = hasCachedData ? i18n.t('agenda.cachedDate', { date: formattedDate }) : formattedDate;
       elements.dateLabel.replaceChildren(time);
       return;
     }
     if (state.status === 'loading') {
-      elements.dateLabel.textContent = 'Loading matches…';
+      elements.dateLabel.textContent = i18n.t('agenda.loading');
     } else {
       elements.dateLabel.textContent = state.gamesFailed
-        ? 'Match schedule unavailable right now.'
-        : 'No matches scheduled yet.';
+        ? i18n.t('agenda.unavailable')
+        : i18n.t('agenda.empty');
     }
   }
 
@@ -73,6 +76,10 @@ export function createAgendaView(document, api) {
   }
 
   function render() {
+    elements.prevButton.textContent = i18n.t('agenda.previous');
+    elements.prevButton.setAttribute('aria-label', i18n.t('agenda.previousLabel'));
+    elements.nextButton.textContent = i18n.t('agenda.next');
+    elements.nextButton.setAttribute('aria-label', i18n.t('agenda.nextLabel'));
     renderDateLabel();
     renderColumns();
     renderControls();
@@ -133,5 +140,5 @@ export function createAgendaView(document, api) {
 
   render();
 
-  return Object.freeze({ ensureLoaded, reset });
+  return Object.freeze({ ensureLoaded, renderLocale: render, reset });
 }

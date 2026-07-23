@@ -1,5 +1,6 @@
 import { requireElement } from './dom.js';
 import { announceViewRendered, markInteractiveCard } from './components.js';
+import { createI18n } from './i18n.js';
 import { createLoadableView, formatScore } from './loadable-view.js';
 import {
   createFanTheme,
@@ -11,7 +12,12 @@ import {
   writeFavoriteTeamId
 } from './fan-dashboard.js';
 
-export function createFanDashboardView(document, api, { storage = globalThis.localStorage } = {}) {
+const DEFAULT_I18N = createI18n({ document: null, storage: null, locale: 'en' });
+
+export function createFanDashboardView(document, api, {
+  storage = globalThis.localStorage,
+  i18n = DEFAULT_I18N
+} = {}) {
   const elements = {
     root: requireElement(document, 'fan-dashboard-view', 'fan dashboard element'),
     status: requireElement(document, 'fan-status', 'fan dashboard element'),
@@ -42,7 +48,7 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
     const options = state.teams.map((team) => {
       const option = document.createElement('option');
       option.value = team.id;
-      option.textContent = team.name;
+      option.textContent = i18n.formatTeamName(team.name);
       option.selected = team.id === state.favoriteTeamId;
       return option;
     });
@@ -53,27 +59,30 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
   function renderSummary() {
     if (!state.dashboard) {
       elements.summary.textContent = state.status === 'loading'
-        ? 'Loading fan dashboard.'
-        : 'Select a team when live team data is available.';
+        ? i18n.t('fan.loadingSummary')
+        : i18n.t('fan.selectSummary');
       return;
     }
-    const pieces = [state.dashboard.team.name];
-    if (state.dashboard.group) pieces.push(state.dashboard.group.name);
-    if (state.dashboard.stale) pieces.push('saved snapshot');
+    const pieces = [i18n.formatTeamName(state.dashboard.team.name)];
+    if (state.dashboard.group) pieces.push(i18n.formatGroupName(state.dashboard.group.name));
+    if (state.dashboard.stale) pieces.push(i18n.t('fan.savedSnapshot'));
     elements.summary.textContent = pieces.join(' - ');
   }
 
   function renderMetrics() {
     if (!state.dashboard) {
-      elements.metrics.replaceChildren(metricTerm('Status'), metricValue(state.status === 'loading' ? 'Loading' : 'Unavailable'));
+      elements.metrics.replaceChildren(
+        metricTerm(i18n.t('fan.status')),
+        metricValue(i18n.t(state.status === 'loading' ? 'fan.loading' : 'fan.unavailable'))
+      );
       return;
     }
     const metrics = state.dashboard.metrics;
     elements.metrics.replaceChildren(
-      metricTerm('Points'), metricValue(metrics.points),
-      metricTerm('Goals for'), metricValue(metrics.goalsFor),
-      metricTerm('Goals against'), metricValue(metrics.goalsAgainst),
-      metricTerm('Matches'), metricValue(metrics.matches)
+      metricTerm(i18n.t('fan.points')), metricValue(i18n.formatNumber(metrics.points)),
+      metricTerm(i18n.t('fan.goalsFor')), metricValue(i18n.formatNumber(metrics.goalsFor)),
+      metricTerm(i18n.t('fan.goalsAgainst')), metricValue(i18n.formatNumber(metrics.goalsAgainst)),
+      metricTerm(i18n.t('fan.matches')), metricValue(i18n.formatNumber(metrics.matches))
     );
   }
 
@@ -82,8 +91,8 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
       const item = document.createElement('li');
       item.className = 'fan-match fan-match--empty';
       item.textContent = state.dashboard?.partial?.gamesFailed
-        ? 'Matches are unavailable. Saved team summary remains visible.'
-        : 'No matches are linked to this team yet.';
+        ? i18n.t('fan.matchesUnavailable')
+        : i18n.t('fan.noMatches');
       elements.matches.replaceChildren(item);
       return;
     }
@@ -94,10 +103,10 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
       const date = document.createElement('time');
       date.className = 'fan-match__date';
       if (game.localDate) date.dateTime = game.localDate;
-      date.textContent = game.localDate ?? 'Date TBC';
+      date.textContent = i18n.formatDate(game.localDate);
       const score = document.createElement('span');
       score.className = 'fan-match__score';
-      score.textContent = formatScore(game);
+      score.textContent = formatScore(game, i18n.t('common.notPlayed'), i18n.formatNumber);
       item.append(date, score);
       return item;
     }));
@@ -105,23 +114,23 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
 
   function renderStatus() {
     if (state.status === 'loading') {
-      elements.status.textContent = 'Loading teams, matches, and groups.';
+      elements.status.textContent = i18n.t('fan.loadingAll');
       return;
     }
     if (hasCachedData && state.dashboard) {
-      elements.status.textContent = 'Fan dashboard ready from cached data.';
+      elements.status.textContent = i18n.t('fan.readyCached');
       return;
     }
     if (state.snapshotUsed || state.dashboard?.stale) {
-      elements.status.textContent = 'Showing saved favorite snapshot because live dashboard data is unavailable.';
+      elements.status.textContent = i18n.t('fan.snapshotStatus');
       return;
     }
     const partial = state.dashboard?.partial;
     if (partial?.gamesFailed || partial?.groupsFailed) {
-      elements.status.textContent = 'Dashboard loaded with partial live data.';
+      elements.status.textContent = i18n.t('fan.partial');
       return;
     }
-    elements.status.textContent = state.dashboard ? 'Fan dashboard ready.' : 'Fan dashboard unavailable.';
+    elements.status.textContent = i18n.t(state.dashboard ? 'fan.available' : 'fan.notAvailable');
   }
 
   function applyTheme() {
@@ -139,6 +148,7 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
     elements.root.style.setProperty('--fan-contrast', theme.contrast);
   }
   function render() {
+    elements.matches.setAttribute('aria-label', i18n.t('fan.matchesLabel'));
     applyTheme();
     renderSelector();
     renderStatus();
@@ -208,5 +218,5 @@ export function createFanDashboardView(document, api, { storage = globalThis.loc
   }
 
   render();
-  return Object.freeze({ ensureLoaded, reset });
+  return Object.freeze({ ensureLoaded, renderLocale: render, reset });
 }

@@ -6,9 +6,13 @@ import {
   reduceTimelineState,
   visibleTimelineGames
 } from './timeline.js';
+import { createI18n } from './i18n.js';
 import { formatScore } from './loadable-view.js';
 
+const DEFAULT_I18N = createI18n({ document: null, storage: null, locale: 'en' });
+
 export function createTimelineView(document, api, {
+  i18n = DEFAULT_I18N,
   IntersectionObserverImpl = globalThis.IntersectionObserver,
   setIntervalImpl = globalThis.setInterval,
   clearIntervalImpl = globalThis.clearInterval
@@ -42,15 +46,15 @@ export function createTimelineView(document, api, {
     const time = document.createElement('time');
     time.className = 'timeline-item__date';
     if (game.localDate) time.dateTime = game.localDate;
-    time.textContent = game.localDate ?? 'Date to be confirmed';
+    time.textContent = i18n.formatDate(game.localDate);
 
     const title = document.createElement('p');
     title.className = 'timeline-item__title';
-    title.textContent = `Match ${game.id}`;
+    title.textContent = i18n.t('timeline.match', { id: game.id });
 
     const meta = document.createElement('p');
     meta.className = 'timeline-item__meta';
-    meta.textContent = `${formatScore(game)} · Stadium ${game.stadiumId ?? 'TBC'}`;
+    meta.textContent = `${formatScore(game, i18n.t('common.notPlayed'), i18n.formatNumber)} · ${i18n.t('timeline.stadium', { stadium: game.stadiumId ?? i18n.t('common.tbc') })}`;
 
     row.append(time, title, meta);
     return row;
@@ -111,24 +115,27 @@ export function createTimelineView(document, api, {
   function renderStatus() {
     if (state.status === 'loading') {
       elements.status.textContent = state.retrying && state.retrySecondsRemaining > 0
-        ? `Retrying in ${state.retrySecondsRemaining}s.`
-        : 'Loading match timeline.';
+        ? i18n.t('timeline.retrying', { seconds: state.retrySecondsRemaining })
+        : i18n.t('timeline.loading');
       return;
     }
     if (state.status === 'error') {
-      elements.status.textContent = 'Match timeline unavailable. Retry when the API is reachable.';
+      elements.status.textContent = i18n.t('timeline.unavailable');
       return;
     }
     if (state.games.length === 0) {
-      elements.status.textContent = 'No matches are available yet.';
+      elements.status.textContent = i18n.t('timeline.empty');
       return;
     }
     elements.status.textContent = hasCachedData
-      ? `${visibleTimelineGames(state).length} of ${state.games.length} matches shown from cached data.`
-      : `${visibleTimelineGames(state).length} of ${state.games.length} matches shown.`;
+      ? i18n.t('timeline.shownCached', { visible: visibleTimelineGames(state).length, total: state.games.length })
+      : i18n.t('timeline.shown', { visible: visibleTimelineGames(state).length, total: state.games.length });
   }
 
   function renderControls() {
+    elements.list.setAttribute('aria-label', i18n.t('timeline.label'));
+    elements.loadMoreButton.textContent = i18n.t('timeline.loadMore');
+    elements.retryButton.textContent = i18n.t('timeline.retry');
     elements.loadMoreButton.hidden = state.status !== 'loaded' || !hasMoreTimelineGames(state);
     elements.loadMoreButton.disabled = state.status !== 'loaded' || !hasMoreTimelineGames(state);
     elements.retryButton.hidden = state.status !== 'error';
@@ -204,5 +211,11 @@ export function createTimelineView(document, api, {
 
   render();
 
-  return Object.freeze({ ensureLoaded, reset, retry });
+  function renderLocale() {
+    renderStatus();
+    renderList();
+    renderControls();
+  }
+
+  return Object.freeze({ ensureLoaded, renderLocale, reset, retry });
 }

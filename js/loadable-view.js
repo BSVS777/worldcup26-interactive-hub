@@ -2,10 +2,10 @@
 // views that load endpoints in parallel and must survive rapid
 // reset()/ensureLoaded() cycles without a stale load clobbering fresher state.
 
-export function formatScore(game) {
+export function formatScore(game, notPlayedLabel = 'Not played yet', formatNumber = String) {
   return game.played && game.homeScore !== null && game.awayScore !== null
-    ? `${game.homeScore} – ${game.awayScore}`
-    : 'Not played yet';
+    ? `${formatNumber(game.homeScore)} – ${formatNumber(game.awayScore)}`
+    : notPlayedLabel;
 }
 
 export function createLoadableView(api) {

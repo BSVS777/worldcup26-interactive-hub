@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { createI18n } from '../js/i18n.js';
 import { buildGroupMatrices, createInitialMatrixState, reduceMatrixState } from '../js/matrix.js';
 import { createMatrixView } from '../js/matrix-view.js';
 
@@ -32,8 +33,11 @@ test('builds a 4x4 matrix from groups teams and games', () => {
   assert.equal(matrix.rows.length, 4);
   assert.ok(matrix.rows.every((row) => row.cells.length === 4));
   assert.equal(cell(matrix, 't1', 't2').score, '2 - 1');
+  assert.deepEqual(cell(matrix, 't1', 't2').scores, { for: 2, against: 1 });
   assert.equal(cell(matrix, 't2', 't1').score, '1 - 2');
+  assert.deepEqual(cell(matrix, 't2', 't1').scores, { for: 1, against: 2 });
   assert.equal(cell(matrix, 't3', 't4').score, 'Pending');
+  assert.equal(cell(matrix, 't3', 't4').scores, null);
 });
 
 test('marks diagonal cells as disabled and semantic same-team cells', () => {
@@ -215,4 +219,44 @@ test('matrix view announces when endpoint data came from cache', async () => {
   await view.ensureLoaded();
 
   assert.match(status.textContent, /cached data/i);
+});
+
+test('matrix view localizes played scores and generated team names from structured cell values', async () => {
+  const fallbackGroups = [{
+    id: 'z',
+    name: 'Group Z',
+    teams: [
+      { teamId: 'missing-1', points: 0, goalsFor: 0, goalsAgainst: 0 },
+      { teamId: 'missing-2', points: 0, goalsFor: 0, goalsAgainst: 0 }
+    ]
+  }];
+  const fallbackGames = [{
+    id: 'large-score',
+    localDate: '2026-06-11',
+    homeTeamId: 'missing-1',
+    awayTeamId: 'missing-2',
+    homeScore: 12345,
+    awayScore: 67890,
+    played: true
+  }];
+  const { document, grid } = createFakeDocument();
+  const api = {
+    async apiRequest(endpoint) {
+      if (endpoint === 'groups') return { data: fallbackGroups };
+      if (endpoint === 'teams') throw new Error('teams unavailable');
+      return { data: fallbackGames };
+    }
+  };
+  const i18n = createI18n({ document: null, storage: null, locale: 'es' });
+
+  const view = createMatrixView(document, api, { i18n });
+  await view.ensureLoaded();
+
+  const target = grid.querySelectorAll('[data-matrix-cell]')
+    .find((item) => item.dataset.matrixCell === 'z::missing-1::missing-2');
+  assert.equal(target.textContent, '12.345 - 67.890');
+  assert.equal(
+    target.getAttribute('aria-label'),
+    'Equipo desconocido, 12.345 a 67.890 contra Equipo desconocido'
+  );
 });

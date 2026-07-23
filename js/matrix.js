@@ -16,8 +16,8 @@ function gameKey(a, b) {
 
 function scoreForTeam(game, teamId) {
   if (!game?.played || game.homeScore === null || game.awayScore === null) return null;
-  if (game.homeTeamId === teamId) return `${game.homeScore} - ${game.awayScore}`;
-  if (game.awayTeamId === teamId) return `${game.awayScore} - ${game.homeScore}`;
+  if (game.homeTeamId === teamId) return Object.freeze({ for: game.homeScore, against: game.awayScore });
+  if (game.awayTeamId === teamId) return Object.freeze({ for: game.awayScore, against: game.homeScore });
   return null;
 }
 
@@ -41,10 +41,11 @@ function teamsForGroup(group, teamsById, allTeams) {
 function buildCell(rowTeam, columnTeam, gamesByPair, gamesFailed) {
   const diagonal = rowTeam.id === columnTeam.id;
   if (diagonal) {
-    return Object.freeze({ rowTeamId: rowTeam.id, columnTeamId: columnTeam.id, diagonal: true, label: 'Same team', score: '—', gameId: null, date: null, status: 'disabled' });
+    return Object.freeze({ rowTeamId: rowTeam.id, columnTeamId: columnTeam.id, diagonal: true, label: 'Same team', score: '—', scores: null, gameId: null, date: null, status: 'disabled' });
   }
   const game = gamesByPair.get(gameKey(rowTeam.id, columnTeam.id)) ?? null;
-  const score = scoreForTeam(game, rowTeam.id);
+  const scores = scoreForTeam(game, rowTeam.id);
+  const score = scores ? `${scores.for} - ${scores.against}` : null;
   const label = score ? `${rowTeam.name} ${score} ${columnTeam.name}` : `${rowTeam.name} vs ${columnTeam.name} pending`;
   return Object.freeze({
     rowTeamId: rowTeam.id,
@@ -52,9 +53,10 @@ function buildCell(rowTeam, columnTeam, gamesByPair, gamesFailed) {
     diagonal: false,
     label,
     score: score ?? 'Pending',
+    scores,
     gameId: game?.id ?? null,
     date: game?.localDate ?? null,
-    status: score ? 'played' : (gamesFailed ? 'unknown' : 'pending')
+    status: scores ? 'played' : (gamesFailed ? 'unknown' : 'pending')
   });
 }
 

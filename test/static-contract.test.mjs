@@ -48,7 +48,7 @@ test('embedded sign-in uses section semantics and exposes accessibility hooks', 
   assert.match(html, /<section id="session-panel"[^>]*aria-labelledby="session-title"/);
   assert.doesNotMatch(html, /id="session-panel"[^>]*role="dialog"/);
   assert.match(html, /id="app-status"[^>]*role="status"[^>]*aria-live="polite"/);
-  assert.match(app, /announceMessage:\s*'Signed in\./);
+  assert.match(app, /announceMessage:\s*i18n\.t\('session\.signedInLive'\)/);
   assert.match(app, /view\.focusCurrentView\(\)/);
   assert.match(ui, /getElementById\('main-content'\)|requireElement\(document, 'main-content'/);
   assert.match(ui, /setAttribute\('role', 'dialog'\)/);
@@ -84,6 +84,7 @@ test('README lists the exact package commands and local URLs', async () => {
   assert.equal(packageJson.scripts['test:console-401'], 'python tools/console-401-audit.py');
   assert.equal(packageJson.scripts['test:tour-partial-failure'], 'python tools/tour-partial-failure-audit.py');
   assert.equal(packageJson.scripts['test:agenda-layout'], 'python tools/agenda-layout-audit.py');
+  assert.equal(packageJson.scripts['test:i18n'], 'python tools/i18n-audit.py');
   assert.equal(packageJson.scripts['test:session-storage'], 'python tools/session-storage-audit.py');
   assert.equal(packageJson.scripts['test:endpoint-injection'], 'python tools/endpoint-injection-audit.py');
   assert.equal(packageJson.scripts['test:security-headers'], 'python tools/security-headers-audit.py');
@@ -136,7 +137,7 @@ test('tour module exposes a live venue grid and detail region alongside the shar
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   const tourView = await readFile(new URL('../js/tour-view.js', import.meta.url), 'utf8');
   assert.match(html, /<div id="tour-view" class="tour-view" hidden>/);
-  assert.match(html, /<ul id="tour-venue-list" class="venue-grid" aria-label="[^"]+">/);
+  assert.match(html, /<ul id="tour-venue-list" class="venue-grid" aria-label="[^"]+" data-i18n-aria-label="tour\.venuesLabel">/);
   assert.match(html, /<div id="tour-venue-detail" class="venue-detail" role="status" aria-live="polite">/);
   assert.match(tourView, /scrollIntoView\(\{\s*behavior:\s*'smooth'\s*\}\)/);
 });
@@ -231,7 +232,7 @@ test('document shell uses semantic landmarks and reduced inline surface', async 
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.equal((html.match(/<main\b/g) ?? []).length, 1);
   assert.match(html, /<header class="site-header">/);
-  assert.match(html, /<nav class="route-nav" id="route-nav" tabindex="-1" aria-label="World Cup views" data-drawer-open="false">/);
+  assert.match(html, /<nav class="route-nav" id="route-nav" tabindex="-1" aria-label="Vistas del Mundial" data-i18n-aria-label="nav\.label" data-drawer-open="false">/);
   assert.match(html, /id="route-drawer-toggle"[^>]*aria-controls="route-nav-track"[^>]*aria-expanded="false"/);
   assert.match(html, /<ol id="route-nav-track" class="route-nav__track">/);
   assert.match(html, /<footer class="site-footer">/);
@@ -248,3 +249,60 @@ test('document language is Spanish for the WC26 command center', async () => {
   assert.match(html, /<html lang="es">/);
 });
 
+test('language selector is one keyboard-native switch that exposes its state', async () => {
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+  const css = await readFile(new URL('../css/styles.css', import.meta.url), 'utf8');
+  const app = await readFile(new URL('../js/app.js', import.meta.url), 'utf8');
+
+  assert.match(html, /id="language-selector"[^>]*>\s*<button id="language-toggle"[^>]*type="button"[^>]*role="switch"[^>]*aria-checked="false"[^>]*data-language-toggle/);
+  assert.equal((html.match(/class="language-selector__toggle"/g) ?? []).length, 1);
+  assert.doesNotMatch(html, /id="language-(?:es|en)"/);
+  assert.match(css, /\.language-selector__toggle\s*\{[\s\S]*min-height:\s*2\.75rem;/);
+  assert.match(css, /\.language-selector__option\s*\{[\s\S]*min-width:\s*2\.75rem;/);
+  assert.match(app, /i18n\.subscribe\(\(\) => \{[\s\S]*renderLocale\(\)/);
+  assert.doesNotMatch(app, /i18n\.subscribe\([\s\S]*ensureLoaded\(\)/);
+});
+
+test('module navigation keeps native links, stable badges, and readable labels', async () => {
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+  const css = await readFile(new URL('../css/styles.css', import.meta.url), 'utf8');
+  const mobileNavigationCss = css.slice(
+    css.indexOf('@media (max-width: 52rem)'),
+    css.indexOf('@media (max-width: 34rem)')
+  );
+  const routes = ['tour', 'agenda', 'timeline', 'fan-dashboard', 'group-matrix'];
+
+  for (const route of routes) {
+    assert.match(
+      html,
+      new RegExp(`<a data-route="${route}" href="#${route}"><span class="route-nav__number">\\d{2}</span><span class="route-nav__name"[^>]*>`)
+    );
+  }
+  assert.doesNotMatch(html, /<a data-route="[^"]+"[^>]*tabindex=/);
+  assert.match(css, /\.route-nav__number\s*\{[\s\S]*flex:\s*0 0 2rem;[\s\S]*width:\s*2rem;/);
+  assert.match(css, /\.route-nav__name\s*\{[\s\S]*min-width:\s*0;[\s\S]*overflow-wrap:\s*anywhere;/);
+  assert.match(css, /\.route-nav a:focus-visible\s*\{/);
+  assert.match(
+    mobileNavigationCss,
+    /\.route-nav\s*\{[^}]*backdrop-filter:\s*none;[^}]*background:\s*var\(--night\);/
+  );
+});
+
+test('language changes retranslate active login feedback without another request', async () => {
+  const app = await readFile(new URL('../js/app.js', import.meta.url), 'utf8');
+  assert.match(app, /let lastLoginError\s*=\s*null/);
+  assert.match(app, /lastLoginError\s*=\s*error/);
+  assert.match(
+    app,
+    /i18n\.subscribe\(\(\) => \{[\s\S]*LOGIN_FAILED[\s\S]*describeLoginError\(lastLoginError,\s*i18n\)[\s\S]*view\.renderLocale\(state\)/
+  );
+});
+
+test('language changes clear the event-only live region instead of leaving stale copy', async () => {
+  const app = await readFile(new URL('../js/app.js', import.meta.url), 'utf8');
+  const ui = await readFile(new URL('../js/ui.js', import.meta.url), 'utf8');
+  assert.match(ui, /function renderLocale\(state\)[\s\S]*render\(state,\s*\{\s*clearAnnouncement:\s*true\s*\}\)/);
+  assert.match(ui, /if\s*\(clearAnnouncement\)\s*elements\.appStatus\.textContent\s*=\s*''/);
+  assert.match(ui, /return Object\.freeze\(\{[^}]*renderLocale/);
+  assert.match(app, /i18n\.subscribe\(\(\) => \{[\s\S]*view\.renderLocale\(state\)/);
+});

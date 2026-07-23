@@ -269,13 +269,13 @@ test('next/prev move across retained dates and disable at each boundary, includi
   await view.ensureLoaded();
 
   nextButton.trigger('click');
-  assert.equal(dateLabel.textContent, '2026-06-12');
+  assert.equal(dateLabel.children[0].dateTime, '2026-06-12');
   assert.equal(columns.children.length, 1, 'a single-match date (e.g. a semifinal) still renders');
   assert.equal(nextButton.disabled, false);
   assert.equal(prevButton.disabled, false);
 
   nextButton.trigger('click');
-  assert.equal(dateLabel.textContent, '2026-06-13');
+  assert.equal(dateLabel.children[0].dateTime, '2026-06-13');
   assert.equal(dateLabel.children[0].tagName, 'time');
   assert.equal(dateLabel.children[0].dateTime, '2026-06-13');
   assert.equal(columns.children.length, 2);
@@ -286,20 +286,20 @@ test('next/prev move across retained dates and disable at each boundary, includi
   nextButton.trigger('click');
   nextButton.trigger('click');
   nextButton.trigger('click');
-  assert.equal(dateLabel.textContent, '2026-06-13');
+  assert.equal(dateLabel.children[0].dateTime, '2026-06-13');
   assert.equal(nextButton.disabled, true);
 
   prevButton.trigger('click');
-  assert.equal(dateLabel.textContent, '2026-06-12');
+  assert.equal(dateLabel.children[0].dateTime, '2026-06-12');
   assert.equal(prevButton.disabled, false);
 
   prevButton.trigger('click');
-  assert.equal(dateLabel.textContent, '2026-06-11');
+  assert.equal(dateLabel.children[0].dateTime, '2026-06-11');
   assert.equal(prevButton.disabled, true);
 
   prevButton.trigger('click');
   prevButton.trigger('click');
-  assert.equal(dateLabel.textContent, '2026-06-11');
+  assert.equal(dateLabel.children[0].dateTime, '2026-06-11');
   assert.equal(prevButton.disabled, true);
 });
 
@@ -324,7 +324,7 @@ test('clicking Next/Previous while the initial load is still in flight is a safe
   calls.find((c) => c.endpoint === 'teams').resolve({ data: teams });
   await loaded;
 
-  assert.equal(dateLabel.textContent, '2026-06-11', 'load must land on the first retained date, unaffected by the earlier clicks');
+  assert.equal(dateLabel.children[0].dateTime, '2026-06-11', 'load must land on the first retained date, unaffected by the earlier clicks');
   assert.equal(prevButton.disabled, true);
   assert.equal(nextButton.disabled, false);
 });
@@ -370,7 +370,7 @@ test('a stale in-flight load never overwrites a fresher load (race condition gua
   calls[1].resolve({ data: teams });
   await firstLoad;
 
-  assert.equal(dateLabel.textContent, '2026-07-01', 'must show the fresh load\'s date, not the stale one');
+  assert.equal(dateLabel.children[0].dateTime, '2026-07-01', 'must show the fresh load\'s date, not the stale one');
   assert.equal(dateLabel.children[0].tagName, 'time');
   assert.equal(dateLabel.children[0].dateTime, '2026-07-01');
   assert.equal(columns.children.length, 2);

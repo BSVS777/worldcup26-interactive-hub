@@ -1,13 +1,16 @@
 import { requireElement } from './dom.js';
 import { announceViewRendered, markInteractiveCard } from './components.js';
+import { createI18n } from './i18n.js';
 import { createLoadableView } from './loadable-view.js';
 import { createInitialMatrixState, reduceMatrixState } from './matrix.js';
+
+const DEFAULT_I18N = createI18n({ document: null, storage: null, locale: 'en' });
 
 function matrixStructureKey(matrices) {
   return matrices.map((matrix) => `${matrix.id}:${matrix.teams.map((team) => team.id).join(',')}`).join('|');
 }
 
-export function createMatrixView(document, api) {
+export function createMatrixView(document, api, { i18n = DEFAULT_I18N } = {}) {
   const elements = {
     status: requireElement(document, 'matrix-status', 'matrix element'),
     grid: requireElement(document, 'matrix-grid', 'matrix element')
@@ -20,22 +23,22 @@ export function createMatrixView(document, api) {
 
   function renderStatus() {
     if (state.status === 'loading') {
-      elements.status.textContent = 'Loading groups, teams, and matches.';
+      elements.status.textContent = i18n.t('matrix.loading');
       return;
     }
     if (state.groupsFailed) {
-      elements.status.textContent = 'Group matrix unavailable. Groups are required to build the tables.';
+      elements.status.textContent = i18n.t('matrix.unavailable');
       return;
     }
     if (state.teamsFailed || state.gamesFailed) {
-      elements.status.textContent = hasCachedData ? 'Group matrix loaded with cached and partial live data.' : 'Group matrix loaded with partial live data.';
+      elements.status.textContent = i18n.t(hasCachedData ? 'matrix.partialCached' : 'matrix.partial');
       return;
     }
     if (hasCachedData && state.matrices.length > 0) {
-      elements.status.textContent = 'Group matrix ready from cached data.';
+      elements.status.textContent = i18n.t('matrix.readyCached');
       return;
     }
-    elements.status.textContent = state.matrices.length > 0 ? 'Group matrix ready.' : 'No group data is available yet.';
+    elements.status.textContent = i18n.t(state.matrices.length > 0 ? 'matrix.ready' : 'matrix.emptyStatus');
   }
 
   function makeCellKey(matrixId, rowTeamId, columnTeamId) {
@@ -56,8 +59,8 @@ export function createMatrixView(document, api) {
     const empty = document.createElement('p');
     empty.className = 'empty-state';
     empty.textContent = state.groupsFailed
-      ? 'Groups are unavailable, so matchups cannot be built.'
-      : 'No groups are available to build matchup matrices.';
+      ? i18n.t('matrix.groupsUnavailable')
+      : i18n.t('matrix.noGroups');
     elements.grid.replaceChildren(empty);
   }
 
@@ -80,7 +83,8 @@ export function createMatrixView(document, api) {
 
       const title = document.createElement('h3');
       title.id = `matrix-title-${matrix.id}`;
-      title.textContent = matrix.name;
+      const groupName = i18n.formatGroupName(matrix.name);
+      title.textContent = groupName;
 
       const shell = document.createElement('div');
       shell.className = 'matrix-table-shell';
@@ -89,20 +93,20 @@ export function createMatrixView(document, api) {
       table.className = 'matrix-table';
       const caption = document.createElement('caption');
       caption.textContent = matrix.completeFourByFour
-        ? `${matrix.name} head-to-head matrix`
-        : `${matrix.name} head-to-head matrix with ${matrix.teams.length} listed teams`;
+        ? i18n.t('matrix.caption', { group: groupName })
+        : i18n.t('matrix.partialCaption', { group: groupName, count: matrix.teams.length });
       table.append(caption);
 
       const thead = document.createElement('thead');
       const headerRow = document.createElement('tr');
       const corner = document.createElement('th');
       corner.scope = 'col';
-      corner.textContent = 'Team';
+      corner.textContent = i18n.t('matrix.team');
       headerRow.append(corner);
       for (const team of matrix.teams) {
         const th = document.createElement('th');
         th.scope = 'col';
-        th.textContent = team.name;
+        th.textContent = i18n.formatTeamName(team.name);
         headerRow.append(th);
       }
       thead.append(headerRow);
@@ -113,7 +117,7 @@ export function createMatrixView(document, api) {
         const tr = document.createElement('tr');
         const th = document.createElement('th');
         th.scope = 'row';
-        th.textContent = row.team.name;
+        th.textContent = i18n.formatTeamName(row.team.name);
         tr.append(th);
         for (const cell of row.cells) {
           const td = document.createElement('td');
@@ -140,8 +144,28 @@ export function createMatrixView(document, api) {
         for (const cell of row.cells) {
           const td = cellRefs.get(makeCellKey(matrix.id, cell.rowTeamId, cell.columnTeamId));
           if (!td) continue;
-          td.textContent = cell.score;
-          td.setAttribute('aria-label', cell.label);
+          const rowTeam = matrix.teams.find((team) => team.id === cell.rowTeamId);
+          const columnTeam = matrix.teams.find((team) => team.id === cell.columnTeamId);
+          const rowTeamName = i18n.formatTeamName(rowTeam?.name);
+          const columnTeamName = i18n.formatTeamName(columnTeam?.name);
+          td.textContent = cell.status === 'played' && cell.scores
+            ? `${i18n.formatNumber(cell.scores.for)} - ${i18n.formatNumber(cell.scores.against)}`
+            : cell.diagonal
+              ? '—'
+              : i18n.t('matrix.pending');
+          td.setAttribute('aria-label', cell.diagonal
+            ? i18n.t('matrix.sameTeam')
+            : cell.status === 'played' && cell.scores
+              ? i18n.t('matrix.playedLabel', {
+                team: rowTeamName,
+                scoreFor: cell.scores.for,
+                scoreAgainst: cell.scores.against,
+                opponent: columnTeamName
+              })
+              : i18n.t('matrix.pendingLabel', {
+                home: rowTeamName,
+                away: columnTeamName
+              }));
           td.dataset.status = cell.status;
           if (cell.diagonal) td.setAttribute('aria-disabled', 'true');
           else td.removeAttribute('aria-disabled');
@@ -151,6 +175,7 @@ export function createMatrixView(document, api) {
   }
 
   function render() {
+    elements.grid.setAttribute('aria-label', i18n.t('matrix.label'));
     renderStatus();
     const nextStructureKey = matrixStructureKey(state.matrices);
     if ((state.status === 'loading' && state.matrices.length === 0) || nextStructureKey !== structureKey) {
@@ -202,5 +227,10 @@ export function createMatrixView(document, api) {
   }
 
   render();
-  return Object.freeze({ ensureLoaded, refresh, reset });
+  function renderLocale() {
+    structureKey = '';
+    render();
+  }
+
+  return Object.freeze({ ensureLoaded, refresh, renderLocale, reset });
 }

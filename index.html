@@ -8,115 +8,123 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://worldcup26.ir http://127.0.0.1:4174; base-uri 'self'; form-action 'self'"
     >
-    <meta name="description" content="Explora sedes, partidos, equipos y grupos de una competicion mundial de futbol con una experiencia cinematografica interactiva.">
-    <title>Global Match Theatre</title>
+    <meta name="description" content="Explora sedes, partidos, equipos y grupos de una competición mundial de fútbol con una experiencia cinematográfica interactiva.">
+    <title>Teatro Global de Partidos</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/styles.css">
     <script type="module" src="js/app.js"></script>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <a class="skip-link" href="#main-content" data-i18n="skip.main">Saltar al contenido principal</a>
 
     <header class="site-header">
-      <a class="brand" href="#tour" aria-label="Global Match Theatre home">
+      <a class="brand" href="#tour" aria-label="Inicio de Global Match Theatre" data-i18n-aria-label="header.homeLabel">
         <span class="brand__year" aria-hidden="true">26</span>
         <span class="brand__name">Global<br>Match Theatre</span>
       </a>
-      <p class="site-header__edition">Continental football command room</p>
-      <div id="test-mode-badge" class="test-badge" hidden>Test mode</div>
+      <p class="site-header__edition" data-i18n="header.edition">Centro de mando del fútbol continental</p>
+      <div class="site-header__tools">
+        <div class="language-selector" id="language-selector">
+          <button id="language-toggle" type="button" class="language-selector__toggle" role="switch" aria-checked="false" aria-label="Idioma inglés" data-language-toggle>
+            <span class="language-selector__option language-selector__option--es" aria-hidden="true">ESP</span>
+            <span class="language-selector__option language-selector__option--en" aria-hidden="true">ENG</span>
+          </button>
+        </div>
+        <div id="test-mode-badge" class="test-badge" hidden data-i18n="common.testMode">Modo de prueba</div>
+      </div>
     </header>
 
-    <nav class="route-nav" id="route-nav" tabindex="-1" aria-label="World Cup views" data-drawer-open="false">
+    <nav class="route-nav" id="route-nav" tabindex="-1" aria-label="Vistas del Mundial" data-i18n-aria-label="nav.label" data-drawer-open="false">
       <button id="route-drawer-toggle" class="route-nav__toggle" type="button" aria-controls="route-nav-track" aria-expanded="false">
         <span class="route-nav__toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
-        Views
+        <span data-i18n="nav.open">Vistas</span>
       </button>
-      <p class="route-nav__label" aria-hidden="true">Choose a gate</p>
+      <p class="route-nav__label" aria-hidden="true" data-i18n="nav.choose">Elige una puerta</p>
       <ol id="route-nav-track" class="route-nav__track">
-        <li><a data-route="tour" href="#tour"><span>01</span>Tour</a></li>
-        <li><a data-route="agenda" href="#agenda"><span>02</span>Agenda</a></li>
-        <li><a data-route="timeline" href="#timeline"><span>03</span>Timeline</a></li>
-        <li><a data-route="fan-dashboard" href="#fan-dashboard"><span>04</span>Fan dashboard</a></li>
-        <li><a data-route="group-matrix" href="#group-matrix"><span>05</span>Group matrix</a></li>
+        <li><a data-route="tour" href="#tour"><span class="route-nav__number">01</span><span class="route-nav__name" data-i18n="nav.route.tour">Recorrido</span></a></li>
+        <li><a data-route="agenda" href="#agenda"><span class="route-nav__number">02</span><span class="route-nav__name" data-i18n="nav.route.agenda">Agenda</span></a></li>
+        <li><a data-route="timeline" href="#timeline"><span class="route-nav__number">03</span><span class="route-nav__name" data-i18n="nav.route.timeline">Cronología</span></a></li>
+        <li><a data-route="fan-dashboard" href="#fan-dashboard"><span class="route-nav__number">04</span><span class="route-nav__name" data-i18n="nav.route.fan-dashboard">Panel del aficionado</span></a></li>
+        <li><a data-route="group-matrix" href="#group-matrix"><span class="route-nav__number">05</span><span class="route-nav__name" data-i18n="nav.route.group-matrix">Matriz de grupos</span></a></li>
       </ol>
     </nav>
 
     <main id="main-content" tabindex="-1">
       <section class="hero" aria-labelledby="view-title">
         <div class="hero__copy">
-          <p id="view-marker" class="hero__marker">Gate 01</p>
-          <h1 id="view-title" lang="en">Virtual venue tour</h1>
-          <p id="view-description" class="hero__description">Cross the continent through every host stadium and the matches played there.</p>
+          <p id="view-marker" class="hero__marker">Puerta 01</p>
+          <h1 id="view-title">Recorrido virtual por sedes</h1>
+          <p id="view-description" class="hero__description">Recorre el continente a través de cada estadio anfitrión y los partidos que se disputan allí.</p>
         </div>
         <div class="hero__scoreboard" aria-hidden="true">
-          <span>North</span><strong>vs</strong><span>Central</span><strong>vs</strong><span>South</span>
+          <span data-i18n="common.north">Norte</span><strong data-i18n="common.vs">vs</strong><span data-i18n="common.central">Centro</span><strong data-i18n="common.vs">vs</strong><span data-i18n="common.south">Sur</span>
         </div>
       </section>
 
       <section class="module-stage" aria-labelledby="module-heading">
         <header class="module-stage__header">
           <div>
-            <p class="eyebrow">Current view</p>
-            <h2 id="module-heading">Venue map and match list</h2>
+            <p class="eyebrow" data-i18n="module.current">Vista actual</p>
+            <h2 id="module-heading">Mapa de sedes y lista de partidos</h2>
           </div>
-          <span id="module-status" class="stage-status" role="status">Shell ready</span>
+          <span id="module-status" class="stage-status" role="status">Interfaz lista</span>
         </header>
         <div id="module-placeholder" class="module-placeholder">
-          <p class="module-placeholder__label">This gate is being prepared</p>
-          <p id="module-next-step">Venue cards and their linked fixtures will appear here.</p>
+          <p class="module-placeholder__label" data-i18n="module.preparing">Esta puerta se está preparando</p>
+          <p id="module-next-step">Aquí aparecerán las tarjetas de las sedes y sus partidos relacionados.</p>
         </div>
         <div id="tour-view" class="tour-view" hidden>
-          <ul id="tour-venue-list" class="venue-grid" aria-label="World Cup 2026 host venues"></ul>
+          <ul id="tour-venue-list" class="venue-grid" aria-label="Sedes anfitrionas del Mundial 2026" data-i18n-aria-label="tour.venuesLabel"></ul>
           <div id="tour-venue-detail" class="venue-detail" role="status" aria-live="polite">
-            <p class="venue-detail__hint">Select a venue to see its matches.</p>
+            <p class="venue-detail__hint" data-i18n="tour.selectHint">Selecciona una sede para ver sus partidos.</p>
           </div>
         </div>
         <div id="agenda-view" class="agenda-view" hidden>
           <div class="agenda-nav">
-            <button id="agenda-prev" type="button" class="agenda-nav__button" aria-label="Previous matchday">Previous</button>
+            <button id="agenda-prev" type="button" class="agenda-nav__button" aria-label="Jornada anterior" data-i18n="agenda.previous" data-i18n-aria-label="agenda.previousLabel">Anterior</button>
             <p id="agenda-date-label" class="agenda-nav__date" role="status" aria-live="polite"></p>
-            <button id="agenda-next" type="button" class="agenda-nav__button" aria-label="Next matchday">Next</button>
+            <button id="agenda-next" type="button" class="agenda-nav__button" aria-label="Jornada siguiente" data-i18n="agenda.next" data-i18n-aria-label="agenda.nextLabel">Siguiente</button>
           </div>
           <div id="agenda-columns" class="agenda-columns"></div>
         </div>
         <div id="timeline-view" class="timeline-view" hidden>
-          <p id="timeline-status" class="timeline-status" role="status" aria-live="polite">Timeline ready.</p>
-          <ol id="timeline-list" class="timeline-list" aria-label="Chronological match timeline"></ol>
+          <p id="timeline-status" class="timeline-status" role="status" aria-live="polite">Cronología lista.</p>
+          <ol id="timeline-list" class="timeline-list" aria-label="Cronología de partidos en orden cronológico" data-i18n-aria-label="timeline.label"></ol>
           <div class="timeline-actions">
-            <button id="timeline-load-more" type="button" class="timeline-button">Load 10 more matches</button>
-            <button id="timeline-retry" type="button" class="timeline-button">Retry timeline</button>
+            <button id="timeline-load-more" type="button" class="timeline-button" data-i18n="timeline.loadMore">Cargar 10 partidos más</button>
+            <button id="timeline-retry" type="button" class="timeline-button" data-i18n="timeline.retry">Reintentar cronología</button>
           </div>
           <div id="timeline-sentinel" class="timeline-sentinel" aria-hidden="true"></div>
         </div>
         <div id="fan-dashboard-view" class="fan-dashboard" hidden>
           <div class="fan-toolbar">
-            <label for="fan-team-select">Favorite team</label>
+            <label for="fan-team-select" data-i18n="fan.favorite">Equipo favorito</label>
             <select id="fan-team-select" class="fan-select"></select>
           </div>
-          <p id="fan-status" class="status-banner" role="status" aria-live="polite">Fan dashboard ready.</p>
+          <p id="fan-status" class="status-banner" role="status" aria-live="polite">Panel del aficionado listo.</p>
           <p id="fan-summary" class="fan-summary"></p>
           <dl id="fan-metrics" class="fan-metrics"></dl>
-          <ul id="fan-matches" class="fan-matches" aria-label="Favorite team matches"></ul>
+          <ul id="fan-matches" class="fan-matches" aria-label="Partidos del equipo favorito" data-i18n-aria-label="fan.matchesLabel"></ul>
         </div>
         <div id="matrix-view" class="matrix-view" hidden>
-          <p id="matrix-status" class="status-banner" role="status" aria-live="polite">Group matrix ready.</p>
-          <div id="matrix-grid" class="matrix-grid" aria-label="Group matchup matrices"></div>
+          <p id="matrix-status" class="status-banner" role="status" aria-live="polite">Matriz de grupos lista.</p>
+          <div id="matrix-grid" class="matrix-grid" aria-label="Matrices de enfrentamientos por grupo" data-i18n-aria-label="matrix.label"></div>
         </div>
       </section>
     </main>
 
     <section id="session-panel" class="session-panel" aria-labelledby="session-title" hidden>
       <div class="session-panel__intro">
-        <p class="eyebrow">Secure access</p>
-        <h2 id="session-title">Sign in to load live match data</h2>
-        <p id="session-copy">Your atlas stays open while you sign in.</p>
+        <p class="eyebrow" data-i18n="session.secureAccess">Acceso seguro</p>
+        <h2 id="session-title">Inicia sesión para cargar datos de partidos en vivo</h2>
+        <p id="session-copy">Tu atlas permanecerá abierto mientras inicias sesión.</p>
       </div>
       <form id="login-form" class="login-form">
-        <label for="email">Email</label>
+        <label for="email" data-i18n="session.email">Correo electrónico</label>
         <input id="email" name="email" type="email" autocomplete="username" required>
-        <label for="password">Password</label>
+        <label for="password" data-i18n="session.password">Contraseña</label>
         <input id="password" name="password" type="password" autocomplete="current-password" required>
-        <button id="login-button" type="submit">Sign in</button>
+        <button id="login-button" type="submit" data-i18n="session.signIn">Iniciar sesión</button>
       </form>
       <p id="login-status" class="login-status" role="status" aria-live="polite"></p>
     </section>
@@ -125,8 +133,8 @@
     <p id="retry-status" class="status-banner retry-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
 
     <footer class="site-footer">
-      <p>Global Match Theatre · Five live views, one tournament pulse.</p>
-      <p>Live data loads from the public tournament API. Sign-in is an optional compatibility path.</p>
+      <p data-i18n="footer.pulse">Global Match Theatre · Cinco vistas en vivo, un solo pulso del torneo.</p>
+      <p data-i18n="footer.data">Los datos en vivo se cargan desde la API pública del torneo. El inicio de sesión es una vía opcional de compatibilidad.</p>
     </footer>
 
     <div id="pitch-transition" class="pitch-transition" aria-hidden="true">
@@ -143,56 +151,56 @@
           <rect x="7.5" y="16.3" width="2.4" height="6.6" rx="1.2" fill="currentColor" transform="rotate(-18 8.7 16.3)" />
           <rect x="14.1" y="16.3" width="2.4" height="6.6" rx="1.2" fill="currentColor" transform="rotate(18 15.3 16.3)" />
         </svg>
-        <span class="sr-only">Accessibility settings</span>
+        <span class="sr-only" data-i18n="a11y.settings">Configuración de accesibilidad</span>
       </button>
 
       <div id="a11y-panel" class="a11y-panel" role="dialog" aria-modal="true" aria-labelledby="a11y-panel-title" hidden>
         <div class="a11y-panel__header">
-          <p id="a11y-panel-title" class="a11y-panel__title">Accessibility</p>
-          <button id="a11y-panel-close" type="button" class="a11y-panel__close" aria-label="Close accessibility settings">
+          <p id="a11y-panel-title" class="a11y-panel__title" data-i18n="a11y.title">Accesibilidad</p>
+          <button id="a11y-panel-close" type="button" class="a11y-panel__close" aria-label="Cerrar la configuración de accesibilidad" data-i18n-aria-label="a11y.close">
             <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
               <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
               <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
             </svg>
           </button>
         </div>
-        <p class="a11y-panel__hint">Adjust how Global Match Theatre looks and moves. Changes save to this device.</p>
+        <p class="a11y-panel__hint" data-i18n="a11y.hint">Ajusta la apariencia y el movimiento de Global Match Theatre. Los cambios se guardan en este dispositivo.</p>
         <ul class="a11y-panel__list">
           <li class="a11y-panel__row">
-            <span id="a11y-label-large-text" class="a11y-panel__label">Large text</span>
+            <span id="a11y-label-large-text" class="a11y-panel__label" data-i18n="a11y.largeText">Texto grande</span>
             <button type="button" id="a11y-toggle-large-text" class="a11y-switch" role="switch" aria-checked="false" aria-labelledby="a11y-label-large-text">
               <span class="a11y-switch__track"><span class="a11y-switch__thumb"></span></span>
             </button>
           </li>
           <li class="a11y-panel__row">
-            <span id="a11y-label-high-contrast" class="a11y-panel__label">High contrast</span>
+            <span id="a11y-label-high-contrast" class="a11y-panel__label" data-i18n="a11y.highContrast">Alto contraste</span>
             <button type="button" id="a11y-toggle-high-contrast" class="a11y-switch" role="switch" aria-checked="false" aria-labelledby="a11y-label-high-contrast">
               <span class="a11y-switch__track"><span class="a11y-switch__thumb"></span></span>
             </button>
           </li>
           <li class="a11y-panel__row">
-            <span id="a11y-label-reduce-transparency" class="a11y-panel__label">Reduce transparency</span>
+            <span id="a11y-label-reduce-transparency" class="a11y-panel__label" data-i18n="a11y.reduceTransparency">Reducir transparencia</span>
             <button type="button" id="a11y-toggle-reduce-transparency" class="a11y-switch" role="switch" aria-checked="false" aria-labelledby="a11y-label-reduce-transparency">
               <span class="a11y-switch__track"><span class="a11y-switch__thumb"></span></span>
             </button>
           </li>
           <li class="a11y-panel__row">
-            <span id="a11y-label-reduce-motion" class="a11y-panel__label">Reduce motion</span>
+            <span id="a11y-label-reduce-motion" class="a11y-panel__label" data-i18n="a11y.reduceMotion">Reducir movimiento</span>
             <button type="button" id="a11y-toggle-reduce-motion" class="a11y-switch" role="switch" aria-checked="false" aria-labelledby="a11y-label-reduce-motion">
               <span class="a11y-switch__track"><span class="a11y-switch__thumb"></span></span>
             </button>
           </li>
           <li class="a11y-panel__row">
-            <span id="a11y-label-underline-links" class="a11y-panel__label">Underline links</span>
+            <span id="a11y-label-underline-links" class="a11y-panel__label" data-i18n="a11y.underlineLinks">Subrayar enlaces</span>
             <button type="button" id="a11y-toggle-underline-links" class="a11y-switch" role="switch" aria-checked="false" aria-labelledby="a11y-label-underline-links">
               <span class="a11y-switch__track"><span class="a11y-switch__thumb"></span></span>
             </button>
           </li>
         </ul>
-        <button id="a11y-reset" type="button" class="a11y-panel__reset">Reset to defaults</button>
+        <button id="a11y-reset" type="button" class="a11y-panel__reset" data-i18n="a11y.reset">Restablecer valores predeterminados</button>
       </div>
     </div>
 
-    <a class="skip-link skip-link--end" href="#route-nav">Back to navigation</a>
+    <a class="skip-link skip-link--end" href="#route-nav" data-i18n="skip.navigation">Volver a la navegación</a>
   </body>
 </html>

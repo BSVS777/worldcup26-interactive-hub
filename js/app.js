@@ -13,7 +13,9 @@ import { createFanDashboardView } from './fan-dashboard-view.js';
 import { createMatrixView } from './matrix-view.js';
 import { createShellView } from './ui.js';
 import { createMotionSystem } from './motion.js';
+import { bindLanguageSelector, createI18n } from './i18n.js';
 
+const i18n = createI18n({ document, storage: window.localStorage });
 applyAccessibilityPreferences(document.documentElement, readAccessibilityPreferences(window.localStorage));
 const session = createAuthStore();
 let state = createInitialViewState({
@@ -23,6 +25,7 @@ let state = createInitialViewState({
 });
 let view;
 let motion;
+let lastLoginError = null;
 
 function update(action, options) {
   state = reduceViewState(state, action);
@@ -46,11 +49,11 @@ const api = createApiClient({
   }
 });
 
-const tourView = createTourView(document, api);
-const agendaView = createAgendaView(document, api);
-const timelineView = createTimelineView(document, api);
-const fanDashboardView = createFanDashboardView(document, api);
-const matrixView = createMatrixView(document, api);
+const tourView = createTourView(document, api, { i18n });
+const agendaView = createAgendaView(document, api, { i18n });
+const timelineView = createTimelineView(document, api, { i18n });
+const fanDashboardView = createFanDashboardView(document, api, { storage: window.localStorage, i18n });
+const matrixView = createMatrixView(document, api, { i18n });
 
 function resetModuleViews() {
   retryStatus.clear();
@@ -71,21 +74,38 @@ function loadActiveModule() {
 }
 
 async function handleLogin(credentials) {
+  lastLoginError = null;
   update({ type: 'LOGIN_STARTED' });
   try {
     await api.authenticate(credentials);
     resetModuleViews();
-    update({ type: 'LOGIN_SUCCEEDED' }, { announceMessage: 'Signed in. Live match data is available.' });
+    update({ type: 'LOGIN_SUCCEEDED' }, { announceMessage: i18n.t('session.signedInLive') });
     view.focusCurrentView();
     loadActiveModule();
   } catch (error) {
-    update({ type: 'LOGIN_FAILED', message: describeLoginError(error) });
+    lastLoginError = error;
+    update({ type: 'LOGIN_FAILED', message: describeLoginError(error, i18n) });
   }
 }
 
-view = createShellView(document, { onLogin: handleLogin });
+view = createShellView(document, { onLogin: handleLogin, i18n });
 motion = createMotionSystem(document, window);
 createAccessibilityPanel(document, window, { storage: window.localStorage });
+bindLanguageSelector(document, i18n);
+i18n.subscribe(() => {
+  if (lastLoginError && state.loginStatus === 'error') {
+    state = reduceViewState(state, {
+      type: 'LOGIN_FAILED',
+      message: describeLoginError(lastLoginError, i18n)
+    });
+  }
+  view.renderLocale(state);
+  tourView.renderLocale();
+  agendaView.renderLocale();
+  timelineView.renderLocale();
+  fanDashboardView.renderLocale();
+  matrixView.renderLocale();
+});
 view.render(state);
 motion.animateRoute(state.route);
 loadActiveModule();

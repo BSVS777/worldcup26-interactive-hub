@@ -7,7 +7,8 @@ ALLOWED_KEY_PREFIXES = (
     'wc26:cache:v2:',
     'wc26:favorite-team:',
     'wc26:fan-snapshot:',
-    'wc26:a11y-preferences:'
+    'wc26:a11y-preferences:',
+    'wc26:locale:'
 )
 
 

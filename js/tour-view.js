@@ -1,9 +1,12 @@
 import { requireElement } from './dom.js';
 import { announceViewRendered, markInteractiveCard } from './components.js';
+import { createI18n } from './i18n.js';
 import { createInitialTourState, reduceTourState } from './tour.js';
 import { createLoadableView, formatScore } from './loadable-view.js';
 
-export function createTourView(document, api) {
+const DEFAULT_I18N = createI18n({ document: null, storage: null, locale: 'en' });
+
+export function createTourView(document, api, { i18n = DEFAULT_I18N } = {}) {
   const elements = {
     list: requireElement(document, 'tour-venue-list', 'tour element'),
     detail: requireElement(document, 'tour-venue-detail', 'tour element')
@@ -31,17 +34,17 @@ export function createTourView(document, api) {
 
     const name = document.createElement('span');
     name.className = 'venue-card__name';
-    name.textContent = venue.name;
+    name.textContent = i18n.formatVenueName(venue.name);
 
     const city = document.createElement('span');
     city.className = 'venue-card__city';
-    city.textContent = venue.city ?? 'City to be confirmed';
+    city.textContent = venue.city ?? i18n.t('tour.cityTbc');
 
     const gamesLabel = document.createElement('span');
     gamesLabel.className = 'venue-card__games';
     gamesLabel.textContent = venue.gamesError
-      ? 'Match data unavailable'
-      : `${venue.games.length} match${venue.games.length === 1 ? '' : 'es'}`;
+      ? i18n.t('tour.matchesUnavailable')
+      : i18n.t('tour.matches', { count: venue.games.length });
 
     button.append(name, city, gamesLabel);
     item.append(button);
@@ -59,13 +62,14 @@ export function createTourView(document, api) {
   function createDetailHeading(venue) {
     const heading = document.createElement('h3');
     heading.tabIndex = -1;
-    heading.textContent = hasCachedData ? `${venue.name} (cached data)` : venue.name;
+    const venueName = i18n.formatVenueName(venue.name);
+    heading.textContent = hasCachedData ? i18n.t('tour.cachedHeading', { venue: venueName }) : venueName;
     return heading;
   }
 
   function renderDetail(venue) {
     if (!venue) {
-      elements.detail.replaceChildren(paragraph('venue-detail__hint', 'Select a venue to see its matches.'));
+      elements.detail.replaceChildren(paragraph('venue-detail__hint', i18n.t('tour.selectHint')));
       return null;
     }
 
@@ -74,14 +78,14 @@ export function createTourView(document, api) {
     if (venue.gamesError) {
       elements.detail.replaceChildren(heading, paragraph(
         'venue-detail__error',
-        `Match data for ${venue.name} is unavailable right now. Try another venue or refresh later.`,
+        i18n.t('tour.venueGamesUnavailable', { venue: i18n.formatVenueName(venue.name) }),
         { role: 'alert' }
       ));
       return heading;
     }
 
     if (venue.games.length === 0) {
-      elements.detail.replaceChildren(heading, paragraph('venue-detail__hint', `No matches are scheduled for ${venue.name} yet.`));
+      elements.detail.replaceChildren(heading, paragraph('venue-detail__hint', i18n.t('tour.noMatches', { venue: i18n.formatVenueName(venue.name) })));
       return heading;
     }
 
@@ -91,9 +95,9 @@ export function createTourView(document, api) {
       const row = document.createElement('li');
       row.className = 'venue-detail__game';
       const date = document.createElement('span');
-      date.textContent = game.localDate ?? 'Date to be confirmed';
+      date.textContent = i18n.formatDate(game.localDate);
       const score = document.createElement('span');
-      score.textContent = formatScore(game);
+      score.textContent = formatScore(game, i18n.t('common.notPlayed'), i18n.formatNumber);
       row.append(date, score);
       list.append(row);
     }
@@ -149,7 +153,7 @@ export function createTourView(document, api) {
     });
 
     if (state.stadiumsFailed) {
-      renderFatalError('Venues could not be loaded. Try again later.');
+      renderFatalError(i18n.t('tour.loadError'));
     } else {
       renderList();
     }
@@ -168,5 +172,13 @@ export function createTourView(document, api) {
     hasCachedData = false;
   }
 
-  return Object.freeze({ ensureLoaded, reset });
+  function renderLocale() {
+    elements.list.setAttribute('aria-label', i18n.t('tour.venuesLabel'));
+    if (state.stadiumsFailed) renderFatalError(i18n.t('tour.loadError'));
+    else renderList();
+    renderDetail(state.venues.find((venue) => venue.id === state.selectedVenueId) ?? null);
+    markActiveButton();
+  }
+
+  return Object.freeze({ ensureLoaded, renderLocale, reset });
 }
