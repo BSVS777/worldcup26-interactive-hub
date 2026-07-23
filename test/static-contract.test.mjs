@@ -42,14 +42,14 @@ function extractFunctionBody(source, name) {
 
 test('embedded sign-in uses section semantics and exposes accessibility hooks', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-  const app = await readFile(new URL('../js/app.js', import.meta.url), 'utf8');
+  const loginController = await readFile(new URL('../js/login-controller.js', import.meta.url), 'utf8');
   const ui = await readFile(new URL('../js/ui.js', import.meta.url), 'utf8');
   const accessibility = await readFile(new URL('../js/accessibility.js', import.meta.url), 'utf8');
   assert.match(html, /<section id="session-panel"[^>]*aria-labelledby="session-title"/);
   assert.doesNotMatch(html, /id="session-panel"[^>]*role="dialog"/);
   assert.match(html, /id="app-status"[^>]*role="status"[^>]*aria-live="polite"/);
-  assert.match(app, /announceMessage:\s*i18n\.t\('session\.signedInLive'\)/);
-  assert.match(app, /view\.focusCurrentView\(\)/);
+  assert.match(loginController, /announceMessage:\s*i18n\.t\('session\.signedInLive'\)/);
+  assert.match(loginController, /view\.focusCurrentView\(\)/);
   assert.match(ui, /getElementById\('main-content'\)|requireElement\(document, 'main-content'/);
   assert.match(ui, /setAttribute\('role', 'dialog'\)/);
   assert.match(ui, /setAttribute\('aria-modal', 'true'\)/);
@@ -128,6 +128,24 @@ test('runtime code keeps async and fetch responsibilities centralized', async ()
   assert.match(api, /headers\.set\('Authorization', `Bearer \$\{token\}`\)/);
 });
 
+test('registration never fabricates a session locally', async () => {
+  const runtimeFiles = await readRuntimeFiles();
+  const api = runtimeFiles.find(({ file }) => file === 'js/api.js')?.text ?? '';
+  const app = runtimeFiles.find(({ file }) => file === 'js/app.js')?.text ?? '';
+  const loginController = runtimeFiles.find(({ file }) => file === 'js/login-controller.js')?.text ?? '';
+  const registerBody = extractFunctionBody(api, 'register');
+  assert.notEqual(registerBody, '', 'register() must exist in js/api.js');
+  assert.doesNotMatch(
+    registerBody, /session\.setToken\(/,
+    'register() must never store a token directly; only authenticate() may call session.setToken'
+  );
+  assert.doesNotMatch(api, /\bbtoa\(/, 'the client must never locally fabricate a JWT with btoa');
+  assert.doesNotMatch(app, /\bbtoa\(/, 'the shell must never locally fabricate a JWT with btoa');
+  assert.doesNotMatch(loginController, /\bbtoa\(/, 'the login controller must never locally fabricate a JWT with btoa');
+  assert.match(loginController, /await api\.register\(/, 'the shell must call the real register() client method');
+  assert.match(loginController, /handleLogin\(\{ email, password \}\)/, 'a successful register must hand off to the same handleLogin() authenticate path, not a forked one');
+});
+
 test('document declares the explicitly served favicon', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /<link rel="icon" href="favicon\.svg" type="image\/svg\+xml">/);
@@ -161,7 +179,7 @@ test('interactive listeners stay centralized and are not registered during rende
   const runtimeFiles = Object.fromEntries((await readRuntimeFiles()).map(({ file, text }) => [file, text]));
   const listenerCounts = new Map([
     ['js/app.js', 1],
-    ['js/ui.js', 4],
+    ['js/ui.js', 7],
     ['js/tour-view.js', 1],
     ['js/agenda-view.js', 2],
     ['js/timeline-view.js', 2],
@@ -290,8 +308,10 @@ test('module navigation keeps native links, stable badges, and readable labels',
 
 test('language changes retranslate active login feedback without another request', async () => {
   const app = await readFile(new URL('../js/app.js', import.meta.url), 'utf8');
-  assert.match(app, /let lastLoginError\s*=\s*null/);
-  assert.match(app, /lastLoginError\s*=\s*error/);
+  const loginController = await readFile(new URL('../js/login-controller.js', import.meta.url), 'utf8');
+  assert.match(loginController, /let lastLoginError\s*=\s*null/);
+  assert.match(loginController, /lastLoginError\s*=\s*error/);
+  assert.match(app, /const lastLoginError\s*=\s*loginController\.getLastLoginError\(\)/);
   assert.match(
     app,
     /i18n\.subscribe\(\(\) => \{[\s\S]*LOGIN_FAILED[\s\S]*describeLoginError\(lastLoginError,\s*i18n\)[\s\S]*view\.renderLocale\(state\)/

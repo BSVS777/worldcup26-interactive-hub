@@ -123,6 +123,18 @@ function handleAuth(request, response, origin) {
   return true;
 }
 
+// This test-fixture token is only ever served by this deterministic local
+// server, never by the real API — it exists solely so register/authenticate
+// can be exercised end-to-end in CI without a real network call.
+function handleRegister(request, response, origin) {
+  if (request.method !== 'POST') {
+    sendJson(response, 405, { message: 'Method not allowed' }, origin);
+    return true;
+  }
+  sendJson(response, 200, { user: { id: 'wc26-test-user', name: 'WC26 Test User' }, token: TEST_TOKEN }, origin);
+  return true;
+}
+
 function handleData(request, response, origin, pathname) {
   if (!Object.hasOwn(DATA_FIXTURES, pathname)) return false;
   if (request.method !== 'GET') {
@@ -149,6 +161,10 @@ export function createTestServer() {
     const url = new URL(request.url, `http://${HOST}:${PORT}`);
     if (url.pathname === '/auth/authenticate') {
       handleAuth(request, response, origin);
+      return;
+    }
+    if (url.pathname === '/auth/register') {
+      handleRegister(request, response, origin);
       return;
     }
     if (handleData(request, response, origin, url.pathname)) return;

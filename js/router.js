@@ -56,6 +56,13 @@ export function reduceViewState(state, action) {
         loginStatus: 'idle',
         statusMessage: 'Signed in. Your current view is ready.'
       });
+    case 'LOGOUT':
+      return Object.freeze({
+        ...state,
+        session: 'anonymous',
+        loginStatus: 'idle',
+        statusMessage: ''
+      });
     case 'LOGIN_FAILED':
       return Object.freeze({
         ...state,

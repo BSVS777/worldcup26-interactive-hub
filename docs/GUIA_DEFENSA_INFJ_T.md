@@ -31,7 +31,8 @@ Detecto -> preservo -> informo -> recupero -> verifico.
 22. La defensa contra endpoint injection se demuestra con Playwright: `apiBase` malicioso no recibe trafico y el proxy rechaza queries target.
 23. La defensa anti-clickjacking local se demuestra con Playwright: CSP incluye `frame-ancestors 'none'` y `X-Frame-Options: DENY`.
 24. La resiliencia de API se demuestra con Playwright: 429 y 500 recuperan con retry, y una caida de red usa cache valida en Agenda.
-25. La API viva se valida con `tools/live-api-probe.mjs` contra los cuatro `GET` publicos sin credenciales; `tools/live-api-auth-probe.mjs` conserva el flujo autenticado como compatibilidad opcional y se salta sin credenciales sin imprimir secretos.
+25. La API viva se valida con `tools/live-api-probe.mjs` contra los cuatro `GET` publicos sin credenciales; `tools/live-api-auth-probe.mjs` valida en vivo registro real (`WC26_API_REGISTER=true`) + login real + Bearer real contra `https://worldcup26.ir`, y se salta sin credenciales sin imprimir secretos.
+27. La app expone tres estados de acceso explicitos y accesibles desde el panel de sesion: Modo publico (sin JWT), Sesion JWT real (registro real -> login automatico real -> `Authorization: Bearer`) y Servidor local de pruebas (mismo contrato con tokens de fixture). El registro nunca fabrica el token: `js/api.js:register()` no llama `session.setToken`, solo `js/api.js:authenticate()` lo hace.
 26. El reflow 200%/400% se demuestra con Playwright: cinco rutas sin overflow global ni controles con texto cortado.
 
 ## Endpoints por modulo
@@ -163,7 +164,15 @@ Tecnica: `js/cache.js`, `test/cache.test.mjs`.
 
 30 segundos: La API desplegada permite actualmente lectura publica. Por eso el flujo real no fabrica ni persiste credenciales. Conservamos el manejo de 401 y los escenarios deterministas de seguridad, pero documentamos la contradiccion con el requisito academico de JWT para validarla con el profesor. `apiRequest` agrega `Authorization: Bearer` solo si existe una sesion; su ausencia ya no produce un 401 local, y un 401 real del servidor sigue limpiando el token y abriendo el panel de recuperacion.
 
-Tecnica: `js/api.js:apiRequest`, `js/ui.js` (panel de sesion solo visible en `expired`), `tools/live-api-probe.mjs` (`LIVE_API_PUBLIC_PROBE_PASSED teams=48 games=104 groups=12 stadiums=16`), `docs/MATRIZ_CUMPLIMIENTO.md:API-001..API-003`.
+Tecnica: `js/api.js:apiRequest`, `js/ui.js` (panel de sesion solo visible en `expired`/modo prueba, o al elegir explicitamente Iniciar sesion/Crear cuenta), `tools/live-api-probe.mjs` (`LIVE_API_PUBLIC_PROBE_PASSED teams=48 games=104 groups=12 stadiums=16`), `docs/MATRIZ_CUMPLIMIENTO.md:API-001..API-003`.
+
+### Como defiendo que el registro no fabrica sesion
+
+15 segundos: `register()` en `js/api.js` nunca llama `session.setToken`; el token que queda en memoria siempre viene de `authenticate()`.
+
+30 segundos: El flujo obligatorio es `register() -> authenticate() -> session.setToken()`. Si el registro tiene exito pero el login automatico falla, no se crea ninguna sesion y la app vuelve al formulario de login con un mensaje especifico. Verificado en vivo el 2026-07-23 contra `https://worldcup26.ir` con `npm run test:live-api:auth` (`LIVE_API_REGISTER_PASS`, `LIVE_API_AUTH_PASS`, `LIVE_API_JWT_VALID_PASS`, `LIVE_API_BEARER_PASS`).
+
+Tecnica: `js/api.js:register`, `js/login-controller.js:handleRegister`, `test/api.test.mjs`, `test/static-contract.test.mjs:"registration never fabricates a session locally"`.
 
 ### Como defiendo actualizacion parcial de matriz
 
@@ -193,7 +202,7 @@ Tecnica: `tools/app-server.mjs`, `tools/security-headers-audit.py`, `docs/SECURI
 
 - Lector de pantalla y contraste manual completo fuera del Dashboard; zoom con lector sigue pendiente.
 - Reproducciones DevTools manuales para 429, 500 y offline.
-- Validacion del flujo autenticado `/auth/authenticate` contra la API viva: ejecutar `npm run test:live-api:auth` con credenciales validas y exigir `LIVE_API_AUTH_PROBE_PASS`. Es opcional; la lectura publica ya esta verificada con `npm run test:live-api` (`LIVE_API_PUBLIC_PROBE_PASSED teams=48 games=104 groups=12 stadiums=16`).
-- El profesor debe decidir si el requisito de Bearer en cada request sigue aplicando ahora que el proveedor externo permite lectura publica sin token.
+- RESUELTO (2026-07-23): el flujo `/auth/register` + `/auth/authenticate` contra la API viva ya se verifico con una cuenta real desechable. `npm run test:live-api:auth` con `WC26_API_REGISTER=true` imprimio `LIVE_API_REGISTER_PASS`, `LIVE_API_AUTH_PASS`, `LIVE_API_JWT_VALID_PASS` y `LIVE_API_BEARER_PASS`; la lectura publica sigue verificada por separado con `npm run test:live-api` (`LIVE_API_PUBLIC_PROBE_PASSED teams=48 games=104 groups=12 stadiums=16`).
+- El profesor debe decidir si el requisito de Bearer en cada request sigue aplicando ahora que el proveedor externo permite lectura publica sin token; el contrato JWT en si ya esta demostrado como real de extremo a extremo.
 
 

@@ -30,6 +30,8 @@
             <span class="language-selector__option language-selector__option--en" aria-hidden="true">ENG</span>
           </button>
         </div>
+        <div id="session-mode-indicator" class="session-mode-indicator" role="status" aria-live="polite" data-i18n="session.publicModeStatus">Modo público · Datos consultados sin sesión JWT</div>
+        <button id="logout-button" type="button" class="logout-button" hidden data-i18n="session.logout">Cerrar sesión</button>
         <div id="test-mode-badge" class="test-badge" hidden data-i18n="common.testMode">Modo de prueba</div>
       </div>
     </header>
@@ -119,6 +121,11 @@
         <h2 id="session-title">Inicia sesión para cargar datos de partidos en vivo</h2>
         <p id="session-copy">Tu atlas permanecerá abierto mientras inicias sesión.</p>
       </div>
+      <div id="session-mode" class="session-mode" role="group" aria-label="Elige cómo acceder" data-i18n-aria-label="session.modeGroupLabel">
+        <button type="button" id="session-mode-login" class="session-mode__button" aria-pressed="true" data-session-mode="login" data-i18n="session.modeLogin">Iniciar sesión</button>
+        <button type="button" id="session-mode-register" class="session-mode__button" aria-pressed="false" data-session-mode="register" data-i18n="session.modeRegister">Crear una cuenta de prueba</button>
+        <button type="button" id="session-mode-public" class="session-mode__button" data-session-mode="public" data-i18n="session.modePublic">Continuar en modo público</button>
+      </div>
       <form id="login-form" class="login-form">
         <label for="email" data-i18n="session.email">Correo electrónico</label>
         <input id="email" name="email" type="email" autocomplete="username" required>
@@ -127,6 +134,18 @@
         <button id="login-button" type="submit" data-i18n="session.signIn">Iniciar sesión</button>
       </form>
       <p id="login-status" class="login-status" role="status" aria-live="polite"></p>
+      <form id="register-form" class="login-form register-form" hidden>
+        <label for="register-name" data-i18n="register.name">Nombre</label>
+        <input id="register-name" name="name" type="text" autocomplete="name" required>
+        <label for="register-email" data-i18n="session.email">Correo electrónico</label>
+        <input id="register-email" name="email" type="email" autocomplete="email" required>
+        <label for="register-password" data-i18n="session.password">Contraseña</label>
+        <input id="register-password" name="password" type="password" autocomplete="new-password" required>
+        <label for="register-confirm" data-i18n="register.confirmPassword">Confirmación de contraseña</label>
+        <input id="register-confirm" name="confirmPassword" type="password" autocomplete="new-password" required>
+        <button id="register-button" type="submit" data-i18n="register.submit">Crear cuenta</button>
+      </form>
+      <p id="register-status" class="login-status register-status" role="alert" aria-live="assertive"></p>
     </section>
 
     <div id="app-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>

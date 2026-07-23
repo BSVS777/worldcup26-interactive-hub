@@ -3,7 +3,7 @@ import { MODULE_ROUTES } from './router.js';
 import { ENDPOINTS } from './config.js';
 import { setInert, trapTabKey } from './accessibility.js';
 
-export function createShellView(document, { onLogin, i18n }) {
+export function createShellView(document, { onLogin, onRegister, onLogout, i18n }) {
   const elements = {
     viewMarker: requireElement(document, 'view-marker', 'shell element'),
     viewTitle: requireElement(document, 'view-title', 'shell element'),
@@ -18,12 +18,26 @@ export function createShellView(document, { onLogin, i18n }) {
     matrixView: requireElement(document, 'matrix-view', 'shell element'),
     moduleStatus: requireElement(document, 'module-status', 'shell element'),
     testBadge: requireElement(document, 'test-mode-badge', 'shell element'),
+    sessionModeIndicator: requireElement(document, 'session-mode-indicator', 'shell element'),
+    logoutButton: requireElement(document, 'logout-button', 'shell element'),
     sessionPanel: requireElement(document, 'session-panel', 'shell element'),
     sessionTitle: requireElement(document, 'session-title', 'shell element'),
     sessionCopy: requireElement(document, 'session-copy', 'shell element'),
+    sessionModeGroup: requireElement(document, 'session-mode', 'shell element'),
+    loginModeButton: requireElement(document, 'session-mode-login', 'shell element'),
+    registerModeButton: requireElement(document, 'session-mode-register', 'shell element'),
+    publicModeButton: requireElement(document, 'session-mode-public', 'shell element'),
     loginForm: requireElement(document, 'login-form', 'shell element'),
     loginButton: requireElement(document, 'login-button', 'shell element'),
     loginStatus: requireElement(document, 'login-status', 'shell element'),
+    passwordInput: requireElement(document, 'password', 'shell element'),
+    registerForm: requireElement(document, 'register-form', 'shell element'),
+    registerButton: requireElement(document, 'register-button', 'shell element'),
+    registerStatus: requireElement(document, 'register-status', 'shell element'),
+    registerNameInput: requireElement(document, 'register-name', 'shell element'),
+    registerEmailInput: requireElement(document, 'register-email', 'shell element'),
+    registerPasswordInput: requireElement(document, 'register-password', 'shell element'),
+    registerConfirmInput: requireElement(document, 'register-confirm', 'shell element'),
     appStatus: requireElement(document, 'app-status', 'shell element'),
     retryStatus: requireElement(document, 'retry-status', 'shell element'),
     emailInput: requireElement(document, 'email', 'shell element'),
@@ -41,6 +55,9 @@ export function createShellView(document, { onLogin, i18n }) {
   let sessionModalActive = false;
   let drawerRestoreFocus = null;
   let lastRetrySnapshot = null;
+  let sessionMode = 'login';
+  let publicModeDismissed = false;
+  let previousSessionValue = null;
 
   function setSessionModal(active) {
     sessionModalActive = active;
@@ -85,11 +102,88 @@ export function createShellView(document, { onLogin, i18n }) {
 
   elements.loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const formData = new FormData(elements.loginForm);
     await onLogin({
-      email: String(formData.get('email') ?? ''),
-      password: String(formData.get('password') ?? '')
+      email: elements.emailInput.value,
+      password: elements.passwordInput.value
     });
+  });
+
+  function setSessionBusy(busy) {
+    elements.loginModeButton.disabled = busy;
+    elements.registerModeButton.disabled = busy;
+    elements.publicModeButton.disabled = busy;
+  }
+
+  function setSessionFormMode(mode) {
+    sessionMode = mode;
+    elements.loginForm.hidden = mode !== 'login';
+    elements.registerForm.hidden = mode !== 'register';
+    elements.loginModeButton.setAttribute('aria-pressed', String(mode === 'login'));
+    elements.registerModeButton.setAttribute('aria-pressed', String(mode === 'register'));
+    elements.registerStatus.textContent = '';
+    if (mode === 'register') elements.registerNameInput.focus();
+    else elements.emailInput.focus();
+  }
+
+  function dismissToPublicMode() {
+    publicModeDismissed = true;
+    elements.sessionPanel.hidden = true;
+    setSessionModal(false);
+    focusCurrentView();
+  }
+
+  elements.sessionModeGroup.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-session-mode]');
+    if (!button) return;
+    const mode = button.dataset.sessionMode;
+    if (mode === 'public') dismissToPublicMode();
+    else setSessionFormMode(mode);
+  });
+
+  function isLikelyEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  function validateRegisterForm({ name, email, password, confirmPassword }) {
+    if (name === '') return { element: elements.registerNameInput, messageKey: 'register.nameRequired' };
+    if (email === '' || !isLikelyEmail(email)) return { element: elements.registerEmailInput, messageKey: 'register.emailInvalid' };
+    if (password === '') return { element: elements.registerPasswordInput, messageKey: 'register.passwordRequired' };
+    if (password !== confirmPassword) return { element: elements.registerConfirmInput, messageKey: 'register.passwordMismatch' };
+    return null;
+  }
+
+  function clearRegisterFields() {
+    elements.registerNameInput.value = '';
+    elements.registerEmailInput.value = '';
+    elements.registerPasswordInput.value = '';
+    elements.registerConfirmInput.value = '';
+  }
+
+  elements.registerForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const name = elements.registerNameInput.value.trim();
+    const email = elements.registerEmailInput.value.trim();
+    const password = elements.registerPasswordInput.value;
+    const confirmPassword = elements.registerConfirmInput.value;
+
+    const invalid = validateRegisterForm({ name, email, password, confirmPassword });
+    if (invalid) {
+      elements.registerStatus.textContent = i18n.t(invalid.messageKey);
+      invalid.element.focus();
+      return;
+    }
+
+    elements.registerStatus.textContent = '';
+    elements.registerButton.disabled = true;
+    elements.registerButton.textContent = i18n.t('register.submitPending');
+    await onRegister({ name, email, password });
+    elements.registerButton.disabled = false;
+    elements.registerButton.textContent = i18n.t('register.submit');
+    clearRegisterFields();
+  });
+
+  elements.logoutButton.addEventListener('click', () => {
+    onLogout();
   });
 
   function render(state, {
@@ -106,6 +200,10 @@ export function createShellView(document, { onLogin, i18n }) {
     elements.moduleNextStep.textContent = i18n.t(`${prefix}.next`);
     elements.moduleStatus.textContent = i18n.t(state.session === 'authenticated' ? 'module.sessionReady' : 'module.preview');
     elements.testBadge.hidden = !state.testMode;
+    elements.sessionModeIndicator.textContent = i18n.t(
+      state.session === 'authenticated' ? 'session.jwtActiveStatus' : 'session.publicModeStatus'
+    );
+    elements.logoutButton.hidden = state.session !== 'authenticated';
 
     const isTour = route.id === 'tour';
     const isAgenda = route.id === 'agenda';
@@ -124,10 +222,25 @@ export function createShellView(document, { onLogin, i18n }) {
       else link.removeAttribute('aria-current');
     }
 
+    // A session-state transition (fresh expiry, fresh anonymous test-mode
+    // boot, a new logout) always re-opens the panel on the login tab, even
+    // if the visitor had previously dismissed it into public mode.
+    if (state.session !== previousSessionValue) {
+      publicModeDismissed = false;
+      sessionMode = 'login';
+      previousSessionValue = state.session;
+    }
+    elements.loginForm.hidden = sessionMode !== 'login';
+    elements.registerForm.hidden = sessionMode !== 'register';
+    elements.loginModeButton.setAttribute('aria-pressed', String(sessionMode === 'login'));
+    elements.registerModeButton.setAttribute('aria-pressed', String(sessionMode === 'register'));
+
     // Live match data now loads from public read endpoints, so sign-in is an
     // optional compatibility path shown only when a real session actually
-    // expires — not a gate for the ordinary anonymous state.
-    const showSessionPanel = state.session === 'expired' || (state.testMode && state.session === 'anonymous');
+    // expires — not a gate for the ordinary anonymous state. A visitor can
+    // also explicitly dismiss the panel into public mode (see dismissToPublicMode).
+    const showSessionPanel = !publicModeDismissed
+      && (state.session === 'expired' || (state.testMode && state.session === 'anonymous'));
     elements.sessionPanel.hidden = !showSessionPanel;
     setSessionModal(showSessionPanel);
     elements.sessionTitle.textContent = state.session === 'expired'
@@ -188,5 +301,16 @@ export function createShellView(document, { onLogin, i18n }) {
     render(state, { clearAnnouncement: true });
   }
 
-  return Object.freeze({ render, renderLocale, focusSession, focusCurrentView, renderRetryStatus });
+  function setRegisterMessage(message) {
+    elements.registerStatus.textContent = message;
+  }
+
+  function setSessionMode(mode) {
+    setSessionFormMode(mode);
+  }
+
+  return Object.freeze({
+    render, renderLocale, focusSession, focusCurrentView, renderRetryStatus,
+    setRegisterMessage, setSessionMode, setSessionBusy
+  });
 }

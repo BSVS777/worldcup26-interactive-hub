@@ -3,7 +3,7 @@ import test from 'node:test';
 
 import { ApiError, AuthenticationError, createApiClient } from '../js/api.js';
 import { ENDPOINTS } from '../js/config.js';
-import { createSessionStore } from '../js/session.js';
+import { SESSION_TOKEN_KEY, createSessionStore } from '../js/session.js';
 
 function jwt(payload = { exp: 4_102_444_800 }) {
   const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
@@ -255,6 +255,145 @@ test('classifies rejected credentials separately from sign-in service failures',
   );
 });
 
+test('registers successfully and never stores the register response token directly', async () => {
+  const calls = [];
+  const { client, session } = setup(async (url, options) => {
+    calls.push({ url, options });
+    return jsonResponse(200, { user: { id: 1, email: 'student@example.test' }, token: `  ${NEW_TOKEN}  ` });
+  });
+
+  const result = await client.register({ name: 'Student', email: 'student@example.test', password: 'correct horse battery staple' });
+  assert.deepEqual(result, { user: { id: 1, email: 'student@example.test' }, token: NEW_TOKEN });
+  assert.equal(session.getToken(), TEST_TOKEN, 'register() must never call session.setToken itself');
+  assert.equal(calls[0].url, 'https://api.example.test/auth/register');
+  assert.equal(calls[0].options.method, 'POST');
+  assert.deepEqual(JSON.parse(calls[0].options.body), {
+    name: 'Student', email: 'student@example.test', password: 'correct horse battery staple'
+  });
+  assert.equal(new Headers(calls[0].options.headers).has('authorization'), false);
+});
+
+test('rejects empty registration fields with a TypeError before any request', async () => {
+  const { client } = setup(async () => { throw new Error('must not fetch'); });
+  await assert.rejects(client.register({ name: '', email: 'student@example.test', password: 'secret' }), TypeError);
+  await assert.rejects(client.register({ name: 'Student', email: '', password: 'secret' }), TypeError);
+  await assert.rejects(client.register({ name: 'Student', email: 'student@example.test', password: '' }), TypeError);
+});
+
+test('classifies a duplicate/invalid registration (HTTP 400) as a recoverable-false rejection, never assuming 409', async () => {
+  const { client } = setup(async () => jsonResponse(400, { error: 'User already exists' }));
+  await assert.rejects(
+    client.register({ name: 'Student', email: 'student@example.test', password: 'secret' }),
+    (error) => error instanceof ApiError && !(error instanceof AuthenticationError) && error.status === 400 && error.recoverable === false
+  );
+});
+
+test('wraps registration network failures in a typed recoverable ApiError', async () => {
+  const { client } = setup(async () => { throw new TypeError('offline'); });
+  await assert.rejects(
+    client.register({ name: 'Student', email: 'student@example.test', password: 'secret' }),
+    (error) => error instanceof ApiError && !(error instanceof AuthenticationError) && error.status === null && error.recoverable
+  );
+});
+
+test('treats a non-JSON registration response as a typed error', async () => {
+  const { client } = setup(async () => new Response('<html>nope</html>', { status: 200, headers: { 'content-type': 'text/html' } }));
+  await assert.rejects(
+    client.register({ name: 'Student', email: 'student@example.test', password: 'secret' }),
+    (error) => error instanceof ApiError && error.endpoint === 'register'
+  );
+});
+
+test('classifies a 429 registration response as recoverable', async () => {
+  const { client } = setup(async () => jsonResponse(429, { error: 'Too many requests' }));
+  await assert.rejects(
+    client.register({ name: 'Student', email: 'student@example.test', password: 'secret' }),
+    (error) => error instanceof ApiError && error.status === 429 && error.recoverable
+  );
+});
+
+test('classifies a 500+ registration response as recoverable', async () => {
+  const { client } = setup(async () => jsonResponse(503, { error: 'Service unavailable' }));
+  await assert.rejects(
+    client.register({ name: 'Student', email: 'student@example.test', password: 'secret' }),
+    (error) => error instanceof ApiError && error.status === 503 && error.recoverable
+  );
+});
+
+test('rejects an unexpected registration contract missing token or user even on HTTP 200', async () => {
+  const missingToken = setup(async () => jsonResponse(200, { user: { id: 1 } })).client;
+  await assert.rejects(
+    missingToken.register({ name: 'Student', email: 'student@example.test', password: 'secret' }),
+    (error) => error instanceof ApiError && error.endpoint === 'register'
+  );
+
+  const missingUser = setup(async () => jsonResponse(200, { token: NEW_TOKEN })).client;
+  await assert.rejects(
+    missingUser.register({ name: 'Student', email: 'student@example.test', password: 'secret' }),
+    (error) => error instanceof ApiError && error.endpoint === 'register'
+  );
+});
+
+test('register() then authenticate() stores the token authenticate issued, not the one register returned — proving the session JWT is never fabricated from the register response', async () => {
+  const sessionStorage = new MemoryStorage();
+  const session = createSessionStore(sessionStorage);
+  const registerToken = jwt({ exp: 4_102_444_800, jti: 'register-response-token' });
+  const client = createApiClient({
+    baseUrl: 'https://api.example.test',
+    fetchImpl: async (url) => (
+      url.endsWith('/auth/register')
+        ? jsonResponse(200, { user: { id: 1 }, token: registerToken })
+        : jsonResponse(200, { user: { id: 1 }, token: NEW_TOKEN })
+    ),
+    session,
+    cacheStorage: new MemoryStorage()
+  });
+
+  await client.register({ name: 'Student', email: 'student@example.test', password: 'correct horse battery staple' });
+  assert.equal(session.getToken(), null, 'no session may exist after register() alone');
+
+  await client.authenticate({ email: 'student@example.test', password: 'correct horse battery staple' });
+  assert.equal(session.getToken(), NEW_TOKEN, 'the session must hold the authenticate-issued token');
+  assert.notEqual(session.getToken(), registerToken);
+  assert.equal(sessionStorage.getItem(SESSION_TOKEN_KEY), null, 'the JWT must never touch persisted storage');
+
+  const seenAuthorization = [];
+  const dataClient = createApiClient({
+    baseUrl: 'https://api.example.test',
+    fetchImpl: async (url, options) => {
+      seenAuthorization.push(new Headers(options.headers).get('authorization'));
+      return jsonResponse(200, { games: [] });
+    },
+    session,
+    cacheStorage: new MemoryStorage()
+  });
+  await dataClient.apiRequest('games');
+  assert.deepEqual(seenAuthorization, [`Bearer ${NEW_TOKEN}`]);
+});
+
+test('a successful register followed by a failed automatic login creates no session at all', async () => {
+  const sessionStorage = new MemoryStorage();
+  const session = createSessionStore(sessionStorage);
+  const client = createApiClient({
+    baseUrl: 'https://api.example.test',
+    fetchImpl: async (url) => (
+      url.endsWith('/auth/register')
+        ? jsonResponse(200, { user: { id: 1 }, token: NEW_TOKEN })
+        : jsonResponse(400, { error: 'Invalid password' })
+    ),
+    session,
+    cacheStorage: new MemoryStorage()
+  });
+
+  await client.register({ name: 'Student', email: 'student@example.test', password: 'correct horse battery staple' });
+  await assert.rejects(
+    client.authenticate({ email: 'student@example.test', password: 'correct horse battery staple' }),
+    ApiError
+  );
+  assert.equal(session.getToken(), null, 'a failed automatic login must never leave a session behind');
+  assert.equal(sessionStorage.getItem(SESSION_TOKEN_KEY), null);
+});
+
 test('does not replace usable network data when cache persistence fails', async () => {
   const cacheStorage = {
     getItem() { return null; },
@@ -428,6 +567,45 @@ test('does not cache data when cancellation occurs while reading the response bo
     (error) => error === reason
   );
   assert.equal(cacheStorage.getItem('wc26:cache:v1:games'), null);
+});
+
+test('propagates a custom registration abort reason instead of wrapping it as a network error', async () => {
+  const reason = new Error('registration superseded');
+  const controller = new AbortController();
+  const { client } = setup(async () => {
+    controller.abort(reason);
+    throw new TypeError('fetch masked the abort');
+  });
+
+  await assert.rejects(
+    client.register(
+      { name: 'Student', email: 'student@example.test', password: 'password' },
+      { signal: controller.signal }
+    ),
+    (error) => error === reason
+  );
+});
+
+test('does not resolve a registration cancelled while reading the response body', async () => {
+  const reason = new Error('registration body cancelled');
+  const controller = new AbortController();
+  const { client } = setup(async () => ({
+    ok: true,
+    status: 200,
+    headers: new Headers({ 'content-type': 'application/json' }),
+    json: async () => {
+      controller.abort(reason);
+      return { user: { id: 1 }, token: 'jwt-must-not-be-returned' };
+    }
+  }));
+
+  await assert.rejects(
+    client.register(
+      { name: 'Student', email: 'student@example.test', password: 'password' },
+      { signal: controller.signal }
+    ),
+    (error) => error === reason
+  );
 });
 
 test('does not store a token when cancellation occurs while reading the authentication body', async () => {

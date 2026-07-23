@@ -50,6 +50,31 @@ test('the real api client authenticates against the live deterministic server an
   });
 });
 
+test('register() against the live deterministic server never stores a session; authenticate() afterward does, and every data endpoint then carries that real Bearer token', async () => {
+  await withServer(async (baseUrl) => {
+    const client = createApiClient({
+      baseUrl,
+      fetchImpl: fetch,
+      session: createSessionStore(new MemoryStorage()),
+      cacheStorage: new MemoryStorage()
+    });
+
+    const registered = await client.register({ name: 'Student', email: 'student@example.test', password: 'secret' });
+    assert.equal(typeof registered.token, 'string');
+    assert.ok(registered.token.length > 0);
+
+    await assert.rejects(client.apiRequest('games'), (error) => error instanceof AuthenticationError && error.status === 401);
+
+    const { token } = await client.authenticate({ email: 'student@example.test', password: 'secret' });
+    assert.equal(token, TEST_TOKEN, 'the session must hold the exact token the live server issued to authenticate(), not register()');
+
+    for (const endpoint of Object.keys(ENDPOINTS)) {
+      const result = await client.apiRequest(endpoint);
+      assert.equal(result.source, 'network', `${endpoint} must round-trip over the real network, not a fallback`);
+    }
+  });
+});
+
 test('the real api client is rejected by the live deterministic server when no Bearer token exists', async () => {
   await withServer(async (baseUrl) => {
     const client = createApiClient({

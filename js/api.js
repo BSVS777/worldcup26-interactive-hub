@@ -1,4 +1,4 @@
-import { ENDPOINTS, AUTH_ENDPOINT } from './config.js';
+import { ENDPOINTS, AUTH_ENDPOINT, REGISTER_ENDPOINT } from './config.js';
 import { readEndpointCache, writeEndpointCache } from './cache.js';
 import { normalizePayload } from './normalizers.js';
 import { createSessionStore } from './session.js';
@@ -276,5 +276,68 @@ export function createApiClient({
     return { user: payload.user ?? null, token };
   }
 
-  return Object.freeze({ apiRequest, authenticate });
+  // Registration never stores a token itself — the preferred flow is
+  // register() -> authenticate() -> session.setToken(), so the session's JWT
+  // is always provably issued by /auth/authenticate, even though the real
+  // API's /auth/register response also happens to include a usable token.
+  async function register({ name, email, password }, { signal } = {}) {
+    if (
+      typeof name !== 'string' || name.trim() === '' ||
+      typeof email !== 'string' || email.trim() === '' ||
+      typeof password !== 'string' || password === ''
+    ) {
+      throw new TypeError('Name, email and password are required');
+    }
+    if (signal?.aborted) throw abortReason(signal);
+    let response;
+    try {
+      response = await fetchImpl(joinUrl(baseUrl, REGISTER_ENDPOINT.path), {
+        method: REGISTER_ENDPOINT.method,
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
+        signal,
+        credentials: 'omit',
+        cache: 'no-store',
+        referrerPolicy: 'no-referrer'
+      });
+    } catch (cause) {
+      if (signal?.aborted) throw abortReason(signal);
+      if (cause?.name === 'AbortError') throw cause;
+      throw new ApiError('Registration network request failed', {
+        endpoint: 'register', recoverable: true, cause
+      });
+    }
+    if (signal?.aborted) throw abortReason(signal);
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new AuthenticationError(`Registration failed with status ${response.status}`, { status: response.status });
+      }
+      // The real API was never observed returning 409 for a duplicate email —
+      // it answers with a generic 400, so that status is classified as "the
+      // server rejected the registration" rather than assumed to mean one
+      // specific cause.
+      if (response.status === 400) {
+        throw new ApiError('Registration was rejected: this email may already be registered or the data was rejected', {
+          status: response.status, endpoint: 'register', recoverable: false
+        });
+      }
+      throw new ApiError(`Registration service failed with status ${response.status}`, {
+        status: response.status,
+        endpoint: 'register',
+        recoverable: response.status === 429 || response.status >= 500
+      });
+    }
+    if (!hasJsonContentType(response)) {
+      throw new ApiError('Registration response was not JSON', { status: response.status, endpoint: 'register', recoverable: true });
+    }
+    const payload = await readJson(response, 'register', signal);
+    if (typeof payload?.token !== 'string' || payload.token.trim() === '' || !payload?.user || typeof payload.user !== 'object') {
+      throw new ApiError('The registration response does not match the expected contract', {
+        status: response.status, endpoint: 'register', recoverable: true
+      });
+    }
+    return { user: payload.user, token: payload.token.trim() };
+  }
+
+  return Object.freeze({ apiRequest, authenticate, register });
 }

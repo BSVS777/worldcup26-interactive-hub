@@ -66,6 +66,20 @@ Procedimientos exactos para reproducir en vivo, frente al profesor, cada comport
 
 ---
 
+## Registro real, login automático, Bearer y logout (JWT real contra worldcup26.ir)
+
+Esta sección documenta cómo reproducir en vivo, con DevTools, que el JWT que usa la app viene realmente de `POST /auth/register` + `POST /auth/authenticate` contra `https://worldcup26.ir` — no de un token fabricado localmente. La verificación programática equivalente (sin navegador) está en `tools/live-api-auth-probe.mjs` (`npm run test:live-api:auth`); ver resultado real en `README.md`.
+
+**Registro (Network, filtro `register`):** en el panel de sesión elegir "Crear una cuenta de prueba", completar Nombre/Correo/Contraseña/Confirmación con un correo nuevo y enviar. En Network, filtrar por `register`: la request es `POST /auth/register`, Status `200`, Response Headers `content-type: application/json`. El body de Request muestra `{"name":...,"email":...,"password":...}` — no capturar ni mostrar la contraseña en la demo. El body de Response muestra `{"user":{...},"token":"eyJ..."}`; no expandir/copiar el valor completo de `token` durante la demo, basta con confirmar que el campo existe y empieza con `eyJ`.
+
+**Login automático (Network, filtro `authenticate`):** inmediatamente después del 200 de `register`, la app dispara sola una segunda request `POST /auth/authenticate` con el mismo correo/contraseña — visible como la siguiente entrada al filtrar por `authenticate`. Status `200`, Response con `{"user":{...},"token":"eyJ..."}`. Este es el token que realmente queda en memoria (`session.setToken`), no el de `register`.
+
+**Petición autenticada (Network, filtro `games`):** tras el login automático, seleccionar cualquier request a `/get/games` y abrir la pestaña Headers → Request Headers → `Authorization: Bearer eyJ...` real, con tres segmentos separados por puntos. Confirma que el cliente adjunta el Bearer de sesión en cada llamada a un endpoint de datos.
+
+**Logout (Network + UI):** hacer clic en "Cerrar sesión" (visible solo con sesión activa). Verificar en UI que el indicador vuelve a "Modo público · Datos consultados sin sesión JWT". Verificar en Network que la siguiente request a `/get/games` (o cualquier otro endpoint público) ya NO tiene header `Authorization` y sigue respondiendo `200`. Verificar que no aparece ninguna nueva request `type: document` (sin `reload()`).
+
+**Persistencia (Application → Local/Session Storage):** con sesión activa, abrir Application → Local Storage y Session Storage para el origen de la app: ninguna clave contiene el JWT completo (solo pueden existir claves de caché de datos `wc26:cache:v1:*`, favorito de equipo y preferencias de accesibilidad — nunca el token). Recargar la página manualmente (F5): el indicador vuelve a "Modo público" y la sesión desapareció, confirmando que el JWT vivía solo en memoria.
+
 ## Tabla resumen
 
 | Prueba | Ruta | Acción | Network esperado | Console esperado | UI esperada |

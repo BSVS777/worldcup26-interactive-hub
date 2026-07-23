@@ -2,6 +2,7 @@ import { createApiClient } from './api.js';
 import { createRetryStatusController } from './retry-status.js';
 import { resolveApiBaseUrl } from './config.js';
 import { describeLoginError } from './login-feedback.js';
+import { createLoginController } from './login-controller.js';
 import { createInitialViewState, normalizeRoute, reduceViewState } from './router.js';
 import { applyAccessibilityPreferences, readAccessibilityPreferences } from './accessibility.js';
 import { createAccessibilityPanel } from './accessibility-panel.js';
@@ -25,7 +26,6 @@ let state = createInitialViewState({
 });
 let view;
 let motion;
-let lastLoginError = null;
 
 function update(action, options) {
   state = reduceViewState(state, action);
@@ -73,30 +73,31 @@ function loadActiveModule() {
   if (state.route === 'group-matrix') matrixView.ensureLoaded();
 }
 
-async function handleLogin(credentials) {
-  lastLoginError = null;
-  update({ type: 'LOGIN_STARTED' });
-  try {
-    await api.authenticate(credentials);
-    resetModuleViews();
-    update({ type: 'LOGIN_SUCCEEDED' }, { announceMessage: i18n.t('session.signedInLive') });
-    view.focusCurrentView();
-    loadActiveModule();
-  } catch (error) {
-    lastLoginError = error;
-    update({ type: 'LOGIN_FAILED', message: describeLoginError(error, i18n) });
-  }
+const loginController = createLoginController({
+  api, i18n, update, resetModuleViews, loadActiveModule, getView: () => view
+});
+
+function handleLogout() {
+  session.clear();
+  resetModuleViews();
+  update({ type: 'LOGOUT' }, { announceMessage: i18n.t('session.loggedOut') });
 }
 
-view = createShellView(document, { onLogin: handleLogin, i18n });
+view = createShellView(document, {
+  onLogin: loginController.handleLogin,
+  onRegister: loginController.handleRegister,
+  onLogout: handleLogout,
+  i18n
+});
 motion = createMotionSystem(document, window);
 createAccessibilityPanel(document, window, { storage: window.localStorage });
 bindLanguageSelector(document, i18n);
 i18n.subscribe(() => {
+  const lastLoginError = loginController.getLastLoginError();
   if (lastLoginError && state.loginStatus === 'error') {
     state = reduceViewState(state, {
       type: 'LOGIN_FAILED',
-      message: describeLoginError(lastLoginError, i18n)
+      message: loginController.isAutoLoginFailedAfterRegister() ? i18n.t('register.autoLoginFailed') : describeLoginError(lastLoginError, i18n)
     });
   }
   view.renderLocale(state);

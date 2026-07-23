@@ -264,6 +264,56 @@ select {
   text-transform: uppercase;
 }
 
+.session-mode-indicator {
+  padding: 0.55rem 0.75rem;
+  color: rgb(247 242 223 / 76%);
+  background: rgb(247 242 223 / 8%);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font: 700 0.62rem/1 var(--utility);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.logout-button {
+  padding: 0.55rem 0.75rem;
+  color: var(--night);
+  background: var(--gold);
+  border: 1px solid var(--chalk);
+  border-radius: 999px;
+  cursor: pointer;
+  font: 700 0.62rem/1 var(--utility);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.session-mode {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.session-mode__button {
+  padding: 0.5rem 0.85rem;
+  color: var(--chalk);
+  background: rgb(247 242 223 / 8%);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  font: 700 0.66rem/1 var(--utility);
+  letter-spacing: 0.05em;
+}
+
+.session-mode__button[aria-pressed="true"] {
+  color: var(--night);
+  background: var(--aqua);
+  border-color: var(--chalk);
+}
+
+.register-status:not(:empty) {
+  color: var(--gold);
+}
+
 .route-nav {
   position: sticky;
   top: 6.8rem;

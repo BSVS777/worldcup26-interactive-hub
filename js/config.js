@@ -9,6 +9,7 @@ export const ENDPOINTS = Object.freeze({
 });
 
 export const AUTH_ENDPOINT = Object.freeze({ path: '/auth/authenticate', method: 'POST', cache: false });
+export const REGISTER_ENDPOINT = Object.freeze({ path: '/auth/register', method: 'POST', cache: false });
 
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 

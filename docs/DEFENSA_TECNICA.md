@@ -318,6 +318,94 @@ Formato: pregunta → respuesta 15s → respuesta 30s → archivo/función → p
     Prueba: N/A — es una decisión de alcance, no un comportamiento a testear.
     Error común: que te agarren "inventando" que sí existe algo que no existe — es mejor declarar el límite con criterio que fingir cobertura total.
 
+## 4b. Preguntas sobre registro real y JWT (guion de defensa del gap cerrado)
+
+41. **¿De dónde proviene el JWT?**
+    15s: De la API real `https://worldcup26.ir`, emitido por `POST /auth/authenticate` tras un registro real contra `POST /auth/register`.
+    30s: El flujo es siempre `js/api.js:register()` → `js/api.js:authenticate()` → `session.setToken()`. `register()` nunca llama `session.setToken` — solo prueba que la cuenta existe; el token que termina en memoria es el que devuelve `authenticate()`, verificado en vivo el 2026-07-23 con `npm run test:live-api:auth` contra la API real.
+    Archivo: `js/api.js:register`, `js/api.js:authenticate`, `tools/live-api-auth-probe.mjs`.
+    Prueba: `test/api.test.mjs` → "register() then authenticate() stores the token authenticate issued, not the one register returned".
+    Error común: decir que el token de `register()` se guarda directamente — el contrato explícito es que NO se guarda ahí.
+
+42. **¿Cómo se demuestra que no fue fabricado?**
+    15s: Nunca se usa `btoa()` ni una cadena hardcodeada como token; siempre viene de una respuesta HTTP real y se valida contra el JWT que el servidor realmente firmó.
+    30s: `test/static-contract.test.mjs` → "registration never fabricates a session locally" escanea el runtime y falla si aparece `btoa(` o si `register()` llama `session.setToken` directamente. Además `session.setToken()` en `js/session.js` rechaza cualquier cadena que no sea un JWT válido de 3 segmentos con `exp` futuro — no acepta un string arbitrario.
+    Archivo: `test/static-contract.test.mjs`, `js/session.js:setToken`.
+    Prueba: la misma, más `test/session.test.mjs` → "rejects malformed JWTs".
+    Error común: confundir "no lo generamos localmente" con "no lo validamos" — se hacen ambas cosas.
+
+43. **¿Por qué se guarda en memoria?**
+    15s: Para reducir el impacto de un XSS — ver pregunta 12 de la sección 4.
+    30s: Sin cambios respecto al comportamiento pre-existente: `createSessionStore` en `js/session.js` guarda el token en una variable de closure, nunca en `localStorage`/`sessionStorage`/cookies. El registro no introduce ninguna vía alterna de persistencia.
+    Archivo: `js/session.js:createSessionStore`.
+    Prueba: `test/session.test.mjs`; `test/api.test.mjs` → las pruebas de registro confirman `sessionStorage.getItem(SESSION_TOKEN_KEY)` sigue siendo `null` después de registrar y autenticar.
+    Error común: pensar que el flujo de registro necesita su propio mecanismo de storage — reutiliza exactamente el mismo `session.js`.
+
+44. **¿Por qué no localStorage?**
+    15s: Mismo motivo que el login manual — ver pregunta 12 de la sección 4. El registro no cambia esa decisión.
+    30s: Si `register()` hubiera guardado su propio token en `localStorage` "por si el login automático fallaba", eso habría sido exactamente el tipo de sesión fabricada/prematura que la consigna prohíbe — por eso el contrato es `register() -> authenticate() -> session.setToken()` y nada más.
+    Archivo: `js/api.js:register` (ausencia deliberada de cualquier `setToken`/`setItem`).
+    Prueba: `test/static-contract.test.mjs` → "registration never fabricates a session locally".
+    Error común: justificar esto solo por la regla del laboratorio sin explicar el riesgo real (sesión válida sin verificar credenciales).
+
+45. **¿Qué pasa al refrescar?**
+    15s: Igual que con login manual — el JWT vive solo en memoria, así que recargar borra la sesión y hay que autenticarse de nuevo (con login o con un nuevo registro si aplica).
+    30s: No hay ninguna ruta de "recordar sesión tras registro" — inmediatamente después de un registro + login exitosos, si el usuario recarga la página pierde la sesión igual que cualquier otra sesión de este proyecto, por diseño.
+    Archivo: `js/session.js` (sin persistencia), `js/app.js` (`createAuthStore()` arranca sin token en cada carga).
+    Prueba: `test/session.test.mjs` → "a reload starts anonymous because JWT is memory-only".
+    Error común: asumir que el registro "recuerda" al usuario de alguna forma — no lo hace, es una acción puntual.
+
+46. **¿Por qué funciona sin login?**
+    15s: Porque los cuatro endpoints públicos de lectura (`stadiums`/`games`/`teams`/`groups`) no exigen Bearer en el servidor real — verificado con `npm run test:live-api`.
+    30s: El registro/login siguen siendo una vía de compatibilidad académica para demostrar el contrato JWT completo, no un requisito para leer datos. Esto es exactamente lo que dice el indicador "Modo público · Datos consultados sin sesión JWT" en la interfaz.
+    Archivo: `js/config.js:ENDPOINTS`, `js/api.js:apiRequest` (agrega Bearer solo si `session.getToken()` no es null).
+    Prueba: `npm run test:live-api`; `test/api.test.mjs` → "fetches public data for a client that has never had a session".
+    Error común: decir que el modo público es "un bug" o "una degradación" — es un estado explícito y correcto de la app.
+
+47. **¿Por qué Bearer si los endpoints son públicos?**
+    15s: Porque el laboratorio exige demostrar un contrato JWT real de extremo a extremo, y porque el servidor SÍ acepta y usa el Bearer cuando existe (aunque no lo exija).
+    30s: `apiRequest` en `js/api.js` sigue agregando `Authorization: Bearer <token>` cada vez que hay una sesión válida — visible en DevTools → Network → Headers en cualquier request a `/get/*` mientras hay sesión activa (ver `docs/EVIDENCIAS_DEFENSA.md`). No enviarlo sería ocultar evidencia del contrato que sí se implementó.
+    Archivo: `js/api.js:apiRequest`.
+    Prueba: `test/api.test.mjs` → "adds Bearer JWT to every public data endpoint request".
+    Error común: pensar que hay que elegir entre "modo público" y "Bearer" — conviven: Bearer se manda cuando hay sesión, se omite cuando no la hay.
+
+48. **¿Diferencia entre servidor real y servidor de pruebas?**
+    15s: El servidor real (`https://worldcup26.ir`) es la API de producción, verificada en vivo el 2026-07-23. El servidor de pruebas (`tools/test-server.mjs`) es HTTP real mismo, pero local y determinista, con datos y tokens de fixture que nunca se presentan como reales.
+    30s: Ambos implementan el mismo contrato (`/auth/register`, `/auth/authenticate`, `/get/*` con Bearer), lo que permite probar la app contra el servidor local en CI sin depender de la red, y confirmar el mismo comportamiento contra la API real con `tools/live-api-auth-probe.mjs`. El token del servidor de pruebas (`TEST_TOKEN` en `tools/test-server.mjs`) es una fixture claramente de prueba, nunca aparece en documentación como si viniera de producción.
+    Archivo: `tools/test-server.mjs`, `tools/live-api-auth-probe.mjs`.
+    Prueba: `test/auth-contract.test.mjs` (servidor de pruebas real); `npm run test:live-api:auth` (API real).
+    Error común: llamar "mock" al servidor de pruebas — es HTTP real corriendo en un puerto local, no una función simulada en memoria.
+
+49. **¿Qué pasa si el registro funciona pero el login falla?**
+    15s: No se crea ninguna sesión. La app muestra "La cuenta fue creada, pero no fue posible iniciar sesión automáticamente. Intenta ingresar manualmente." y vuelve al formulario de login (no al de registro).
+    30s: `js/login-controller.js:handleRegister` llama `handleLogin()` (el mismo código que usa el login manual) tras un registro exitoso; si `handleLogin` devuelve `false`, `handleRegister` sobrescribe el mensaje genérico con uno específico, cambia el panel a modo login (`view.setSessionMode('login')`) y nunca toca `session.setToken`. Ambas funciones viven fuera de `js/app.js` (que solo instancia el controlador) precisamente para poder probarlas con `node:test` sin un DOM real. El caso está probado explícitamente porque es la prueba "no fake session" más importante del cambio.
+    Archivo: `js/login-controller.js:handleRegister`.
+    Prueba: `test/api.test.mjs` → "a successful register followed by a failed automatic login creates no session at all".
+    Error común: asumir que como el registro "funcionó" debería haber alguna sesión parcial — la consigna es explícita: cero sesión sin login exitoso.
+
+50. **¿Token ya expirado?**
+    15s: `session.setToken()` rechaza cualquier JWT cuyo `exp` ya pasó — nunca llega a guardarse, sin importar si vino de un login manual o de uno automático tras registro.
+    30s: `isUsableJwt()` en `js/session.js` decodifica el payload y compara `exp` contra `now()` antes de aceptar el token; esto aplica igual al flujo de registro porque reutiliza exactamente `authenticate()` → `session.setToken()`, sin ningún atajo.
+    Archivo: `js/session.js:isUsableJwt`, `setToken`.
+    Prueba: `test/session.test.mjs` → "rejects malformed JWTs and ignores malformed persisted values"; `npm run test:live-api:auth` valida `exp` en el futuro contra el JWT real.
+    Error común: pensar que el flujo de registro necesita su propia validación de expiración — no, es la misma de siempre.
+
+51. **¿Dos peticiones con 401 simultáneo?**
+    15s: Sin cambios respecto al comportamiento existente — ver pregunta 28 de la sección 4 (`clearIfToken` compara contra el token exacto que causó el 401).
+    30s: El registro no introduce una segunda fuente de verdad de sesión, así que la deduplicación de expiración (`notifySessionExpired`) y el guard `clearIfToken(expectedToken)` siguen siendo el único mecanismo, sin duplicarse para la ruta de registro.
+    Archivo: `js/api.js:clearIfToken`, `notifySessionExpired`.
+    Prueba: `test/api.test.mjs` → "deduplicates concurrent expiration callbacks for the same token" (sin cambios, sigue pasando).
+    Error común: pensar que hace falta lógica nueva para esto — el registro entra al mismo `session`, no crea un segundo canal.
+
+52. **¿Cómo se demuestra que logout no recarga?**
+    15s: `handleLogout()` nunca llama `location.reload()`/`location.href`; solo limpia el token en memoria, resetea las vistas y actualiza el estado — visible en Network porque no aparece ninguna nueva request `type: document`.
+    30s: `test/static-contract.test.mjs` escanea todo el runtime (incluido el código nuevo de logout) y falla si aparece `location.reload(` o una asignación de navegación; en DevTools, la evidencia manual es la ausencia de una nueva entrada `document` en Network justo después de hacer clic en "Cerrar sesión" (ver `docs/EVIDENCIAS_DEFENSA.md`).
+    Archivo: `js/app.js:handleLogout`, `test/static-contract.test.mjs`.
+
+    Nota: `handleLogin`/`handleRegister` sí viven en `js/login-controller.js` (ver pregunta 49); `handleLogout` es lo único de este trío que se quedó en `js/app.js` porque no necesitaba el guard de generación.
+    Prueba: la misma, más inspección manual de Network descrita en `docs/EVIDENCIAS_DEFENSA.md`.
+    Error común: no verificar Network y solo confiar en que "la URL no cambió" — un `reload()` no cambia la URL pero sí genera una nueva request de documento.
+
 ## 5. Defensa por archivos
 
 - **`js/api.js`** — Responsabilidad: único cliente HTTP, clasifica y reintenta errores, agrega Bearer, cachea. Entrada: `endpointKey` + opciones. Salida: `{data, source, stale, cachedAt}` o una excepción tipada (`ApiError`/`AuthenticationError`). Decisión técnica clave: `onRetryEvent` centraliza la notificación global sin que cada vista deba pasar su propio `onRetry`. Falla que controla: 401/429/500/red/JSON inválido. Prueba: `test/api.test.mjs`.
