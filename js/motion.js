@@ -55,6 +55,7 @@ export function createMotionSystem(document, window) {
   const transition = document.getElementById('pitch-transition');
   const bars = transition?.querySelector('.pitch-transition__bars');
   const logo = document.getElementById('pitch-transition-logo');
+  const logoFrame = logo?.querySelector('.pitch-transition__logo-frame');
   const hero = document.querySelector('.hero');
   const stage = document.querySelector('.module-stage');
   let lastRoute = '';
@@ -85,7 +86,7 @@ export function createMotionSystem(document, window) {
     window.clearInterval(logoTimer);
     window.clearTimeout(logoFadeTimer);
     let frame = 0;
-    logo.src = LOGO_FRAMES[0];
+    logoFrame.src = LOGO_FRAMES[0];
     logo.classList.add('is-active');
     logoTimer = window.setInterval(() => {
       frame += 1;
@@ -93,7 +94,7 @@ export function createMotionSystem(document, window) {
         window.clearInterval(logoTimer);
         return;
       }
-      logo.src = LOGO_FRAMES[frame];
+      logoFrame.src = LOGO_FRAMES[frame];
     }, LOGO_FRAME_MS);
     const spinDuration = LOGO_FRAMES.length * LOGO_FRAME_MS;
     logoFadeTimer = window.setTimeout(() => logo.classList.remove('is-active'), spinDuration);
